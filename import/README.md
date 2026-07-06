@@ -39,6 +39,17 @@ Outputs land in `import/output/` (git-ignored) and **never touch `../data.js` di
 Requests are throttled (~1/sec per host) and cached on disk (`.cache/`), so reruns are fast and
 polite. `node run.js` after a full run costs almost nothing.
 
+### Rate limits & resuming
+
+Jolpica (F1) throttles unauthenticated use to roughly **500 requests/hour** with no
+`Retry-After` header. The F1 collector is built to stay well under that — it makes about **one
+request per season (~77 total)**, not per driver — so a normal run won't hit the wall. If it
+ever does (e.g. you ran it several times in one hour), the run **does not crash**: a per-host
+circuit breaker trips, the run finishes with whatever it has, and it prints
+`... rerun later to finish`. Because successful fetches are cached, **just run `node run.js`
+again** once the hour resets and it resumes where it left off. The same graceful behavior
+applies to the Wikipedia/Wikidata calls for the other series.
+
 ## What the pipeline gets reliably vs. what needs curation
 
 **Reliable, automatic:** the roster (who ran a full season each year), nationality → continent,
