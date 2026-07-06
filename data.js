@@ -1,5 +1,5 @@
 /* ============================================================
-   MOTORDLE — Driver database
+   RACEDLE — Driver database
    ------------------------------------------------------------
    INCLUSION RULE: drivers who completed at least one full season
    (or were era-defining multi-season regulars) in one of:

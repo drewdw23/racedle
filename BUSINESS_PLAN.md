@@ -1,4 +1,4 @@
-# Motordle 🏁 — Business & Development Plan
+# Racedle 🏁 — Business & Development Plan
 
 *A daily "guess the motorsports driver" game in the mold of Wordle/Loldle. Version 1.0 of this plan — July 5, 2026.*
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive summary
 
-**Motordle** is a free, browser-based daily guessing game for motorsports fans. Each day, every player worldwide gets the same mystery driver drawn from F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA, WEC, WRC, and MotoGP. Players guess driver names; each guess reveals color-coded feedback across seven categories (nationality, primary series, current/last team, championships, race wins band, active/retired, debut decade) until the driver is found. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
+**Racedle** is a free, browser-based daily guessing game for motorsports fans. Each day, every player worldwide gets the same mystery driver drawn from F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA, WEC, WRC, and MotoGP. Players guess driver names; each guess reveals color-coded feedback across seven categories (nationality, primary series, current/last team, championships, race wins band, active/retired, debut decade) until the driver is found. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. Motorsports is an underserved niche with a large, passionate, daily-engaged audience (F1 alone averages 70M+ viewers per race weekend) and a strong meme/share culture on Reddit, X, and TikTok.
 
@@ -29,7 +29,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 - Monetized with display ads; costs stayed near zero, so even modest RPMs were profitable.
 - Lesson 1: pick a fandom that already argues about trivia daily. Motorsports qualifies.
 - Lesson 2: ship Classic mode first, then add modes to multiply engagement (see roadmap).
-- Lesson 3: the daily reset time becomes a community ritual — publicize it (Motordle: 00:00 UTC).
+- Lesson 3: the daily reset time becomes a community ritual — publicize it (Racedle: 00:00 UTC).
 
 ### Competitive landscape
 - Generic clone directories (wordle-clone lists) contain few or no polished motorsports entries.
@@ -78,7 +78,7 @@ Deliberately **no** React/Vue/build pipeline for v1:
 
 ### Code architecture
 ```
-motordle/
+racedle/
 ├── index.html        # page shell, modals, ad slots (AdSense-ready)
 ├── styles.css        # theme; CSS variables for palette
 ├── data.js           # driver database — single source of truth
@@ -104,7 +104,7 @@ motordle/
 
 ### Primary: Google AdSense display ads
 Setup sequence (accounts can't be created programmatically — owner actions):
-1. **Buy a custom domain** (e.g., `motordle.com` / `.io` / `.gg`, ~$12/yr). AdSense approval on a bare `*.github.io` subdomain is unreliable; a custom domain also protects the brand and makes the site portable. GitHub Pages supports custom domains free (repo Settings → Pages → Custom domain + DNS CNAME).
+1. **Buy a custom domain** (e.g., `racedle.com` / `.io` / `.gg`, ~$12/yr). AdSense approval on a bare `*.github.io` subdomain is unreliable; a custom domain also protects the brand and makes the site portable. GitHub Pages supports custom domains free (repo Settings → Pages → Custom domain + DNS CNAME).
 2. Apply at [adsense.google.com](https://adsense.google.com) with the Google account that should receive payouts. Requirements already satisfied by v1: original content, privacy policy page, navigable site. Approval typically takes days to a few weeks.
 3. On approval, paste the AdSense `<script>` into `index.html` (the tag is already there, commented, with instructions) and replace the two placeholder `.ad-slot` divs with ad units. Recommended: one 728×90/responsive banner below the header, one below the game. **Never** interstitials or ads inside the game board — session length is the asset; don't poison it.
 4. Configure Google's **CMP (consent management)** in AdSense settings for EEA/UK GDPR consent — this is built into AdSense and mandatory for EU traffic.
@@ -141,13 +141,13 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 ### Phase 1 — Community seeding (weeks 2–6)
 - **Reddit is the engine.** r/formula1 (4M+), r/NASCAR, r/INDYCAR, r/motogp, r/wrc, r/F1Feedback. **Read each sub's self-promo rules first** — the safe pattern is participating genuinely, then one well-timed "I made a free daily guessing game for us" post with a screenshot of a solved grid. Loldle's initial spike came from exactly one such Reddit post.
 - Time launches to race weekends (Grand Prix Sunday = peak fan idle time) and to news moments (driver transfer announcements make "Current team" spicy).
-- Discord: motorsports fan servers and sim-racing communities; offer the daily result as a shared ritual (servers make #motordle channels — this happened organically for Wordle).
+- Discord: motorsports fan servers and sim-racing communities; offer the daily result as a shared ritual (servers make #racedle channels — this happened organically for Wordle).
 - X/Twitter: post the daily grid, tag with race-weekend hashtags (#F1, #NASCAR75, GP-specific tags).
 
 ### Phase 2 — Content & SEO flywheel (months 2–6)
 - SEO: the site already targets "f1 wordle", "nascar wordle", "motorsports guessing game" via title/meta. Add a short FAQ page for long-tail queries ("wordle for f1 fans"). Wordle-clone listicles and directories (there are dozens) accept submissions — get listed.
-- TikTok/Shorts/Reels: 15-second "can you get today's Motordle in 3?" clips; racing TikTok is enormous and starving for interactive content.
-- Streamers: pitch small motorsports YouTubers/streamers to open streams with the daily Motordle (Loldle became a stream-opening ritual for LoL streamers — the single biggest driver of its growth).
+- TikTok/Shorts/Reels: 15-second "can you get today's Racedle in 3?" clips; racing TikTok is enormous and starving for interactive content.
+- Streamers: pitch small motorsports YouTubers/streamers to open streams with the daily Racedle (Loldle became a stream-opening ritual for LoL streamers — the single biggest driver of its growth).
 
 ### Phase 3 — Retention & expansion (months 3+)
 - Ship **new modes** (see roadmap) — every mode multiplies daily sessions, Loldle-style.

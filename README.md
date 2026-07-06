@@ -1,10 +1,10 @@
-# Motordle 🏁
+# Racedle 🏁
 
 **The daily motorsports driver guessing game** — a Wordle/Loldle-style game for racing fans.
 Guess the mystery driver from **F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA,
 WEC, WRC, and MotoGP** using clues across seven categories.
 
-▶️ **Play it:** https://drewdw23.github.io/motordle/
+▶️ **Play it:** https://drewdw23.github.io/racedle/
 
 ## How to play
 
@@ -45,7 +45,7 @@ This is **v1 for user testing.** Things we want to hear about:
 - Missing drivers you'd expect (340+ full-season drivers in the database).
 - Mobile experience, bugs, confusing UI.
 
-**[→ Open an issue](https://github.com/drewdw23/motordle/issues)** with anything you find.
+**[→ Open an issue](https://github.com/drewdw23/racedle/issues)** with anything you find.
 
 ## Project docs
 
@@ -60,5 +60,5 @@ team for retired drivers). PRs welcome during testing.
 
 ---
 
-*Motordle is an unofficial fan-made game, not affiliated with Formula 1, NASCAR, IndyCar,
+*Racedle is an unofficial fan-made game, not affiliated with Formula 1, NASCAR, IndyCar,
 MotoGP, the FIA, or any team or driver. Driver data compiled from public sources.*

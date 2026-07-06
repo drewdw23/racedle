@@ -1,14 +1,14 @@
 "use strict";
 
 /* ============================================================
-   MOTORDLE — game logic
+   RACEDLE — game logic
    Pure logic (evaluation, seeding) is kept separate from DOM
    rendering so it can be unit-tested later.
    ============================================================ */
 
 /* ---------- Config ---------- */
 const EPOCH_UTC = Date.UTC(2026, 6, 5); // puzzle #1 = July 5, 2026 (UTC)
-const SITE_URL = "https://drewdw23.github.io/motordle/";
+const SITE_URL = "https://drewdw23.github.io/racedle/";
 
 const WIN_BANDS = [
   { max: 0, label: "0" },
@@ -102,8 +102,8 @@ function evaluateGuess(guess, answer) {
 }
 
 /* ---------- Persistence ---------- */
-const LS_DAILY = "motordle_daily_v1";
-const LS_STATS = "motordle_stats_v1";
+const LS_DAILY = "racedle_daily_v1";
+const LS_STATS = "racedle_stats_v1";
 
 function loadJSON(key, fallback) {
   try {
@@ -405,7 +405,7 @@ function shareResult() {
   const lines = state.guesses.map((d) =>
     evaluateGuess(d, state.answer).map((c) => emoji[c.status]).join("")
   );
-  const text = `Motordle #${state.puzzle} \u{1F3C1} ${state.guesses.length}/∞\n\n${lines.join("\n")}\n\n${SITE_URL}`;
+  const text = `Racedle #${state.puzzle} \u{1F3C1} ${state.guesses.length}/∞\n\n${lines.join("\n")}\n\n${SITE_URL}`;
 
   const done = () => {
     const btn = $("share-btn");
