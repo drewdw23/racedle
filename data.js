@@ -4,7 +4,7 @@
    INCLUSION RULE: drivers who completed at least one full season
    (or were era-defining multi-season regulars) in one of:
    Formula 1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars,
-   IMSA, WEC, WRC (+ legacy MotoGP set retained from v1).
+   IMSA, WEC, WRC.
 
    TAXONOMY:
    - Each driver appears once, under their PRIMARY series (the
@@ -23,8 +23,8 @@
    DATA VINTAGE (verify before public launch — see BUSINESS_PLAN.md):
    - Teams reflect 2025/2026 rosters; career stats generally
      through the END OF THE 2024 SEASON. 2025 outcomes are included
-     only where certain (e.g. Palou's 2025 IndyCar title, Marquez's
-     2025 MotoGP title). Win counts only ever display as bands
+     only where certain (e.g. Palou's 2025 IndyCar title).
+     Win counts only ever display as bands
      (0, 1-9, 10-24, 25-49, 50-99, 100+), which buffers staleness,
      but borderline drivers should be re-checked. Entries marked
      "verify" are the shakiest.
@@ -39,8 +39,23 @@ const SERIES = {
   IMSA: "IMSA",
   WEC: "WEC",
   WRC: "WRC",
-  MOTOGP: "MotoGP",
 };
+
+/* Playable genres. `series: null` means the full combined pool
+   ("Ultimate"). Small single-series pools are grouped — IndyCar and
+   CART/Champ Car share one lineage, and IMSA + WEC are both endurance
+   sportscar racing — so every genre has a big enough answer pool for
+   a fun daily rotation. The Series tile still distinguishes the exact
+   series within a genre. */
+const GENRES = [
+  { id: "ultimate",  label: "Ultimate",     series: null },
+  { id: "f1",        label: "Formula 1",    series: [SERIES.F1] },
+  { id: "nascar",    label: "NASCAR",       series: [SERIES.NASCAR] },
+  { id: "indycar",   label: "IndyCar",      series: [SERIES.INDYCAR, SERIES.CART] },
+  { id: "supercars", label: "V8 Supercars", series: [SERIES.SUPERCARS] },
+  { id: "endurance", label: "Endurance",    series: [SERIES.IMSA, SERIES.WEC] },
+  { id: "rally",     label: "Rally",        series: [SERIES.WRC] },
+];
 
 const FLAGS = {
   "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹", "Belgium": "🇧🇪",
@@ -410,16 +425,4 @@ const DRIVERS = [
   { name: "Takamoto Katsuta",    country: "Japan",          continent: "Asia",          series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 0,  status: "Active",  debut: 2020 },
   { name: "Adrien Fourmaux",     country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 0,  status: "Active",  debut: 2021 },
   { name: "Sami Pajari",         country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 0,  status: "Active",  debut: 2024 },
-
-  // ================= MOTOGP (legacy v1 set, premier class) =================
-  { name: "Marc Marquez",        country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Ducati Lenovo",         titles: 7, wins: 73, status: "Active",  debut: 2013 }, // incl. 2025 title
-  { name: "Valentino Rossi",     country: "Italy",          continent: "Europe",        series: SERIES.MOTOGP, team: "Petronas Yamaha SRT",   titles: 7, wins: 89, status: "Retired", debut: 2000 },
-  { name: "Francesco Bagnaia",   country: "Italy",          continent: "Europe",        series: SERIES.MOTOGP, team: "Ducati Lenovo",         titles: 2, wins: 27, status: "Active",  debut: 2019 },
-  { name: "Fabio Quartararo",    country: "France",         continent: "Europe",        series: SERIES.MOTOGP, team: "Monster Energy Yamaha", titles: 1, wins: 11, status: "Active",  debut: 2019 },
-  { name: "Jorge Martin",        country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Aprilia Racing",        titles: 1, wins: 5,  status: "Active",  debut: 2021 },
-  { name: "Casey Stoner",        country: "Australia",      continent: "Oceania",       series: SERIES.MOTOGP, team: "Repsol Honda",          titles: 2, wins: 38, status: "Retired", debut: 2006 },
-  { name: "Mick Doohan",         country: "Australia",      continent: "Oceania",       series: SERIES.MOTOGP, team: "Repsol Honda",          titles: 5, wins: 54, status: "Retired", debut: 1989 },
-  { name: "Jorge Lorenzo",       country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Repsol Honda",          titles: 3, wins: 47, status: "Retired", debut: 2008 },
-  { name: "Giacomo Agostini",    country: "Italy",          continent: "Europe",        series: SERIES.MOTOGP, team: "MV Agusta",             titles: 8, wins: 68, status: "Retired", debut: 1965 },
-  { name: "Dani Pedrosa",        country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Repsol Honda",          titles: 0, wins: 31, status: "Retired", debut: 2006 },
 ];

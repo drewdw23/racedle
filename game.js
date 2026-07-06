@@ -4,6 +4,10 @@
    RACEDLE — game logic
    Pure logic (evaluation, seeding) is kept separate from DOM
    rendering so it can be unit-tested later.
+
+   Genres: every genre (see GENRES in data.js) has its own daily
+   puzzle, free-play pool, stats, and streaks. "Ultimate" is the
+   full combined driver pool.
    ============================================================ */
 
 /* ---------- Config ---------- */
@@ -35,6 +39,15 @@ function norm(s) {
 function flagFor(country) {
   return FLAGS[country] || "";
 }
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) | 0;
+  return h >>> 0;
+}
+
+function genrePool(genre) {
+  return genre.series ? DRIVERS.filter((d) => genre.series.includes(d.series)) : DRIVERS;
+}
 
 /* Deterministic PRNG so every player gets the same daily driver. */
 function mulberry32(seed) {
@@ -52,9 +65,13 @@ function todayPuzzleNumber() {
   return Math.max(1, Math.floor((todayUTC - EPOCH_UTC) / 86400000) + 1);
 }
 
-function driverForPuzzle(n) {
-  const rand = mulberry32(Math.imul(n, 2654435761) >>> 0)();
-  return DRIVERS[Math.floor(rand * DRIVERS.length)];
+/* Each genre gets its own independent daily driver by mixing the
+   genre id into the seed. */
+function driverForPuzzle(n, genre) {
+  const pool = genrePool(genre);
+  const seed = (Math.imul(n, 2654435761) ^ hashStr(genre.id)) >>> 0;
+  const rand = mulberry32(seed)();
+  return pool[Math.floor(rand * pool.length)];
 }
 
 /*
@@ -101,9 +118,13 @@ function evaluateGuess(guess, answer) {
   return cells;
 }
 
-/* ---------- Persistence ---------- */
-const LS_DAILY = "racedle_daily_v1";
-const LS_STATS = "racedle_stats_v1";
+/* ---------- Persistence (per genre) ---------- */
+function dailyKey() {
+  return `racedle_daily_v2_${state.genre.id}`;
+}
+function statsKey() {
+  return `racedle_stats_v2_${state.genre.id}`;
+}
 
 function loadJSON(key, fallback) {
   try {
@@ -125,6 +146,7 @@ function defaultStats() {
 
 /* ---------- Game state ---------- */
 const state = {
+  genre: GENRES[0], // Ultimate by default
   mode: "daily", // "daily" | "free"
   puzzle: todayPuzzleNumber(),
   answer: null,
@@ -137,14 +159,24 @@ const $ = (id) => document.getElementById(id);
 let suggestionIndex = -1;
 
 function init() {
-  state.answer = driverForPuzzle(state.puzzle);
-  $("puzzle-number").textContent = "#" + state.puzzle;
-
-  restoreDaily();
-  renderYesterday();
+  buildGenreTabs();
   bindEvents();
+  startDaily();
   setInterval(tickCountdown, 1000);
   tickCountdown();
+}
+
+function buildGenreTabs() {
+  const wrap = $("genre-tabs");
+  GENRES.forEach((g) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "genre-tab" + (g.id === state.genre.id ? " active" : "") + (g.id === "ultimate" ? " ultimate" : "");
+    btn.textContent = g.id === "ultimate" ? "🏆 " + g.label : g.label;
+    btn.dataset.genre = g.id;
+    btn.addEventListener("click", () => switchGenre(g.id));
+    wrap.appendChild(btn);
+  });
 }
 
 function bindEvents() {
@@ -174,29 +206,51 @@ function toggleModal(id, show) {
   $(id).classList.toggle("open", show);
 }
 
-/* ---------- Modes ---------- */
+/* ---------- Genres & modes ---------- */
+function switchGenre(id) {
+  if (state.genre.id === id) return;
+  state.genre = GENRES.find((g) => g.id === id);
+  document.querySelectorAll(".genre-tab").forEach((el) =>
+    el.classList.toggle("active", el.dataset.genre === id)
+  );
+  if (state.mode === "daily") {
+    startDaily();
+  } else {
+    startFreeGame();
+  }
+}
+
 function switchMode(mode) {
   if (state.mode === mode) return;
   state.mode = mode;
   $("tab-daily").classList.toggle("active", mode === "daily");
   $("tab-free").classList.toggle("active", mode === "free");
   $("free-new").classList.toggle("hidden", mode !== "free");
-  $("daily-tagline").classList.toggle("hidden", mode !== "daily");
 
   if (mode === "daily") {
-    state.puzzle = todayPuzzleNumber();
-    state.answer = driverForPuzzle(state.puzzle);
-    state.guesses = [];
-    state.solved = false;
-    clearBoard();
-    restoreDaily();
+    startDaily();
   } else {
     startFreeGame();
   }
 }
 
+function startDaily() {
+  state.puzzle = todayPuzzleNumber();
+  state.answer = driverForPuzzle(state.puzzle, state.genre);
+  state.guesses = [];
+  state.solved = false;
+  clearBoard();
+  $("win-panel").classList.add("hidden");
+  setInputEnabled(true);
+  $("puzzle-number").textContent = "#" + state.puzzle;
+  $("puzzle-genre").textContent = state.genre.label;
+  restoreDaily();
+  renderYesterday();
+}
+
 function startFreeGame() {
-  state.answer = DRIVERS[Math.floor(Math.random() * DRIVERS.length)];
+  const pool = genrePool(state.genre);
+  state.answer = pool[Math.floor(Math.random() * pool.length)];
   state.guesses = [];
   state.solved = false;
   clearBoard();
@@ -207,7 +261,7 @@ function startFreeGame() {
 
 /* ---------- Daily persistence ---------- */
 function restoreDaily() {
-  const saved = loadJSON(LS_DAILY, null);
+  const saved = loadJSON(dailyKey(), null);
   if (saved && saved.puzzle === state.puzzle) {
     for (const name of saved.guesses) {
       const driver = DRIVERS.find((d) => d.name === name);
@@ -219,7 +273,7 @@ function restoreDaily() {
 
 function persistDaily() {
   if (state.mode !== "daily") return;
-  saveJSON(LS_DAILY, {
+  saveJSON(dailyKey(), {
     puzzle: state.puzzle,
     guesses: state.guesses.map((d) => d.name),
     solved: state.solved,
@@ -229,10 +283,11 @@ function persistDaily() {
 /* ---------- Guessing ---------- */
 function submitGuess(driver) {
   if (state.solved || state.guesses.some((d) => d.name === driver.name)) return;
+  if (!genrePool(state.genre).some((d) => d.name === driver.name)) return;
   applyGuess(driver, true);
 
   if (state.mode === "daily") {
-    const stats = loadJSON(LS_STATS, defaultStats());
+    const stats = loadJSON(statsKey(), defaultStats());
     if (stats.lastPlayedPuzzle !== state.puzzle) {
       stats.played += 1;
       stats.lastPlayedPuzzle = state.puzzle;
@@ -244,7 +299,7 @@ function submitGuess(driver) {
       stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
       stats.lastWonPuzzle = state.puzzle;
     }
-    saveJSON(LS_STATS, stats);
+    saveJSON(statsKey(), stats);
     persistDaily();
   }
 }
@@ -331,8 +386,11 @@ function showWinPanel(animate) {
 
 function renderYesterday() {
   if (state.puzzle > 1) {
-    const prev = driverForPuzzle(state.puzzle - 1);
-    $("yesterday").textContent = `Yesterday's driver (#${state.puzzle - 1}): ${prev.name}`;
+    const prev = driverForPuzzle(state.puzzle - 1, state.genre);
+    $("yesterday").textContent =
+      `Yesterday's ${state.genre.label} driver (#${state.puzzle - 1}): ${prev.name}`;
+  } else {
+    $("yesterday").textContent = "";
   }
 }
 
@@ -343,7 +401,9 @@ function renderSuggestions(query) {
   if (!q || state.solved) return hideSuggestions();
 
   const guessed = new Set(state.guesses.map((d) => d.name));
-  const matches = DRIVERS.filter((d) => !guessed.has(d.name) && norm(d.name).includes(q)).slice(0, 8);
+  const matches = genrePool(state.genre)
+    .filter((d) => !guessed.has(d.name) && norm(d.name).includes(q))
+    .slice(0, 8);
   if (matches.length === 0) return hideSuggestions();
 
   box.innerHTML = "";
@@ -360,7 +420,10 @@ function renderSuggestions(query) {
 }
 
 function hideSuggestions() {
-  $("suggestions").classList.add("hidden");
+  const box = $("suggestions");
+  box.classList.add("hidden");
+  box.innerHTML = "";
+  box.dataset.names = "[]";
   suggestionIndex = -1;
 }
 
@@ -405,7 +468,7 @@ function shareResult() {
   const lines = state.guesses.map((d) =>
     evaluateGuess(d, state.answer).map((c) => emoji[c.status]).join("")
   );
-  const text = `Racedle #${state.puzzle} \u{1F3C1} ${state.guesses.length}/∞\n\n${lines.join("\n")}\n\n${SITE_URL}`;
+  const text = `Racedle ${state.genre.label} #${state.puzzle} \u{1F3C1} ${state.guesses.length}/∞\n\n${lines.join("\n")}\n\n${SITE_URL}`;
 
   const done = () => {
     const btn = $("share-btn");
@@ -431,7 +494,8 @@ function fallbackCopy(text, done) {
 
 /* ---------- Stats ---------- */
 function renderStats() {
-  const s = loadJSON(LS_STATS, defaultStats());
+  const s = loadJSON(statsKey(), defaultStats());
+  $("stats-genre").textContent = state.genre.label;
   $("stat-played").textContent = s.played;
   $("stat-winrate").textContent = s.played ? Math.round((100 * s.won) / s.played) + "%" : "–";
   $("stat-streak").textContent = s.streak;

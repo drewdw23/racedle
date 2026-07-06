@@ -69,6 +69,35 @@ main {
 .puzzle-label { text-align: center; font-weight: 700; margin: 0 0 16px; }
 .puzzle-label span { color: var(--accent); }
 
+/* ---------- Genre tabs ---------- */
+.genre-tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 14px;
+}
+.genre-tab {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-dim);
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.genre-tab:hover { color: var(--text); border-color: var(--text-dim); }
+.genre-tab.active {
+  color: #fff;
+  border-color: var(--accent);
+  background: linear-gradient(180deg, #2a1214, #1a0d0e);
+}
+.genre-tab.ultimate.active {
+  border-color: #d4a017;
+  background: linear-gradient(180deg, #2a2214, #1a150e);
+}
+
 /* ---------- Mode tabs ---------- */
 .mode-tabs {
   display: flex;

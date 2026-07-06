@@ -2,14 +2,16 @@
 
 **The daily motorsports driver guessing game** — a Wordle/Loldle-style game for racing fans.
 Guess the mystery driver from **F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA,
-WEC, WRC, and MotoGP** using clues across seven categories.
+WEC, and WRC** using clues across seven categories. Pick a genre — **Formula 1, NASCAR,
+IndyCar, V8 Supercars, Endurance, Rally** — or play **🏆 Ultimate** across the whole database.
+Every genre has its own daily puzzle, free play, and stats.
 
 ▶️ **Play it:** https://drewdw23.github.io/racedle/
 
 ## How to play
 
-A new mystery driver drops every day at **00:00 UTC** (same driver for everyone). Type a name,
-pick from the autocomplete, and each guess reveals seven tiles:
+A new mystery driver drops every day at **00:00 UTC** in every genre (same driver for
+everyone). Type a name, pick from the autocomplete, and each guess reveals seven tiles:
 
 | Tile | Green 🟩 | Orange 🟧 | Gray ⬛ |
 |---|---|---|---|
@@ -22,7 +24,8 @@ pick from the autocomplete, and each guess reveals seven tiles:
 | Decade debuted | same decade | adjacent decade (▲▼) | ▲▼ |
 
 Unlimited guesses. Share your spoiler-free emoji grid when you win. **Free play** mode gives
-unlimited random practice rounds.
+unlimited random practice rounds in whichever genre you're playing. Streaks and stats are
+tracked per genre — protect them all.
 
 ## Run it locally
 
@@ -42,7 +45,9 @@ This is **v1 for user testing.** Things we want to hear about:
   [data.js](data.js)) and are being verified; entries marked `// verify` are the shakiest.
 - Difficulty — too easy? too hard? is the continent hint too generous? Are deep-cut
   full-season drivers fun or frustrating as daily answers?
-- Missing drivers you'd expect (340+ full-season drivers in the database).
+- Missing drivers you'd expect (333 full-season drivers in the database).
+- Genre groupings — IndyCar includes CART/Champ Car, Endurance covers IMSA + WEC.
+  Should any genre be split out or combined differently?
 - Mobile experience, bugs, confusing UI.
 
 **[→ Open an issue](https://github.com/drewdw23/racedle/issues)** with anything you find.
@@ -61,4 +66,4 @@ team for retired drivers). PRs welcome during testing.
 ---
 
 *Racedle is an unofficial fan-made game, not affiliated with Formula 1, NASCAR, IndyCar,
-MotoGP, the FIA, or any team or driver. Driver data compiled from public sources.*
+Supercars, IMSA, the FIA, or any series, team or driver. Driver data compiled from public sources.*

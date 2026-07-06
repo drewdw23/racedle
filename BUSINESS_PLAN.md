@@ -6,7 +6,7 @@
 
 ## 1. Executive summary
 
-**Racedle** is a free, browser-based daily guessing game for motorsports fans. Each day, every player worldwide gets the same mystery driver drawn from F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA, WEC, WRC, and MotoGP. Players guess driver names; each guess reveals color-coded feedback across seven categories (nationality, primary series, current/last team, championships, race wins band, active/retired, debut decade) until the driver is found. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
+**Racedle** is a free, browser-based daily guessing game for motorsports fans. Players pick a **genre** — Formula 1, NASCAR, IndyCar (incl. CART/Champ Car), V8 Supercars, Endurance (IMSA/WEC), Rally, or the combined **🏆 Ultimate** pool — and each day, every player worldwide gets the same mystery driver per genre. Players guess driver names; each guess reveals color-coded feedback across seven categories (nationality, primary series, current/last team, championships, race wins band, active/retired, debut decade) until the driver is found. Seven daily puzzles per day per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. Motorsports is an underserved niche with a large, passionate, daily-engaged audience (F1 alone averages 70M+ viewers per race weekend) and a strong meme/share culture on Reddit, X, and TikTok.
 
@@ -33,7 +33,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 
 ### Competitive landscape
 - Generic clone directories (wordle-clone lists) contain few or no polished motorsports entries.
-- One-series games (an "F1 wordle") exist sporadically but multi-series coverage (F1 + NASCAR + IndyCar + MotoGP + WRC) is a differentiator that widens the audience — US oval fans, European open-wheel fans, bike fans, and rally fans in one funnel.
+- One-series games (an "F1 wordle") exist sporadically but multi-series coverage (F1 + NASCAR + IndyCar/CART + V8 Supercars + IMSA/WEC + WRC) with per-genre daily modes is a differentiator that widens the audience — US oval fans, European open-wheel fans, Aussie touring-car fans, endurance fans, and rally fans each get "their" daily puzzle in one funnel.
 - Defensibility is low (anyone can clone), so speed, data quality, polish, and community are the moat.
 
 ---
@@ -41,8 +41,9 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 ## 3. Product & gameplay design
 
 ### Core loop (v1 — shipped)
-1. Player types a driver name; autocomplete suggests from the database (340+ drivers).
-2. On guess, a row of seven tiles flips, one per category:
+1. Player picks a genre (defaults to 🏆 Ultimate — the full pool). Each genre has an independent daily driver, free-play mode, stats, and streaks, so a fan can play up to seven dailies per visit.
+2. Player types a driver name; autocomplete suggests from that genre's pool (333 drivers in Ultimate).
+3. On guess, a row of seven tiles flips, one per category:
 
 | Category | 🟩 Green | 🟧 Orange (close) | ⬛ Gray |
 |---|---|---|---|
@@ -54,10 +55,10 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 | Active/Retired | Match | — | Different |
 | Decade debuted | Same decade | Adjacent decade (+ ▲▼) | Farther (+ ▲▼) |
 
-3. Unlimited guesses (like Loldle). Win screen shows the driver, guess count, share button, and countdown to the next puzzle.
-4. **Share** copies a spoiler-free emoji grid + link to the clipboard — the viral loop.
-5. **Free play** mode offers unlimited random practice rounds (extra sessions = extra ad impressions) without touching daily stats.
-6. Local stats: games played, win %, current/best streak, average guesses. Yesterday's answer is always shown (confirms fairness, resolves arguments).
+4. Unlimited guesses (like Loldle). Win screen shows the driver, guess count, share button, and countdown to the next puzzle.
+5. **Share** copies a spoiler-free emoji grid (tagged with the genre) + link to the clipboard — the viral loop.
+6. **Free play** mode offers unlimited random practice rounds per genre (extra sessions = extra ad impressions) without touching daily stats.
+7. Local stats per genre: games played, win %, current/best streak, average guesses. Yesterday's answer is always shown (confirms fairness, resolves arguments).
 
 ### Design principles
 - Answerable by feel: banded wins and decades mean casual fans can reason ("lots of wins, debuted 2010s, active, Europe… Verstappen?") rather than memorize exact stats.
@@ -91,7 +92,7 @@ racedle/
 - Adding a driver = adding one object literal to `data.js`. Adding a series = one constant.
 
 ### Data strategy (the real product)
-- The database now covers **340+ full-season drivers** across nine series: F1 (96), NASCAR Cup (88), IndyCar (33), CART/Champ Car (14), V8 Supercars (30), IMSA (17), WEC (20), WRC (35), MotoGP (10).
+- The database covers **333 full-season drivers** across eight series: F1 (97), NASCAR Cup (87), IndyCar (33), CART/Champ Car (14), V8 Supercars (30), IMSA (17), WEC (20), WRC (35). (MotoGP was cut to keep the game car-focused; the schema supports re-adding bike series later if fans ask.)
 - Inclusion rule: completed at least one full season (or was an era-defining multi-season regular) in the series. Champions and race winners of every era are in; the exhaustive long tail of journeyman full-season drivers (thousands of people) is a **scripted-import project** — pull season entry lists from Wikipedia/official archives into the `data.js` schema, then human-verify. Do this only if testers ask for deeper cuts; obscure answers can hurt more than help.
 - Documented editorial rules (in `data.js` header): one primary series per driver; championships = top-class titles only; debut = top-class debut; Active = full-time in primary series; team = current, or last for retired drivers.
 - ⚠️ **Pre-launch task:** career stats are entered as of end-2024 season with 2025/26 team rosters (2025 titles included only where certain); every entry must be verified against current sources before public launch, starting with those marked `// verify`. Win *bands* buffer most staleness, but borderline drivers need checking.
@@ -167,9 +168,10 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 | Version | Scope | Target |
 |---|---|---|
 | **v1.0** ✅ | Daily + free play, 7 categories, share, stats, ad slots ready | shipped |
-| **v1.5** ✅ | 340+ full-season drivers across 9 series (F1, NASCAR, IndyCar, CART, V8 Supercars, IMSA, WEC, WRC, MotoGP) | shipped |
-| v1.6 | Data verification pass (start with `// verify` entries), tester feedback fixes, colorblind mode, favicon/social-card images | +2 weeks |
-| v1.7 | Custom domain, AdSense live, analytics; frozen daily-answer calendar; optional scripted import of the full-season long tail | +6 weeks |
+| **v1.5** ✅ | 333 full-season drivers across 8 series (F1, NASCAR, IndyCar, CART, V8 Supercars, IMSA, WEC, WRC) | shipped |
+| **v1.6** ✅ | Genre modes: per-genre daily puzzle, free play, stats & share (F1 / NASCAR / IndyCar / V8 Supercars / Endurance / Rally / 🏆 Ultimate) | shipped |
+| v1.7 | Data verification pass (start with `// verify` entries), tester feedback fixes, colorblind mode, favicon/social-card images | +2 weeks |
+| v1.8 | Custom domain, AdSense live, analytics; frozen daily-answer calendar; optional scripted import of the full-season long tail | +6 weeks |
 | v2.0 | Second mode (e.g., **Career mode**: guess from a career-path clue chain — teams listed one by one), unit tests + CI, i18n groundwork (ES/PT/IT/FR fan bases are huge) | +3 months |
 | v2.1 | Third mode (quote/radio-message mode or silhouette/helmet mode — needs licensing review for imagery), archive of past puzzles for new players | +5 months |
 | v3.0 | Only if traction: accounts, global leaderboards, head-to-head race mode (thin serverless API) | 6–12 months |

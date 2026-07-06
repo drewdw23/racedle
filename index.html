@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Racedle — the daily motorsports driver guessing game</title>
-  <meta name="description" content="Racedle is a free daily guessing game for racing fans. Guess the mystery driver from F1, NASCAR, IndyCar, CART, V8 Supercars, IMSA, WEC, WRC and MotoGP using clues about nationality, team, titles and more. A new driver every day!" />
+  <meta name="description" content="Racedle is a free daily guessing game for racing fans. Guess the mystery driver from F1, NASCAR, IndyCar, CART, V8 Supercars, IMSA, WEC and WRC using clues about nationality, team, titles and more. Pick your genre or play Ultimate — a new driver every day!" />
   <meta property="og:title" content="Racedle 🏁 Guess the daily motorsports driver" />
-  <meta property="og:description" content="A Wordle-style daily game for racing fans. F1, NASCAR, IndyCar, CART, Supercars, IMSA, WEC, WRC & MotoGP." />
+  <meta property="og:description" content="A Wordle-style daily game for racing fans. F1, NASCAR, IndyCar, CART, Supercars, IMSA, WEC & WRC — pick a genre or play Ultimate." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://drewdw23.github.io/racedle/" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>" />
@@ -35,8 +35,11 @@
   <div class="ad-slot" id="ad-top">AD SPACE — 728×90</div>
 
   <main>
-    <p class="tagline" id="daily-tagline">Guess today's mystery driver — F1 · NASCAR · IndyCar · CART · Supercars · IMSA · WEC · WRC · MotoGP</p>
-    <p class="puzzle-label">Daily puzzle <span id="puzzle-number">#1</span></p>
+    <p class="tagline" id="daily-tagline">Guess the mystery driver — pick your genre or go Ultimate</p>
+
+    <div class="genre-tabs" id="genre-tabs"></div>
+
+    <p class="puzzle-label">Daily puzzle <span id="puzzle-number">#1</span> — <span id="puzzle-genre">Ultimate</span></p>
 
     <div class="mode-tabs">
       <button id="tab-daily" class="tab active">Daily</button>
@@ -105,15 +108,18 @@
         how close you are in seven categories:</p>
       <table>
         <tr><td><strong>Nationality</strong></td><td>🟩 same country · 🟧 same continent</td></tr>
-        <tr><td><strong>Series</strong></td><td>The driver's primary series (F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA, WEC, WRC, MotoGP)</td></tr>
+        <tr><td><strong>Series</strong></td><td>The driver's primary series (F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA, WEC, WRC)</td></tr>
         <tr><td><strong>Team</strong></td><td>Current team, or last team for retired drivers</td></tr>
         <tr><td><strong>Titles</strong></td><td>Championships in their primary series · 🟧 = off by one · ▲▼ higher/lower</td></tr>
         <tr><td><strong>Wins</strong></td><td>Career wins as a band (0, 1–9, 10–24, 25–49, 50–99, 100+) · 🟧 = one band off</td></tr>
         <tr><td><strong>Status</strong></td><td>Active (racing full-time) or Retired</td></tr>
         <tr><td><strong>Debut</strong></td><td>Decade of their top-level debut · 🟧 = adjacent decade</td></tr>
       </table>
-      <p>A new daily driver drops at <strong>midnight UTC</strong>. Use <strong>Free play</strong> for
-        unlimited practice rounds. Good luck! 🏆</p>
+      <p><strong>Genres:</strong> every genre has its own daily driver, free play, and stats —
+        play them all! <strong>🏆 Ultimate</strong> draws from the entire database
+        (IndyCar includes CART/Champ Car; Endurance covers IMSA + WEC).</p>
+      <p>A new daily driver drops at <strong>midnight UTC</strong> in every genre. Use
+        <strong>Free play</strong> for unlimited practice rounds. Good luck! 🏆</p>
     </div>
   </div>
 
@@ -121,7 +127,7 @@
   <div class="modal" id="modal-stats">
     <div class="modal-card">
       <button class="modal-close" data-close="modal-stats" aria-label="Close">✕</button>
-      <h2>My stats 📊</h2>
+      <h2>My stats 📊 — <span id="stats-genre">Ultimate</span></h2>
       <div class="stats-grid">
         <div><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
         <div><div class="stat-num" id="stat-winrate">–</div><div class="stat-label">Win %</div></div>
