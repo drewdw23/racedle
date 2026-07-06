@@ -53,12 +53,22 @@ the game.
 
 ## ⚠️ First-run tuning (expected)
 
-Wikipedia's motorsport season tables are hand-authored and inconsistent across series and
-decades. On the first run, open `output/report.md`: if a series or specific years yield **0
-drivers**, the entry-list section heading or the driver-column header for that series needs
-adjusting in [`config.js`](config.js) (`sections` / `driverColumns` / `titleCandidates`). Run
-that one series with `--debug` to see per-season hit counts. Budget an hour of selector-tuning
-per series the first time; after that the config is stable and reruns just refresh the data.
+The table parser handles the hard parts automatically — **rowspan/colspan** grids (so NASCAR
+team tables don't bleed crew chiefs into the driver column), **multi-tier headers** (e.g. a
+"Championship entries" super-header above the real "Driver name" row), and **flag-icon links**
+(so nationalities don't get mistaken for names). All eight series parse their modern
+(2010s) season pages out of the box, verified on 2015.
+
+What still needs attention on a full 1970→present run:
+
+- **Older eras** (1970s–90s) use different table layouts and section headings. If specific
+  years yield **0 drivers** in `output/report.md`, add that era's section heading or
+  driver-column label to the series' `sections` / `driverColumns` / `titleCandidates` in
+  [`config.js`](config.js). Run one series with `--debug` to see per-season hit counts.
+- **Endurance (WEC/IMSA)** rosters include every class (LMP2, GTD/GTE, gentleman co-drivers).
+  Filtering to the top class is a curation decision, not something the scraper guesses.
+- The **Wikidata occupation filter** drops entities Wikidata knows aren't drivers (crew chiefs,
+  owners); anyone with unknown occupation is kept and flagged for review.
 
 ## Merge workflow
 

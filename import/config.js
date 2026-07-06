@@ -102,7 +102,10 @@ export const SERIES_CONFIG = {
     series: "IMSA",
     engine: "wikipedia",
     wikipedia: {
-      // Top class only — see README for the class-filter caveat.
+      // NOTE: the entry-list table lists ALL classes (GTP/LMDh + LMP2 +
+      // GTD/GT). The scraper returns everyone; filtering to the top class
+      // (and dropping gentleman/am co-drivers) is a curation step. Same
+      // applies to WEC below.
       titleCandidates: (y) => [
         `${y} IMSA SportsCar Championship`,
         `${y} WeatherTech SportsCar Championship season`,

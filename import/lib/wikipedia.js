@@ -50,31 +50,74 @@ export async function getFullPageHtml(title) {
 
 /* ---------- HTML table extraction ---------- */
 
+/* Parse tables into rectangular grids that honor rowspan/colspan, so a
+   given column index means the same column on every row. This is what
+   lets us reliably read the "Driver(s)" column even in NASCAR team
+   tables where the Team/Manufacturer cells span several driver rows
+   (the naive approach drifts onto the Crew chief column). */
 export function parseTables(html) {
   const tables = [];
   const tableRe = /<table[\s\S]*?<\/table>/gi;
   let m;
   while ((m = tableRe.exec(html))) {
-    const table = m[0];
-    const rows = [];
+    const rawRows = [];
     const rowRe = /<tr[\s\S]*?<\/tr>/gi;
     let rm;
-    while ((rm = rowRe.exec(table))) {
+    while ((rm = rowRe.exec(m[0]))) {
       const cells = [];
       const cellRe = /<(th|td)([^>]*)>([\s\S]*?)<\/\1>/gi;
       let cm;
       while ((cm = cellRe.exec(rm[0]))) {
         cells.push({
           header: cm[1].toLowerCase() === "th",
+          rowspan: attrNum(cm[2], "rowspan"),
+          colspan: attrNum(cm[2], "colspan"),
           links: extractLinks(cm[3]),
           text: stripTags(cm[3]),
         });
       }
-      if (cells.length) rows.push(cells);
+      if (cells.length) rawRows.push(cells);
     }
-    if (rows.length) tables.push(rows);
+    const grid = expandSpans(rawRows);
+    if (grid.length) tables.push(grid);
   }
   return tables;
+}
+
+function attrNum(attrs, name) {
+  const m = new RegExp(`${name}\\s*=\\s*["']?(\\d+)`, "i").exec(attrs || "");
+  return m ? Math.max(1, Number(m[1])) : 1;
+}
+
+/* Turn raw parsed rows (with span metadata) into a rectangular grid,
+   carrying rowspanned cells down and duplicating colspanned cells. */
+function expandSpans(rawRows) {
+  const grid = [];
+  const carry = []; // per-column: { cell, remaining }
+  for (const raw of rawRows) {
+    const out = [];
+    let col = 0;
+    let ri = 0;
+    const nextFree = () => {
+      while (carry[col] && carry[col].remaining > 0) {
+        out[col] = carry[col].cell;
+        carry[col].remaining -= 1;
+        col++;
+      }
+    };
+    while (ri < raw.length) {
+      nextFree();
+      const cell = raw[ri++];
+      for (let c = 0; c < cell.colspan; c++) {
+        out[col] = cell;
+        if (cell.rowspan > 1) carry[col] = { cell, remaining: cell.rowspan - 1 };
+        col++;
+      }
+    }
+    nextFree(); // trailing carried cells
+    grid.push(out.map((c) => c || { header: false, links: [], text: "" }));
+  }
+  return grid;
 }
 
 /* From a set of parsed tables, pull driver names out of the column(s)
@@ -85,15 +128,28 @@ export function driversFromTables(tables, driverColumns) {
   const names = new Set();
 
   for (const rows of tables) {
-    const headerRow = rows.find((r) => r.some((c) => c.header)) || rows[0];
-    const headers = headerRow.map((c) => c.text.toLowerCase());
-    const colIdx = headers.findIndex((h) => wanted.some((w) => h === w || h.includes(w)));
+    // The column-header block is the LEADING run of header rows (e.g. a
+    // "Championship entries" super-header above the real "Team / Car /
+    // Driver name" row). Sub-headers that appear mid-table (e.g. a
+    // "Wildcard entries" separator) must NOT be treated as the header
+    // block, or every driver above them gets skipped.
+    const isHeaderRow = (r) => r.filter((c) => c.header).length >= r.length / 2;
+    let headerBlockEnd = -1;
+    while (headerBlockEnd + 1 < rows.length && isHeaderRow(rows[headerBlockEnd + 1])) headerBlockEnd++;
+    if (headerBlockEnd < 0) continue;
+    const headerRows = rows.slice(0, headerBlockEnd + 1);
+
+    const width = Math.max(...rows.map((r) => r.length));
+    const combined = [];
+    for (let i = 0; i < width; i++) {
+      combined[i] = headerRows.map((r) => (r[i] ? r[i].text.toLowerCase() : "")).join(" ").trim();
+    }
+    const colIdx = combined.findIndex((h) => wanted.some((w) => h === w || h.split(/\s+/).includes(w) || h.includes(w)));
     if (colIdx === -1) continue;
 
-    for (const row of rows) {
-      if (row === headerRow) continue;
-      const cell = row[colIdx];
-      if (!cell) continue;
+    for (let ri = headerBlockEnd + 1; ri < rows.length; ri++) {
+      const cell = rows[ri][colIdx];
+      if (!cell || cell.header) continue; // skip mid-table sub-header separators
       // Prefer linked article titles (cleanest); else stripped text.
       const candidates = cell.links.length ? cell.links : [cell.text];
       for (const c of candidates) {
@@ -107,16 +163,30 @@ export function driversFromTables(tables, driverColumns) {
 
 function extractLinks(html) {
   const out = [];
-  const re = /<a\b[^>]*?\btitle="([^"]+)"[^>]*>/gi;
+  const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html))) {
-    const t = decodeEntities(m[1]);
-    // skip non-article links (files, categories, footnotes, flags)
-    if (/[:#]/.test(t)) continue;
+    const tm = /\btitle="([^"]+)"/i.exec(m[1]);
+    if (!tm) continue;
+    const t = decodeEntities(tm[1]);
+    if (/[:#]/.test(t)) continue; // files, categories, footnotes
+    // Skip flag/icon links: the anchor wraps only an <img>, so its
+    // visible text is empty (this is how "United Kingdom" etc. leaked in).
+    if (!stripTags(m[2]).trim()) continue;
+    if (COUNTRY_STOP.has(t)) continue;
     out.push(t);
   }
   return out;
 }
+
+/* Belt-and-suspenders: nationalities that still slip through as text. */
+const COUNTRY_STOP = new Set([
+  "United Kingdom", "United States", "Australia", "New Zealand", "Germany", "France",
+  "Italy", "Spain", "Brazil", "Finland", "Sweden", "Japan", "Canada", "Belgium",
+  "Netherlands", "Austria", "Switzerland", "Argentina", "Mexico", "Denmark", "Norway",
+  "Ireland", "Portugal", "Estonia", "Colombia", "Venezuela", "Russia", "Monaco",
+  "South Africa", "Poland", "Czech Republic", "China", "Thailand", "India",
+]);
 
 function stripTags(s) {
   return decodeEntities(s.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();

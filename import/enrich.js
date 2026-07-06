@@ -4,13 +4,14 @@
    they are left null and flagged for curation (see report.md). F1 is
    already complete from Jolpica and skips this path. */
 
-import { findDriver, driverFacts } from "./lib/wikidata.js";
+import { findDriver, driverFacts, occupationIsDriver } from "./lib/wikidata.js";
 import { toCountry, inferStatus, buildRecord } from "./lib/normalize.js";
 import { FULL_SEASON_FRACTION } from "./config.js";
 
 export async function enrichRoster(seriesId, seriesLabel, roster, currentYear, log) {
   const records = [];
   let i = 0;
+  let dropped = 0;
   for (const [name, info] of roster) {
     i++;
     if (i % 25 === 0) log(`${seriesId}: enriched ${i}/${roster.size}`);
@@ -26,6 +27,12 @@ export async function enrichRoster(seriesId, seriesLabel, roster, currentYear, l
     const hit = await findDriver(name);
     if (hit) {
       const facts = await driverFacts(hit.qid);
+      // Drop entries Wikidata knows are NOT drivers (crew chiefs, team
+      // owners, engineers) that leak in from rowspan-heavy roster tables.
+      if (occupationIsDriver(facts.occupations) === false) {
+        dropped++;
+        continue;
+      }
       country = toCountry(facts.citizenship);
       if (facts.workStart) debut = Math.min(debut, facts.workStart);
       workEnd = facts.workEnd;
@@ -46,6 +53,7 @@ export async function enrichRoster(seriesId, seriesLabel, roster, currentYear, l
       _wikidata: hit ? hit.qid : null,
     });
   }
+  if (dropped) log(`${seriesId}: dropped ${dropped} non-driver entries (crew chiefs / owners) via Wikidata occupation`);
   return records;
 }
 
