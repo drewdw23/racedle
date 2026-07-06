@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motordle — the daily motorsports driver guessing game</title>
+  <meta name="description" content="Motordle is a free daily guessing game for racing fans. Guess the mystery driver from F1, NASCAR, IndyCar, MotoGP and WRC using clues about nationality, team, titles and more. A new driver every day!" />
+  <meta property="og:title" content="Motordle 🏁 Guess the daily motorsports driver" />
+  <meta property="og:description" content="A Wordle-style daily game for racing fans. F1, NASCAR, IndyCar, MotoGP & WRC." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://drewdw23.github.io/motordle/" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ====================================================
+       GOOGLE ADSENSE — uncomment after AdSense approval and
+       replace ca-pub-XXXXXXXXXXXXXXXX with your publisher ID.
+       See BUSINESS_PLAN.md § Monetization for the full setup.
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+          crossorigin="anonymous"></script>
+       ==================================================== -->
+</head>
+<body>
+  <header>
+    <h1 class="logo"><span class="flag">🏁</span> MOTORDLE</h1>
+    <div class="header-btns">
+      <button id="btn-how" class="icon-btn" title="How to play" aria-label="How to play">?</button>
+      <button id="btn-stats" class="icon-btn" title="My stats" aria-label="My stats">📊</button>
+    </div>
+  </header>
+
+  <!-- Ad slot: top banner (placeholder until AdSense approval).
+       After approval, replace the inner text with an <ins class="adsbygoogle"> unit. -->
+  <div class="ad-slot" id="ad-top">AD SPACE — 728×90</div>
+
+  <main>
+    <p class="tagline" id="daily-tagline">Guess today's mystery driver — F1 · NASCAR · IndyCar · MotoGP · WRC</p>
+    <p class="puzzle-label">Daily puzzle <span id="puzzle-number">#1</span></p>
+
+    <div class="mode-tabs">
+      <button id="tab-daily" class="tab active">Daily</button>
+      <button id="tab-free" class="tab">Free play</button>
+      <button id="free-new" class="hidden" title="New random driver">🔄 New driver</button>
+    </div>
+
+    <div class="guess-box">
+      <input id="guess-input" type="text" placeholder="Type a driver's name…"
+             autocomplete="off" spellcheck="false" aria-label="Guess a driver" />
+      <div id="suggestions" class="hidden"></div>
+    </div>
+    <p class="guess-count" id="guess-count"></p>
+
+    <div class="board-scroll">
+      <div id="board" class="hidden">
+        <div class="board-header">
+          <div>Driver</div>
+          <div>Nationality</div>
+          <div>Series</div>
+          <div>Team</div>
+          <div>Titles</div>
+          <div>Wins</div>
+          <div>Status</div>
+          <div>Debut</div>
+        </div>
+        <div id="board-body"></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><span class="chip green"></span>Correct</span>
+      <span><span class="chip yellow"></span>Close (same continent / one step off)</span>
+      <span><span class="chip gray"></span>Wrong</span>
+      <span>▲▼ answer is higher / lower</span>
+    </div>
+
+    <div id="win-panel" class="hidden">
+      <h2>Chequered flag!</h2>
+      <div id="win-driver"></div>
+      <p id="win-guesses"></p>
+      <button id="share-btn" class="primary-btn">📋 Share result</button>
+      <div id="countdown-wrap">Next driver in <span id="countdown">--:--:--</span></div>
+    </div>
+
+    <p class="yesterday" id="yesterday"></p>
+  </main>
+
+  <!-- Ad slot: bottom banner (placeholder until AdSense approval) -->
+  <div class="ad-slot" id="ad-bottom">AD SPACE — 728×90</div>
+
+  <footer>
+    Motordle is an unofficial fan-made game and is not affiliated with, endorsed by, or associated with
+    Formula 1, NASCAR, IndyCar, MotoGP, the FIA, or any team or driver mentioned.<br />
+    Driver data is compiled from public sources and may contain errors —
+    <a href="https://github.com/drewdw23/motordle/issues" target="_blank" rel="noopener">report an issue</a> ·
+    <a href="privacy.html">privacy policy</a>
+  </footer>
+
+  <!-- How to play -->
+  <div class="modal" id="modal-how">
+    <div class="modal-card">
+      <button class="modal-close" data-close="modal-how" aria-label="Close">✕</button>
+      <h2>How to play 🏁</h2>
+      <p>Guess the mystery motorsports driver in as few tries as you can. Every guess reveals
+        how close you are in seven categories:</p>
+      <table>
+        <tr><td><strong>Nationality</strong></td><td>🟩 same country · 🟧 same continent</td></tr>
+        <tr><td><strong>Series</strong></td><td>The driver's primary series (F1, NASCAR Cup, IndyCar, MotoGP, WRC)</td></tr>
+        <tr><td><strong>Team</strong></td><td>Current team, or last team for retired drivers</td></tr>
+        <tr><td><strong>Titles</strong></td><td>Championships in their primary series · 🟧 = off by one · ▲▼ higher/lower</td></tr>
+        <tr><td><strong>Wins</strong></td><td>Career wins as a band (0, 1–9, 10–24, 25–49, 50–99, 100+) · 🟧 = one band off</td></tr>
+        <tr><td><strong>Status</strong></td><td>Active (racing full-time) or Retired</td></tr>
+        <tr><td><strong>Debut</strong></td><td>Decade of their top-level debut · 🟧 = adjacent decade</td></tr>
+      </table>
+      <p>A new daily driver drops at <strong>midnight UTC</strong>. Use <strong>Free play</strong> for
+        unlimited practice rounds. Good luck! 🏆</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="modal" id="modal-stats">
+    <div class="modal-card">
+      <button class="modal-close" data-close="modal-stats" aria-label="Close">✕</button>
+      <h2>My stats 📊</h2>
+      <div class="stats-grid">
+        <div><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+        <div><div class="stat-num" id="stat-winrate">–</div><div class="stat-label">Win %</div></div>
+        <div><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+        <div><div class="stat-num" id="stat-max-streak">0</div><div class="stat-label">Best streak</div></div>
+        <div><div class="stat-num" id="stat-avg">–</div><div class="stat-label">Avg guesses</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
