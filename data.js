@@ -75,7 +75,7 @@ const DRIVERS = [
   { name: "Max Verstappen",      country: "Netherlands",    continent: "Europe",        series: SERIES.F1, team: "Red Bull",            titles: 4, wins: 63,  status: "Active",  debut: 2015 },
   { name: "Lewis Hamilton",      country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 7, wins: 105, status: "Active",  debut: 2007 },
   { name: "Charles Leclerc",     country: "Monaco",         continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 8,   status: "Active",  debut: 2018 },
-  { name: "Lando Norris",        country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 0, wins: 4,   status: "Active",  debut: 2019 },
+  { name: "Lando Norris",        country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 1, wins: 11,  status: "Active",  debut: 2019 }, // 2025 WDC
   { name: "Oscar Piastri",       country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "McLaren",             titles: 0, wins: 2,   status: "Active",  debut: 2023 },
   { name: "George Russell",      country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Mercedes",            titles: 0, wins: 3,   status: "Active",  debut: 2019 },
   { name: "Fernando Alonso",     country: "Spain",          continent: "Europe",        series: SERIES.F1, team: "Aston Martin",        titles: 2, wins: 32,  status: "Active",  debut: 2001 },
@@ -175,7 +175,7 @@ const DRIVERS = [
   { name: "Mick Schumacher",     country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Haas",                titles: 0, wins: 0,   status: "Retired", debut: 2021 },
 
   // ================= NASCAR CUP — active =================
-  { name: "Kyle Larson",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 1, wins: 29,  status: "Active",  debut: 2013 },
+  { name: "Kyle Larson",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 2, wins: 35,  status: "Active",  debut: 2013 }, // 2025 Cup champ; wins approx, verify exact
   { name: "Chase Elliott",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 1, wins: 19,  status: "Active",  debut: 2015 },
   { name: "William Byron",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 13,  status: "Active",  debut: 2018 },
   { name: "Alex Bowman",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 8,   status: "Active",  debut: 2014 },
@@ -266,7 +266,7 @@ const DRIVERS = [
   { name: "Harrison Burton",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Wood Brothers Racing",     titles: 0, wins: 1,   status: "Retired", debut: 2022 },
 
   // ================= INDYCAR (modern series + pre-1979 USAC) =================
-  { name: "Alex Palou",          country: "Spain",          continent: "Europe",        series: SERIES.INDYCAR, team: "Chip Ganassi Racing",   titles: 4, wins: 19, status: "Active",  debut: 2020 }, // incl. 2025 title
+  { name: "Alex Palou",          country: "Spain",          continent: "Europe",        series: SERIES.INDYCAR, team: "Chip Ganassi Racing",   titles: 4, wins: 19, status: "Active",  debut: 2020 }, // 2021/23/24/25 titles (validated)
   { name: "Scott Dixon",         country: "New Zealand",    continent: "Oceania",       series: SERIES.INDYCAR, team: "Chip Ganassi Racing",   titles: 6, wins: 58, status: "Active",  debut: 2001 },
   { name: "Josef Newgarden",     country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Team Penske",           titles: 2, wins: 29, status: "Active",  debut: 2012 },
   { name: "Will Power",          country: "Australia",      continent: "Oceania",       series: SERIES.INDYCAR, team: "Team Penske",           titles: 2, wins: 44, status: "Active",  debut: 2008 },
@@ -391,7 +391,7 @@ const DRIVERS = [
 
   // ================= WRC =================
   { name: "Sebastien Loeb",      country: "France",         continent: "Europe",        series: SERIES.WRC, team: "M-Sport Ford",            titles: 9, wins: 80, status: "Retired", debut: 1999 },
-  { name: "Sebastien Ogier",     country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 8, wins: 62, status: "Active",  debut: 2008 }, // verify: possible 2025 title
+  { name: "Sebastien Ogier",     country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 9, wins: 68, status: "Active",  debut: 2008 }, // 2025 WRC title (ties Loeb at 9)
   { name: "Juha Kankkunen",      country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai",                 titles: 4, wins: 23, status: "Retired", debut: 1983 }, // verify last team
   { name: "Tommi Makinen",       country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Subaru",                  titles: 4, wins: 24, status: "Retired", debut: 1987 },
   { name: "Walter Rohrl",        country: "Germany",        continent: "Europe",        series: SERIES.WRC, team: "Audi Sport",              titles: 2, wins: 14, status: "Retired", debut: 1973 },
@@ -410,7 +410,7 @@ const DRIVERS = [
   { name: "Ott Tanak",           country: "Estonia",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 1, wins: 22, status: "Active",  debut: 2009 },
   { name: "Thierry Neuville",    country: "Belgium",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 1, wins: 22, status: "Active",  debut: 2009 },
   { name: "Colin McRae",         country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Citroen",                 titles: 1, wins: 25, status: "Retired", debut: 1986 },
-  { name: "Elfyn Evans",         country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 10, status: "Active",  debut: 2013 }, // verify: possible 2025 title
+  { name: "Elfyn Evans",         country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 11, status: "Active",  debut: 2013 }, // 2025 WRC runner-up
   { name: "Jari-Matti Latvala",  country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 18, status: "Retired", debut: 2002 },
   { name: "Mikko Hirvonen",      country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Citroen",                 titles: 0, wins: 15, status: "Retired", debut: 2002 },
   { name: "Markku Alen",         country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Subaru",                  titles: 0, wins: 19, status: "Retired", debut: 1973 },
