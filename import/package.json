@@ -1,0 +1,15 @@
+{
+  "name": "racedle-import",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Data pipeline that builds Racedle's driver database from license-clean public sources (Wikidata CC0, Wikipedia CC BY-SA, Jolpica/Ergast for F1).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node run.js",
+    "build:f1": "node run.js --series=f1",
+    "clean": "node -e \"import('node:fs').then(fs=>fs.rmSync('.cache',{recursive:true,force:true}))\""
+  }
+}
