@@ -6,7 +6,7 @@
 
 ## 1. Executive summary
 
-**Motordle** is a free, browser-based daily guessing game for motorsports fans. Each day, every player worldwide gets the same mystery driver drawn from F1, NASCAR, IndyCar, MotoGP, and WRC. Players guess driver names; each guess reveals color-coded feedback across seven categories (nationality, primary series, current/last team, championships, race wins band, active/retired, debut decade) until the driver is found. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
+**Motordle** is a free, browser-based daily guessing game for motorsports fans. Each day, every player worldwide gets the same mystery driver drawn from F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA, WEC, WRC, and MotoGP. Players guess driver names; each guess reveals color-coded feedback across seven categories (nationality, primary series, current/last team, championships, race wins band, active/retired, debut decade) until the driver is found. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. Motorsports is an underserved niche with a large, passionate, daily-engaged audience (F1 alone averages 70M+ viewers per race weekend) and a strong meme/share culture on Reddit, X, and TikTok.
 
@@ -41,7 +41,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 ## 3. Product & gameplay design
 
 ### Core loop (v1 — shipped)
-1. Player types a driver name; autocomplete suggests from the database (91 drivers at launch).
+1. Player types a driver name; autocomplete suggests from the database (340+ drivers).
 2. On guess, a row of seven tiles flips, one per category:
 
 | Category | 🟩 Green | 🟧 Orange (close) | ⬛ Gray |
@@ -91,11 +91,12 @@ motordle/
 - Adding a driver = adding one object literal to `data.js`. Adding a series = one constant.
 
 ### Data strategy (the real product)
-- v1 ships **91 drivers**: F1 (43), NASCAR Cup (21), IndyCar (9), MotoGP (10), WRC (8).
-- Documented editorial rules (in `data.js` header): championships = top-class titles only; debut = top-class debut; Active = full-time in primary series; team = current, or last for retired drivers.
-- ⚠️ **Pre-launch task:** career stats are entered as of end-2024 season with 2025/26 team rosters; every entry must be verified against current sources before public launch. Win *bands* buffer most staleness, but borderline drivers (e.g., drivers at 8–10 career wins) need checking.
+- The database now covers **340+ full-season drivers** across nine series: F1 (96), NASCAR Cup (88), IndyCar (33), CART/Champ Car (14), V8 Supercars (30), IMSA (17), WEC (20), WRC (35), MotoGP (10).
+- Inclusion rule: completed at least one full season (or was an era-defining multi-season regular) in the series. Champions and race winners of every era are in; the exhaustive long tail of journeyman full-season drivers (thousands of people) is a **scripted-import project** — pull season entry lists from Wikipedia/official archives into the `data.js` schema, then human-verify. Do this only if testers ask for deeper cuts; obscure answers can hurt more than help.
+- Documented editorial rules (in `data.js` header): one primary series per driver; championships = top-class titles only; debut = top-class debut; Active = full-time in primary series; team = current, or last for retired drivers.
+- ⚠️ **Pre-launch task:** career stats are entered as of end-2024 season with 2025/26 team rosters (2025 titles included only where certain); every entry must be verified against current sources before public launch, starting with those marked `// verify`. Win *bands* buffer most staleness, but borderline drivers need checking.
+- ⚠️ **Answer-pool churn:** the daily driver is picked by seeding into the array, so changing the database length re-rolls upcoming daily answers. Fine during testing; after public launch, curate a frozen answer calendar or an append-only answer pool separate from the guessable list.
 - User testing doubles as data QA: the README and site footer invite error reports via GitHub Issues.
-- Target 150+ drivers by v1.2 (add Formula E, more legends, more women drivers) — bigger pool = harder puzzles for veterans and more replay value.
 
 ---
 
@@ -165,9 +166,10 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 
 | Version | Scope | Target |
 |---|---|---|
-| **v1.0** ✅ | Daily + free play, 91 drivers, 7 categories, share, stats, ad slots ready | shipped |
-| v1.1 | Data verification pass, tester feedback fixes, colorblind mode, favicon/social-card images | +2 weeks |
-| v1.2 | 150+ drivers (Formula E, WEC, more legends), custom domain, AdSense live, analytics | +6 weeks |
+| **v1.0** ✅ | Daily + free play, 7 categories, share, stats, ad slots ready | shipped |
+| **v1.5** ✅ | 340+ full-season drivers across 9 series (F1, NASCAR, IndyCar, CART, V8 Supercars, IMSA, WEC, WRC, MotoGP) | shipped |
+| v1.6 | Data verification pass (start with `// verify` entries), tester feedback fixes, colorblind mode, favicon/social-card images | +2 weeks |
+| v1.7 | Custom domain, AdSense live, analytics; frozen daily-answer calendar; optional scripted import of the full-season long tail | +6 weeks |
 | v2.0 | Second mode (e.g., **Career mode**: guess from a career-path clue chain — teams listed one by one), unit tests + CI, i18n groundwork (ES/PT/IT/FR fan bases are huge) | +3 months |
 | v2.1 | Third mode (quote/radio-message mode or silhouette/helmet mode — needs licensing review for imagery), archive of past puzzles for new players | +5 months |
 | v3.0 | Only if traction: accounts, global leaderboards, head-to-head race mode (thin serverless API) | 6–12 months |

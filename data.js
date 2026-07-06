@@ -1,40 +1,62 @@
 /* ============================================================
    MOTORDLE — Driver database
    ------------------------------------------------------------
+   INCLUSION RULE: drivers who completed at least one full season
+   (or were era-defining multi-season regulars) in one of:
+   Formula 1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars,
+   IMSA, WEC, WRC (+ legacy MotoGP set retained from v1).
+
+   TAXONOMY:
+   - Each driver appears once, under their PRIMARY series (the
+     series they are most associated with — judgment call for
+     multi-series careers, e.g. Montoya -> F1, SVG -> NASCAR).
+   - IndyCar = modern IndyCar Series + pre-1979 USAC careers.
+     CART / Champ Car = drivers whose peak was 1979–2007 CART.
+   - WEC includes pre-2012 World Sportscar Championship legends.
+   - IMSA titles = top-class (GTP/DP/DPi/GTP) season championships,
+     including the Grand-Am era.
+   - "Championships" = top-class titles in the primary series.
+   - "Debut" = first top-class start in the primary series.
+   - Status: Active = full-time (or regular title-contending
+     part-timer) in their primary series. Deceased = Retired.
+
    DATA VINTAGE (verify before public launch — see BUSINESS_PLAN.md):
-   - Teams reflect 2025/2026 season rosters.
-   - Career stats (titles, wins) are through the END OF THE 2024
-     SEASON for active drivers. Win counts are only ever shown as
-     bands (0, 1-9, 10-24, 25-49, 50-99, 100+), which buffers
-     staleness, but borderline drivers should be re-checked.
-   - "Championships" = titles in the driver's top-level primary
-     series (e.g. premier-class only for MotoGP riders).
-   - "Debut" = first start in their primary series' top class.
-   - Status rule: Active = competing full-time (or as a regular
-     part-time title contender) in their primary series.
+   - Teams reflect 2025/2026 rosters; career stats generally
+     through the END OF THE 2024 SEASON. 2025 outcomes are included
+     only where certain (e.g. Palou's 2025 IndyCar title, Marquez's
+     2025 MotoGP title). Win counts only ever display as bands
+     (0, 1-9, 10-24, 25-49, 50-99, 100+), which buffers staleness,
+     but borderline drivers should be re-checked. Entries marked
+     "verify" are the shakiest.
    ============================================================ */
 
 const SERIES = {
   F1: "Formula 1",
   NASCAR: "NASCAR Cup",
   INDYCAR: "IndyCar",
-  MOTOGP: "MotoGP",
+  CART: "CART / Champ Car",
+  SUPERCARS: "V8 Supercars",
+  IMSA: "IMSA",
+  WEC: "WEC",
   WRC: "WRC",
+  MOTOGP: "MotoGP",
 };
 
 const FLAGS = {
   "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹", "Belgium": "🇧🇪",
-  "Brazil": "🇧🇷", "Canada": "🇨🇦", "Denmark": "🇩🇰", "Estonia": "🇪🇪",
-  "Finland": "🇫🇮", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹",
-  "Japan": "🇯🇵", "Mexico": "🇲🇽", "Monaco": "🇲🇨", "Netherlands": "🇳🇱",
-  "New Zealand": "🇳🇿", "Spain": "🇪🇸", "Thailand": "🇹🇭",
-  "United Kingdom": "🇬🇧", "United States": "🇺🇸",
+  "Brazil": "🇧🇷", "Canada": "🇨🇦", "China": "🇨🇳", "Colombia": "🇨🇴",
+  "Denmark": "🇩🇰", "Estonia": "🇪🇪", "Finland": "🇫🇮", "France": "🇫🇷",
+  "Germany": "🇩🇪", "Ireland": "🇮🇪", "Italy": "🇮🇹", "Japan": "🇯🇵",
+  "Mexico": "🇲🇽", "Monaco": "🇲🇨", "Netherlands": "🇳🇱", "New Zealand": "🇳🇿",
+  "Norway": "🇳🇴", "Portugal": "🇵🇹", "Russia": "🇷🇺", "South Africa": "🇿🇦",
+  "Spain": "🇪🇸", "Sweden": "🇸🇪", "Switzerland": "🇨🇭", "Thailand": "🇹🇭",
+  "United Kingdom": "🇬🇧", "United States": "🇺🇸", "Venezuela": "🇻🇪",
 };
 
 /* name, country, continent, series, team (current/last), titles,
    wins (career, used only to derive the band), status, debut year */
 const DRIVERS = [
-  // ---------- Formula 1 — active ----------
+  // ================= FORMULA 1 — active =================
   { name: "Max Verstappen",      country: "Netherlands",    continent: "Europe",        series: SERIES.F1, team: "Red Bull",            titles: 4, wins: 63,  status: "Active",  debut: 2015 },
   { name: "Lewis Hamilton",      country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 7, wins: 105, status: "Active",  debut: 2007 },
   { name: "Charles Leclerc",     country: "Monaco",         continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 8,   status: "Active",  debut: 2018 },
@@ -58,7 +80,7 @@ const DRIVERS = [
   { name: "Sergio Perez",        country: "Mexico",         continent: "North America", series: SERIES.F1, team: "Cadillac",            titles: 0, wins: 6,   status: "Active",  debut: 2011 },
   { name: "Valtteri Bottas",     country: "Finland",        continent: "Europe",        series: SERIES.F1, team: "Cadillac",            titles: 0, wins: 10,  status: "Active",  debut: 2013 },
 
-  // ---------- Formula 1 — retired ----------
+  // ================= FORMULA 1 — retired champions =================
   { name: "Michael Schumacher",  country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Mercedes",            titles: 7, wins: 91,  status: "Retired", debut: 1991 },
   { name: "Sebastian Vettel",    country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Aston Martin",        titles: 4, wins: 53,  status: "Retired", debut: 2007 },
   { name: "Kimi Raikkonen",      country: "Finland",        continent: "Europe",        series: SERIES.F1, team: "Alfa Romeo",          titles: 1, wins: 21,  status: "Retired", debut: 2001 },
@@ -68,55 +90,329 @@ const DRIVERS = [
   { name: "Mika Hakkinen",       country: "Finland",        continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 2, wins: 20,  status: "Retired", debut: 1991 },
   { name: "Jenson Button",       country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 1, wins: 15,  status: "Retired", debut: 2000 },
   { name: "Nico Rosberg",        country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Mercedes",            titles: 1, wins: 23,  status: "Retired", debut: 2006 },
-  { name: "Felipe Massa",        country: "Brazil",         continent: "South America", series: SERIES.F1, team: "Williams",            titles: 0, wins: 11,  status: "Retired", debut: 2002 },
-  { name: "Mark Webber",         country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "Red Bull",            titles: 0, wins: 9,   status: "Retired", debut: 2002 },
-  { name: "Daniel Ricciardo",    country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "RB / AlphaTauri",     titles: 0, wins: 8,   status: "Retired", debut: 2011 },
   { name: "Niki Lauda",          country: "Austria",        continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 3, wins: 25,  status: "Retired", debut: 1971 },
   { name: "Jackie Stewart",      country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Tyrrell",             titles: 3, wins: 27,  status: "Retired", debut: 1965 },
   { name: "Jim Clark",           country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Lotus",               titles: 2, wins: 25,  status: "Retired", debut: 1960 },
   { name: "Juan Manuel Fangio",  country: "Argentina",      continent: "South America", series: SERIES.F1, team: "Maserati",            titles: 5, wins: 24,  status: "Retired", debut: 1950 },
-  { name: "Gilles Villeneuve",   country: "Canada",         continent: "North America", series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 6,   status: "Retired", debut: 1977 },
   { name: "Jacques Villeneuve",  country: "Canada",         continent: "North America", series: SERIES.F1, team: "BMW Sauber",          titles: 1, wins: 11,  status: "Retired", debut: 1996 },
+  { name: "Jack Brabham",        country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "Brabham",             titles: 3, wins: 14,  status: "Retired", debut: 1955 },
+  { name: "Graham Hill",         country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Embassy Hill",        titles: 2, wins: 14,  status: "Retired", debut: 1958 },
+  { name: "Denny Hulme",         country: "New Zealand",    continent: "Oceania",       series: SERIES.F1, team: "McLaren",             titles: 1, wins: 8,   status: "Retired", debut: 1965 },
+  { name: "John Surtees",        country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Team Surtees",        titles: 1, wins: 6,   status: "Retired", debut: 1960 },
+  { name: "Phil Hill",           country: "United States",  continent: "North America", series: SERIES.F1, team: "Cooper",              titles: 1, wins: 3,   status: "Retired", debut: 1958 },
+  { name: "Mike Hawthorn",       country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 1, wins: 3,   status: "Retired", debut: 1952 },
+  { name: "Jochen Rindt",        country: "Austria",        continent: "Europe",        series: SERIES.F1, team: "Lotus",               titles: 1, wins: 6,   status: "Retired", debut: 1964 },
+  { name: "Emerson Fittipaldi",  country: "Brazil",         continent: "South America", series: SERIES.F1, team: "Fittipaldi",          titles: 2, wins: 14,  status: "Retired", debut: 1970 },
+  { name: "James Hunt",          country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Wolf",                titles: 1, wins: 10,  status: "Retired", debut: 1973 },
+  { name: "Jody Scheckter",      country: "South Africa",   continent: "Africa",        series: SERIES.F1, team: "Ferrari",             titles: 1, wins: 10,  status: "Retired", debut: 1972 },
+  { name: "Keke Rosberg",        country: "Finland",        continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 1, wins: 5,   status: "Retired", debut: 1978 },
+  { name: "Nelson Piquet",       country: "Brazil",         continent: "South America", series: SERIES.F1, team: "Benetton",            titles: 3, wins: 23,  status: "Retired", debut: 1978 },
+  { name: "Alan Jones",          country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "Haas Lola",           titles: 1, wins: 12,  status: "Retired", debut: 1975 },
+  { name: "Damon Hill",          country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Jordan",              titles: 1, wins: 22,  status: "Retired", debut: 1992 },
+  { name: "Alberto Ascari",      country: "Italy",          continent: "Europe",        series: SERIES.F1, team: "Lancia",              titles: 2, wins: 13,  status: "Retired", debut: 1950 },
+  { name: "Giuseppe Farina",     country: "Italy",          continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 1, wins: 5,   status: "Retired", debut: 1950 },
+
+  // ================= FORMULA 1 — retired, non-champions =================
+  { name: "Felipe Massa",        country: "Brazil",         continent: "South America", series: SERIES.F1, team: "Williams",            titles: 0, wins: 11,  status: "Retired", debut: 2002 },
+  { name: "Mark Webber",         country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "Red Bull",            titles: 0, wins: 9,   status: "Retired", debut: 2002 },
+  { name: "Daniel Ricciardo",    country: "Australia",      continent: "Oceania",       series: SERIES.F1, team: "RB / AlphaTauri",     titles: 0, wins: 8,   status: "Retired", debut: 2011 },
+  { name: "Gilles Villeneuve",   country: "Canada",         continent: "North America", series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 6,   status: "Retired", debut: 1977 },
   { name: "Rubens Barrichello",  country: "Brazil",         continent: "South America", series: SERIES.F1, team: "Williams",            titles: 0, wins: 11,  status: "Retired", debut: 1993 },
   { name: "David Coulthard",     country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Red Bull",            titles: 0, wins: 13,  status: "Retired", debut: 1994 },
   { name: "Kevin Magnussen",     country: "Denmark",        continent: "Europe",        series: SERIES.F1, team: "Haas",                titles: 0, wins: 0,   status: "Retired", debut: 2014 },
+  { name: "Stirling Moss",       country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Lotus (Rob Walker)",  titles: 0, wins: 16,  status: "Retired", debut: 1951 },
+  { name: "Ronnie Peterson",     country: "Sweden",         continent: "Europe",        series: SERIES.F1, team: "Lotus",               titles: 0, wins: 10,  status: "Retired", debut: 1970 },
+  { name: "Gerhard Berger",      country: "Austria",        continent: "Europe",        series: SERIES.F1, team: "Benetton",            titles: 0, wins: 10,  status: "Retired", debut: 1984 },
+  { name: "Jean Alesi",          country: "France",         continent: "Europe",        series: SERIES.F1, team: "Jordan",              titles: 0, wins: 1,   status: "Retired", debut: 1989 },
+  { name: "Riccardo Patrese",    country: "Italy",          continent: "Europe",        series: SERIES.F1, team: "Benetton",            titles: 0, wins: 6,   status: "Retired", debut: 1977 },
+  { name: "Michele Alboreto",    country: "Italy",          continent: "Europe",        series: SERIES.F1, team: "Minardi",             titles: 0, wins: 5,   status: "Retired", debut: 1981 },
+  { name: "Carlos Reutemann",    country: "Argentina",      continent: "South America", series: SERIES.F1, team: "Williams",            titles: 0, wins: 12,  status: "Retired", debut: 1972 },
+  { name: "Clay Regazzoni",      country: "Switzerland",    continent: "Europe",        series: SERIES.F1, team: "Ensign",              titles: 0, wins: 5,   status: "Retired", debut: 1970 },
+  { name: "Jacky Ickx",          country: "Belgium",        continent: "Europe",        series: SERIES.F1, team: "Ligier",              titles: 0, wins: 8,   status: "Retired", debut: 1966 },
+  { name: "Juan Pablo Montoya",  country: "Colombia",       continent: "South America", series: SERIES.F1, team: "McLaren",             titles: 0, wins: 7,   status: "Retired", debut: 2001 },
+  { name: "Ralf Schumacher",     country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Toyota",              titles: 0, wins: 6,   status: "Retired", debut: 1997 },
+  { name: "Giancarlo Fisichella", country: "Italy",         continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 3,   status: "Retired", debut: 1996 },
+  { name: "Jarno Trulli",        country: "Italy",          continent: "Europe",        series: SERIES.F1, team: "Lotus Racing",        titles: 0, wins: 1,   status: "Retired", debut: 1997 },
+  { name: "Heikki Kovalainen",   country: "Finland",        continent: "Europe",        series: SERIES.F1, team: "Caterham",            titles: 0, wins: 1,   status: "Retired", debut: 2007 },
+  { name: "Nick Heidfeld",       country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Lotus Renault",       titles: 0, wins: 0,   status: "Retired", debut: 2000 },
+  { name: "Romain Grosjean",     country: "France",         continent: "Europe",        series: SERIES.F1, team: "Haas",                titles: 0, wins: 0,   status: "Retired", debut: 2009 },
+  { name: "Pastor Maldonado",    country: "Venezuela",      continent: "South America", series: SERIES.F1, team: "Lotus",               titles: 0, wins: 1,   status: "Retired", debut: 2011 },
+  { name: "Eddie Irvine",        country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Jaguar",              titles: 0, wins: 4,   status: "Retired", debut: 1993 },
+  { name: "Heinz-Harald Frentzen", country: "Germany",      continent: "Europe",        series: SERIES.F1, team: "Sauber",              titles: 0, wins: 3,   status: "Retired", debut: 1994 },
+  { name: "Johnny Herbert",      country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Jaguar",              titles: 0, wins: 3,   status: "Retired", debut: 1989 },
+  { name: "Martin Brundle",      country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "Jordan",              titles: 0, wins: 0,   status: "Retired", debut: 1984 },
+  { name: "Olivier Panis",       country: "France",         continent: "Europe",        series: SERIES.F1, team: "Toyota",              titles: 0, wins: 1,   status: "Retired", debut: 1994 },
+  { name: "John Watson",         country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "McLaren",             titles: 0, wins: 5,   status: "Retired", debut: 1973 },
+  { name: "Didier Pironi",       country: "France",         continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 3,   status: "Retired", debut: 1978 },
+  { name: "Rene Arnoux",         country: "France",         continent: "Europe",        series: SERIES.F1, team: "Ligier",              titles: 0, wins: 7,   status: "Retired", debut: 1978 },
+  { name: "Francois Cevert",     country: "France",         continent: "Europe",        series: SERIES.F1, team: "Tyrrell",             titles: 0, wins: 1,   status: "Retired", debut: 1970 },
+  { name: "Dan Gurney",          country: "United States",  continent: "North America", series: SERIES.F1, team: "Eagle (AAR)",         titles: 0, wins: 4,   status: "Retired", debut: 1959 },
+  { name: "Bruce McLaren",       country: "New Zealand",    continent: "Oceania",       series: SERIES.F1, team: "McLaren",             titles: 0, wins: 4,   status: "Retired", debut: 1959 },
+  { name: "Chris Amon",          country: "New Zealand",    continent: "Oceania",       series: SERIES.F1, team: "Ensign",              titles: 0, wins: 0,   status: "Retired", debut: 1963 },
+  { name: "Pedro Rodriguez",     country: "Mexico",         continent: "North America", series: SERIES.F1, team: "BRM",                 titles: 0, wins: 2,   status: "Retired", debut: 1963 },
+  { name: "Wolfgang von Trips",  country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 2,   status: "Retired", debut: 1957 },
+  { name: "Tony Brooks",         country: "United Kingdom", continent: "Europe",        series: SERIES.F1, team: "BRM",                 titles: 0, wins: 6,   status: "Retired", debut: 1956 },
+  { name: "Jose Froilan Gonzalez", country: "Argentina",    continent: "South America", series: SERIES.F1, team: "Ferrari",             titles: 0, wins: 2,   status: "Retired", debut: 1950 },
+  { name: "Jo Siffert",          country: "Switzerland",    continent: "Europe",        series: SERIES.F1, team: "BRM",                 titles: 0, wins: 2,   status: "Retired", debut: 1962 },
+  { name: "Daniil Kvyat",        country: "Russia",         continent: "Europe",        series: SERIES.F1, team: "AlphaTauri",          titles: 0, wins: 0,   status: "Retired", debut: 2014 },
+  { name: "Zhou Guanyu",         country: "China",          continent: "Asia",          series: SERIES.F1, team: "Sauber",              titles: 0, wins: 0,   status: "Retired", debut: 2022 },
+  { name: "Nicholas Latifi",     country: "Canada",         continent: "North America", series: SERIES.F1, team: "Williams",            titles: 0, wins: 0,   status: "Retired", debut: 2020 },
+  { name: "Mick Schumacher",     country: "Germany",        continent: "Europe",        series: SERIES.F1, team: "Haas",                titles: 0, wins: 0,   status: "Retired", debut: 2021 },
 
-  // ---------- NASCAR Cup ----------
+  // ================= NASCAR CUP — active =================
   { name: "Kyle Larson",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 1, wins: 29,  status: "Active",  debut: 2013 },
   { name: "Chase Elliott",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 1, wins: 19,  status: "Active",  debut: 2015 },
   { name: "William Byron",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 13,  status: "Active",  debut: 2018 },
+  { name: "Alex Bowman",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 8,   status: "Active",  debut: 2014 },
   { name: "Denny Hamlin",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Joe Gibbs Racing",         titles: 0, wins: 54,  status: "Active",  debut: 2005 },
   { name: "Christopher Bell",    country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Joe Gibbs Racing",         titles: 0, wins: 9,   status: "Active",  debut: 2020 },
+  { name: "Chase Briscoe",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Joe Gibbs Racing",         titles: 0, wins: 3,   status: "Active",  debut: 2021 },
+  { name: "Ty Gibbs",            country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Joe Gibbs Racing",         titles: 0, wins: 0,   status: "Active",  debut: 2022 },
   { name: "Joey Logano",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Team Penske",              titles: 3, wins: 36,  status: "Active",  debut: 2008 },
   { name: "Ryan Blaney",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Team Penske",              titles: 1, wins: 13,  status: "Active",  debut: 2014 },
+  { name: "Austin Cindric",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Team Penske",              titles: 0, wins: 2,   status: "Active",  debut: 2021 },
   { name: "Kyle Busch",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Richard Childress Racing", titles: 2, wins: 63,  status: "Active",  debut: 2004 },
+  { name: "Austin Dillon",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Richard Childress Racing", titles: 0, wins: 5,   status: "Active",  debut: 2014 },
   { name: "Brad Keselowski",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "RFK Racing",               titles: 1, wins: 36,  status: "Active",  debut: 2008 },
+  { name: "Chris Buescher",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "RFK Racing",               titles: 0, wins: 6,   status: "Active",  debut: 2015 },
+  { name: "Ryan Preece",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "RFK Racing",               titles: 0, wins: 0,   status: "Active",  debut: 2019 },
   { name: "Tyler Reddick",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "23XI Racing",              titles: 0, wins: 8,   status: "Active",  debut: 2020 },
   { name: "Bubba Wallace",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "23XI Racing",              titles: 0, wins: 2,   status: "Active",  debut: 2017 },
+  { name: "Riley Herbst",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "23XI Racing",              titles: 0, wins: 0,   status: "Active",  debut: 2025 },
   { name: "Ross Chastain",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Trackhouse Racing",        titles: 0, wins: 5,   status: "Active",  debut: 2017 },
   { name: "Shane van Gisbergen", country: "New Zealand",    continent: "Oceania",       series: SERIES.NASCAR, team: "Trackhouse Racing",        titles: 0, wins: 1,   status: "Active",  debut: 2023 },
-  { name: "Jeff Gordon",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 4, wins: 93,  status: "Retired", debut: 1992 },
-  { name: "Jimmie Johnson",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Legacy Motor Club",        titles: 7, wins: 83,  status: "Retired", debut: 2001 },
-  { name: "Dale Earnhardt",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Richard Childress Racing", titles: 7, wins: 76,  status: "Retired", debut: 1975 },
-  { name: "Dale Earnhardt Jr.",  country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 26,  status: "Retired", debut: 1999 },
+  { name: "Daniel Suarez",       country: "Mexico",         continent: "North America", series: SERIES.NASCAR, team: "Trackhouse Racing",        titles: 0, wins: 2,   status: "Active",  debut: 2017 },
+  { name: "Erik Jones",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Legacy Motor Club",        titles: 0, wins: 3,   status: "Active",  debut: 2015 },
+  { name: "John Hunter Nemechek", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Legacy Motor Club",        titles: 0, wins: 0,   status: "Active",  debut: 2020 },
+  { name: "Michael McDowell",    country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Spire Motorsports",        titles: 0, wins: 2,   status: "Active",  debut: 2008 },
+  { name: "Justin Haley",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Spire Motorsports",        titles: 0, wins: 1,   status: "Active",  debut: 2019 },
+  { name: "Carson Hocevar",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Spire Motorsports",        titles: 0, wins: 0,   status: "Active",  debut: 2024 },
+  { name: "Todd Gilliland",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Front Row Motorsports",    titles: 0, wins: 0,   status: "Active",  debut: 2022 },
+  { name: "Noah Gragson",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Front Row Motorsports",    titles: 0, wins: 0,   status: "Active",  debut: 2023 },
+  { name: "Zane Smith",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Front Row Motorsports",    titles: 0, wins: 0,   status: "Active",  debut: 2024 },
+  { name: "Ricky Stenhouse Jr.", country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hyak Motorsports",         titles: 0, wins: 3,   status: "Active",  debut: 2013 },
+  { name: "AJ Allmendinger",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Kaulig Racing",            titles: 0, wins: 2,   status: "Active",  debut: 2007 },
+  { name: "Ty Dillon",           country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Kaulig Racing",            titles: 0, wins: 0,   status: "Active",  debut: 2017 },
+  { name: "Josh Berry",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Wood Brothers Racing",     titles: 0, wins: 1,   status: "Active",  debut: 2024 },
+  { name: "Cole Custer",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Haas Factory Team",        titles: 0, wins: 1,   status: "Active",  debut: 2020 },
+
+  // ================= NASCAR CUP — retired =================
   { name: "Richard Petty",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Petty Enterprises",        titles: 7, wins: 200, status: "Retired", debut: 1958 },
+  { name: "Dale Earnhardt",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Richard Childress Racing", titles: 7, wins: 76,  status: "Retired", debut: 1975 },
+  { name: "Jimmie Johnson",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Legacy Motor Club",        titles: 7, wins: 83,  status: "Retired", debut: 2001 },
+  { name: "Jeff Gordon",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 4, wins: 93,  status: "Retired", debut: 1992 },
+  { name: "David Pearson",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Wood Brothers Racing",     titles: 3, wins: 105, status: "Retired", debut: 1960 },
+  { name: "Cale Yarborough",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Cale Yarborough Motorsport", titles: 3, wins: 83, status: "Retired", debut: 1957 },
+  { name: "Darrell Waltrip",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Travis Carter Enterprises", titles: 3, wins: 84,  status: "Retired", debut: 1972 },
+  { name: "Lee Petty",           country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Petty Enterprises",        titles: 3, wins: 54,  status: "Retired", debut: 1949 },
   { name: "Tony Stewart",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Stewart-Haas Racing",      titles: 3, wins: 49,  status: "Retired", debut: 1999 },
+  { name: "Terry Labonte",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 2, wins: 22,  status: "Retired", debut: 1978 },
+  { name: "Ned Jarrett",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Bondy Long",               titles: 2, wins: 50,  status: "Retired", debut: 1953 },
+  { name: "Buck Baker",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Buck Baker Racing",        titles: 2, wins: 46,  status: "Retired", debut: 1949 },
+  { name: "Tim Flock",           country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Kiekhaefer Mercury",       titles: 2, wins: 39,  status: "Retired", debut: 1949 },
+  { name: "Herb Thomas",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Kiekhaefer Mercury",       titles: 2, wins: 48,  status: "Retired", debut: 1949 },
+  { name: "Joe Weatherly",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Bud Moore Engineering",    titles: 2, wins: 25,  status: "Retired", debut: 1952 },
+  { name: "Bobby Allison",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Stavola Brothers Racing",  titles: 1, wins: 85,  status: "Retired", debut: 1961 },
+  { name: "Rusty Wallace",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Team Penske",              titles: 1, wins: 55,  status: "Retired", debut: 1980 },
+  { name: "Bill Elliott",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Evernham Motorsports",     titles: 1, wins: 44,  status: "Retired", debut: 1976 },
+  { name: "Alan Kulwicki",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "AK Racing",                titles: 1, wins: 5,   status: "Retired", debut: 1985 },
+  { name: "Dale Jarrett",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Michael Waltrip Racing",   titles: 1, wins: 32,  status: "Retired", debut: 1984 },
+  { name: "Bobby Labonte",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "JTG Daugherty Racing",     titles: 1, wins: 21,  status: "Retired", debut: 1991 },
+  { name: "Matt Kenseth",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Chip Ganassi Racing",      titles: 1, wins: 39,  status: "Retired", debut: 1998 },
+  { name: "Kurt Busch",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "23XI Racing",              titles: 1, wins: 34,  status: "Retired", debut: 2000 },
   { name: "Kevin Harvick",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Stewart-Haas Racing",      titles: 1, wins: 60,  status: "Retired", debut: 2001 },
   { name: "Martin Truex Jr.",    country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Joe Gibbs Racing",         titles: 1, wins: 34,  status: "Retired", debut: 2004 },
+  { name: "Bobby Isaac",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "K&K Insurance Dodge",      titles: 1, wins: 37,  status: "Retired", debut: 1961 },
+  { name: "Rex White",           country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "White & Clements",         titles: 1, wins: 28,  status: "Retired", debut: 1956 },
+  { name: "Benny Parsons",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "L.G. DeWitt Racing",       titles: 1, wins: 21,  status: "Retired", debut: 1964 }, // verify last team
+  { name: "Dale Earnhardt Jr.",  country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 26,  status: "Retired", debut: 1999 },
+  { name: "Mark Martin",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Michael Waltrip Racing",   titles: 0, wins: 40,  status: "Retired", debut: 1981 },
+  { name: "Junior Johnson",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Junior Johnson & Associates", titles: 0, wins: 50, status: "Retired", debut: 1953 },
+  { name: "Fireball Roberts",    country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Holman-Moody",             titles: 0, wins: 33,  status: "Retired", debut: 1950 },
+  { name: "Carl Edwards",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Joe Gibbs Racing",         titles: 0, wins: 28,  status: "Retired", debut: 2004 },
+  { name: "Ricky Rudd",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Robert Yates Racing",      titles: 0, wins: 23,  status: "Retired", debut: 1975 },
+  { name: "Jeff Burton",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Richard Childress Racing", titles: 0, wins: 21,  status: "Retired", debut: 1993 },
+  { name: "Greg Biffle",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Roush Fenway Racing",      titles: 0, wins: 19,  status: "Retired", debut: 2002 },
+  { name: "Davey Allison",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Robert Yates Racing",      titles: 0, wins: 19,  status: "Retired", debut: 1987 },
+  { name: "Buddy Baker",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Baker-Schiff Racing",      titles: 0, wins: 19,  status: "Retired", debut: 1959 }, // verify last team
+  { name: "Kasey Kahne",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Leavine Family Racing",    titles: 0, wins: 18,  status: "Retired", debut: 2004 },
+  { name: "Ryan Newman",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Roush Fenway Racing",      titles: 0, wins: 18,  status: "Retired", debut: 2000 },
+  { name: "Harry Gant",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Leo Jackson Motorsports",  titles: 0, wins: 18,  status: "Retired", debut: 1973 },
+  { name: "Neil Bonnett",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "RahMoc Enterprises",       titles: 0, wins: 18,  status: "Retired", debut: 1974 }, // verify last team
+  { name: "Ernie Irvan",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "MB2 Motorsports",          titles: 0, wins: 15,  status: "Retired", debut: 1987 },
+  { name: "Tim Richmond",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports",     titles: 0, wins: 13,  status: "Retired", debut: 1980 },
+  { name: "Sterling Marlin",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Ginn Racing",              titles: 0, wins: 10,  status: "Retired", debut: 1976 },
+  { name: "Clint Bowyer",        country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Stewart-Haas Racing",      titles: 0, wins: 10,  status: "Retired", debut: 2005 },
+  { name: "Kyle Petty",          country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Petty Enterprises",        titles: 0, wins: 8,   status: "Retired", debut: 1979 },
+  { name: "Jamie McMurray",      country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Chip Ganassi Racing",      titles: 0, wins: 7,   status: "Retired", debut: 2002 },
+  { name: "Ward Burton",         country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Haas CNC Racing",          titles: 0, wins: 5,   status: "Retired", debut: 1994 },
+  { name: "Michael Waltrip",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Michael Waltrip Racing",   titles: 0, wins: 4,   status: "Retired", debut: 1985 },
+  { name: "Aric Almirola",       country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Stewart-Haas Racing",      titles: 0, wins: 3,   status: "Retired", debut: 2007 },
+  { name: "Harrison Burton",     country: "United States",  continent: "North America", series: SERIES.NASCAR, team: "Wood Brothers Racing",     titles: 0, wins: 1,   status: "Retired", debut: 2022 },
 
-  // ---------- IndyCar ----------
-  { name: "Alex Palou",          country: "Spain",          continent: "Europe",        series: SERIES.INDYCAR, team: "Chip Ganassi Racing",  titles: 3, wins: 11, status: "Active",  debut: 2020 },
-  { name: "Scott Dixon",         country: "New Zealand",    continent: "Oceania",       series: SERIES.INDYCAR, team: "Chip Ganassi Racing",  titles: 6, wins: 58, status: "Active",  debut: 2001 },
-  { name: "Josef Newgarden",     country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Team Penske",          titles: 2, wins: 29, status: "Active",  debut: 2012 },
-  { name: "Will Power",          country: "Australia",      continent: "Oceania",       series: SERIES.INDYCAR, team: "Team Penske",          titles: 2, wins: 44, status: "Active",  debut: 2008 },
-  { name: "Pato O'Ward",         country: "Mexico",         continent: "North America", series: SERIES.INDYCAR, team: "Arrow McLaren",        titles: 0, wins: 7,  status: "Active",  debut: 2018 },
-  { name: "Colton Herta",        country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Andretti Global",      titles: 0, wins: 9,  status: "Active",  debut: 2019 },
-  { name: "Helio Castroneves",   country: "Brazil",         continent: "South America", series: SERIES.INDYCAR, team: "Meyer Shank Racing",   titles: 0, wins: 31, status: "Retired", debut: 1998 },
-  { name: "Mario Andretti",      country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Newman/Haas Racing",   titles: 4, wins: 52, status: "Retired", debut: 1964 },
+  // ================= INDYCAR (modern series + pre-1979 USAC) =================
+  { name: "Alex Palou",          country: "Spain",          continent: "Europe",        series: SERIES.INDYCAR, team: "Chip Ganassi Racing",   titles: 4, wins: 19, status: "Active",  debut: 2020 }, // incl. 2025 title
+  { name: "Scott Dixon",         country: "New Zealand",    continent: "Oceania",       series: SERIES.INDYCAR, team: "Chip Ganassi Racing",   titles: 6, wins: 58, status: "Active",  debut: 2001 },
+  { name: "Josef Newgarden",     country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Team Penske",           titles: 2, wins: 29, status: "Active",  debut: 2012 },
+  { name: "Will Power",          country: "Australia",      continent: "Oceania",       series: SERIES.INDYCAR, team: "Team Penske",           titles: 2, wins: 44, status: "Active",  debut: 2008 },
+  { name: "Pato O'Ward",         country: "Mexico",         continent: "North America", series: SERIES.INDYCAR, team: "Arrow McLaren",         titles: 0, wins: 7,  status: "Active",  debut: 2018 },
+  { name: "Colton Herta",        country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Andretti Global",       titles: 0, wins: 9,  status: "Active",  debut: 2019 },
+  { name: "Scott McLaughlin",    country: "New Zealand",    continent: "Oceania",       series: SERIES.INDYCAR, team: "Team Penske",           titles: 0, wins: 7,  status: "Active",  debut: 2020 },
+  { name: "Kyle Kirkwood",       country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Andretti Global",       titles: 0, wins: 3,  status: "Active",  debut: 2022 },
+  { name: "Marcus Ericsson",     country: "Sweden",         continent: "Europe",        series: SERIES.INDYCAR, team: "Andretti Global",       titles: 0, wins: 4,  status: "Active",  debut: 2019 },
+  { name: "Alexander Rossi",     country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Ed Carpenter Racing",   titles: 0, wins: 8,  status: "Active",  debut: 2016 },
+  { name: "Graham Rahal",        country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Rahal Letterman Lanigan", titles: 0, wins: 6, status: "Active", debut: 2007 },
+  { name: "Christian Lundgaard", country: "Denmark",        continent: "Europe",        series: SERIES.INDYCAR, team: "Arrow McLaren",         titles: 0, wins: 1,  status: "Active",  debut: 2022 },
+  { name: "Felix Rosenqvist",    country: "Sweden",         continent: "Europe",        series: SERIES.INDYCAR, team: "Meyer Shank Racing",    titles: 0, wins: 1,  status: "Active",  debut: 2019 },
+  { name: "Rinus VeeKay",        country: "Netherlands",    continent: "Europe",        series: SERIES.INDYCAR, team: "Dale Coyne Racing",     titles: 0, wins: 1,  status: "Active",  debut: 2020 },
+  { name: "Santino Ferrucci",    country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "A.J. Foyt Enterprises", titles: 0, wins: 0,  status: "Active",  debut: 2019 },
   { name: "A.J. Foyt",           country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "A.J. Foyt Enterprises", titles: 7, wins: 67, status: "Retired", debut: 1957 },
+  { name: "Mario Andretti",      country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Newman/Haas Racing",    titles: 4, wins: 52, status: "Retired", debut: 1964 },
+  { name: "Dario Franchitti",    country: "United Kingdom", continent: "Europe",        series: SERIES.INDYCAR, team: "Chip Ganassi Racing",   titles: 4, wins: 31, status: "Retired", debut: 1997 },
+  { name: "Sam Hornish Jr.",     country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Team Penske",           titles: 3, wins: 19, status: "Retired", debut: 2000 },
+  { name: "Al Unser",            country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Team Penske",           titles: 3, wins: 39, status: "Retired", debut: 1964 },
+  { name: "Bobby Unser",         country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Patrick Racing",        titles: 2, wins: 35, status: "Retired", debut: 1963 },
+  { name: "Tony Kanaan",         country: "Brazil",         continent: "South America", series: SERIES.INDYCAR, team: "Arrow McLaren",         titles: 1, wins: 17, status: "Retired", debut: 1998 },
+  { name: "Dan Wheldon",         country: "United Kingdom", continent: "Europe",        series: SERIES.INDYCAR, team: "Bryan Herta Autosport", titles: 1, wins: 16, status: "Retired", debut: 2002 },
+  { name: "Ryan Hunter-Reay",    country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Dreyer & Reinbold",     titles: 1, wins: 18, status: "Retired", debut: 2003 }, // verify last team
+  { name: "Simon Pagenaud",      country: "France",         continent: "Europe",        series: SERIES.INDYCAR, team: "Meyer Shank Racing",    titles: 1, wins: 15, status: "Retired", debut: 2007 },
+  { name: "Johnny Rutherford",   country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Chaparral Racing",      titles: 1, wins: 27, status: "Retired", debut: 1962 }, // verify last team
+  { name: "Gordon Johncock",     country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Patrick Racing",        titles: 1, wins: 25, status: "Retired", debut: 1965 },
+  { name: "Helio Castroneves",   country: "Brazil",         continent: "South America", series: SERIES.INDYCAR, team: "Meyer Shank Racing",    titles: 0, wins: 31, status: "Retired", debut: 1998 },
+  { name: "Marco Andretti",      country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Andretti Global",       titles: 0, wins: 2,  status: "Retired", debut: 2006 },
+  { name: "Ed Carpenter",        country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Ed Carpenter Racing",   titles: 0, wins: 3,  status: "Retired", debut: 2003 },
+  { name: "James Hinchcliffe",   country: "Canada",         continent: "North America", series: SERIES.INDYCAR, team: "Arrow McLaren SP",      titles: 0, wins: 6,  status: "Retired", debut: 2011 },
+  { name: "Takuma Sato",         country: "Japan",          continent: "Asia",          series: SERIES.INDYCAR, team: "Rahal Letterman Lanigan", titles: 0, wins: 6, status: "Retired", debut: 2010 },
+  { name: "Danica Patrick",      country: "United States",  continent: "North America", series: SERIES.INDYCAR, team: "Andretti Autosport",    titles: 0, wins: 1,  status: "Retired", debut: 2005 },
 
-  // ---------- MotoGP (premier class) ----------
-  { name: "Marc Marquez",        country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Ducati Lenovo",         titles: 6, wins: 62, status: "Active",  debut: 2013 },
+  // ================= CART / CHAMP CAR (peak 1979–2007) =================
+  { name: "Sebastien Bourdais",  country: "France",         continent: "Europe",        series: SERIES.CART, team: "A.J. Foyt Enterprises",  titles: 4, wins: 37, status: "Retired", debut: 2003 }, // verify last team
+  { name: "Bobby Rahal",         country: "United States",  continent: "North America", series: SERIES.CART, team: "Team Rahal",             titles: 3, wins: 24, status: "Retired", debut: 1982 },
+  { name: "Rick Mears",          country: "United States",  continent: "North America", series: SERIES.CART, team: "Team Penske",            titles: 3, wins: 29, status: "Retired", debut: 1978 },
+  { name: "Alex Zanardi",        country: "Italy",          continent: "Europe",        series: SERIES.CART, team: "Chip Ganassi Racing",    titles: 2, wins: 15, status: "Retired", debut: 1996 },
+  { name: "Gil de Ferran",       country: "Brazil",         continent: "South America", series: SERIES.CART, team: "Team Penske",            titles: 2, wins: 12, status: "Retired", debut: 1995 },
+  { name: "Al Unser Jr.",        country: "United States",  continent: "North America", series: SERIES.CART, team: "Kelley Racing",          titles: 2, wins: 34, status: "Retired", debut: 1982 }, // verify last team
+  { name: "Jimmy Vasser",        country: "United States",  continent: "North America", series: SERIES.CART, team: "PKV Racing",             titles: 1, wins: 10, status: "Retired", debut: 1992 },
+  { name: "Cristiano da Matta",  country: "Brazil",         continent: "South America", series: SERIES.CART, team: "RuSPORT",                titles: 1, wins: 12, status: "Retired", debut: 1999 }, // verify
+  { name: "Paul Tracy",          country: "Canada",         continent: "North America", series: SERIES.CART, team: "Forsythe Racing",        titles: 1, wins: 31, status: "Retired", debut: 1991 },
+  { name: "Michael Andretti",    country: "United States",  continent: "North America", series: SERIES.CART, team: "Team Green",             titles: 1, wins: 42, status: "Retired", debut: 1983 },
+  { name: "Danny Sullivan",      country: "United States",  continent: "North America", series: SERIES.CART, team: "PacWest Racing",         titles: 1, wins: 17, status: "Retired", debut: 1982 },
+  { name: "Greg Moore",          country: "Canada",         continent: "North America", series: SERIES.CART, team: "Forsythe Racing",        titles: 0, wins: 5,  status: "Retired", debut: 1996 },
+  { name: "Adrian Fernandez",    country: "Mexico",         continent: "North America", series: SERIES.CART, team: "Fernandez Racing",       titles: 0, wins: 11, status: "Retired", debut: 1993 },
+  { name: "Justin Wilson",       country: "United Kingdom", continent: "Europe",        series: SERIES.CART, team: "Andretti Autosport",     titles: 0, wins: 7,  status: "Retired", debut: 2003 },
+
+  // ================= V8 SUPERCARS (ATCC lineage) =================
+  { name: "Jamie Whincup",       country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Triple Eight Race Engineering", titles: 7, wins: 124, status: "Retired", debut: 2003 },
+  { name: "Mark Skaife",         country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Holden Racing Team",     titles: 5, wins: 90,  status: "Retired", debut: 1987 },
+  { name: "Dick Johnson",        country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Dick Johnson Racing",    titles: 5, wins: 30,  status: "Retired", debut: 1973 }, // verify wins
+  { name: "Allan Moffat",        country: "Canada",         continent: "North America", series: SERIES.SUPERCARS, team: "Allan Moffat Racing",    titles: 4, wins: 32,  status: "Retired", debut: 1965 }, // verify
+  { name: "Jim Richards",        country: "New Zealand",    continent: "Oceania",       series: SERIES.SUPERCARS, team: "Gibson Motorsport",      titles: 4, wins: 35,  status: "Retired", debut: 1974 }, // verify
+  { name: "Peter Brock",         country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Holden Racing Team",     titles: 3, wins: 37,  status: "Retired", debut: 1972 },
+  { name: "Craig Lowndes",       country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Triple Eight Race Engineering", titles: 3, wins: 110, status: "Retired", debut: 1994 },
+  { name: "Glenn Seton",         country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Ford Tickford Racing",   titles: 2, wins: 35,  status: "Retired", debut: 1984 }, // verify wins
+  { name: "Marcos Ambrose",      country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "DJR Team Penske",        titles: 2, wins: 28,  status: "Retired", debut: 2001 },
+  { name: "Garth Tander",        country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Garry Rogers Motorsport", titles: 1, wins: 55, status: "Retired", debut: 1998 },
+  { name: "Mark Winterbottom",   country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Team 18",                titles: 1, wins: 40,  status: "Active",  debut: 2004 }, // verify status
+  { name: "Russell Ingall",      country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Lucas Dumbrell Motorsport", titles: 1, wins: 12, status: "Retired", debut: 1996 }, // verify
+  { name: "Rick Kelly",          country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Kelly Racing",           titles: 1, wins: 12,  status: "Retired", debut: 2002 }, // verify wins
+  { name: "James Courtney",      country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Blanchard Racing Team",  titles: 1, wins: 15,  status: "Active",  debut: 2006 }, // verify status
+  { name: "John Bowe",           country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Brad Jones Racing",      titles: 1, wins: 20,  status: "Retired", debut: 1985 }, // verify
+  { name: "Greg Murphy",         country: "New Zealand",    continent: "Oceania",       series: SERIES.SUPERCARS, team: "Paul Morris Motorsport", titles: 0, wins: 28,  status: "Retired", debut: 1996 }, // verify last team
+  { name: "Will Brown",          country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Triple Eight Race Engineering", titles: 1, wins: 15, status: "Active", debut: 2021 }, // verify wins
+  { name: "Broc Feeney",         country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Triple Eight Race Engineering", titles: 0, wins: 15, status: "Active", debut: 2022 }, // verify: possible 2025 title
+  { name: "Brodie Kostecki",     country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Dick Johnson Racing",    titles: 1, wins: 8,   status: "Active",  debut: 2021 },
+  { name: "Chaz Mostert",        country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Walkinshaw Andretti United", titles: 0, wins: 22, status: "Active", debut: 2013 },
+  { name: "Cameron Waters",      country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Tickford Racing",        titles: 0, wins: 12,  status: "Active",  debut: 2016 },
+  { name: "Will Davison",        country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Dick Johnson Racing",    titles: 0, wins: 22,  status: "Active",  debut: 2004 }, // verify status
+  { name: "Anton De Pasquale",   country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Team 18",                titles: 0, wins: 10,  status: "Active",  debut: 2018 },
+  { name: "David Reynolds",      country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Team 18",                titles: 0, wins: 6,   status: "Active",  debut: 2010 }, // verify team
+  { name: "Matt Payne",          country: "New Zealand",    continent: "Oceania",       series: SERIES.SUPERCARS, team: "Grove Racing",           titles: 0, wins: 5,   status: "Active",  debut: 2023 },
+  { name: "Andre Heimgartner",   country: "New Zealand",    continent: "Oceania",       series: SERIES.SUPERCARS, team: "Brad Jones Racing",      titles: 0, wins: 2,   status: "Active",  debut: 2015 },
+  { name: "Nick Percat",         country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Matt Stone Racing",      titles: 0, wins: 3,   status: "Active",  debut: 2014 },
+  { name: "Thomas Randle",       country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Tickford Racing",        titles: 0, wins: 1,   status: "Active",  debut: 2022 },
+  { name: "Fabian Coulthard",    country: "New Zealand",    continent: "Oceania",       series: SERIES.SUPERCARS, team: "DJR Team Penske",        titles: 0, wins: 13,  status: "Retired", debut: 2008 },
+  { name: "Larry Perkins",       country: "Australia",      continent: "Oceania",       series: SERIES.SUPERCARS, team: "Perkins Engineering",    titles: 0, wins: 5,   status: "Retired", debut: 1977 }, // verify wins
+
+  // ================= IMSA (top class, incl. Grand-Am era) =================
+  { name: "Peter Gregg",         country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Brumos Porsche",          titles: 6, wins: 41, status: "Retired", debut: 1971 }, // verify
+  { name: "Al Holbert",          country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Holbert Racing",          titles: 5, wins: 49, status: "Retired", debut: 1974 },
+  { name: "Scott Pruett",        country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Chip Ganassi Racing",     titles: 5, wins: 60, status: "Retired", debut: 1986 }, // verify wins
+  { name: "Geoff Brabham",       country: "Australia",      continent: "Oceania",       series: SERIES.IMSA, team: "Nissan Performance (NPTI)", titles: 4, wins: 25, status: "Retired", debut: 1984 }, // verify
+  { name: "Felipe Nasr",         country: "Brazil",         continent: "South America", series: SERIES.IMSA, team: "Porsche Penske Motorsport", titles: 3, wins: 15, status: "Active", debut: 2018 }, // verify wins
+  { name: "Hurley Haywood",      country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Brumos Porsche",          titles: 2, wins: 25, status: "Retired", debut: 1971 }, // verify
+  { name: "Juan Manuel Fangio II", country: "Argentina",    continent: "South America", series: SERIES.IMSA, team: "All American Racers",     titles: 2, wins: 20, status: "Retired", debut: 1988 }, // verify wins
+  { name: "Ricky Taylor",        country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Wayne Taylor Racing",     titles: 3, wins: 30, status: "Active",  debut: 2008 }, // verify titles
+  { name: "Jordan Taylor",       country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Wayne Taylor Racing",     titles: 2, wins: 25, status: "Active",  debut: 2010 }, // verify
+  { name: "Filipe Albuquerque",  country: "Portugal",       continent: "Europe",        series: SERIES.IMSA, team: "Wayne Taylor Racing",     titles: 2, wins: 20, status: "Active",  debut: 2013 }, // verify
+  { name: "Pipo Derani",         country: "Brazil",         continent: "South America", series: SERIES.IMSA, team: "Action Express Racing",   titles: 2, wins: 20, status: "Active",  debut: 2016 }, // verify
+  { name: "Dane Cameron",        country: "United States",  continent: "North America", series: SERIES.IMSA, team: "Porsche Penske Motorsport", titles: 2, wins: 15, status: "Active", debut: 2014 }, // verify
+  { name: "Matt Campbell",       country: "Australia",      continent: "Oceania",       series: SERIES.IMSA, team: "Porsche Penske Motorsport", titles: 1, wins: 8, status: "Active", debut: 2019 }, // verify titles
+  { name: "Tom Blomqvist",       country: "United Kingdom", continent: "Europe",        series: SERIES.IMSA, team: "Meyer Shank Racing",      titles: 1, wins: 8,  status: "Active",  debut: 2021 },
+  { name: "Nick Tandy",          country: "United Kingdom", continent: "Europe",        series: SERIES.IMSA, team: "Porsche Penske Motorsport", titles: 0, wins: 15, status: "Active", debut: 2012 }, // verify
+  { name: "Mathieu Jaminet",     country: "France",         continent: "Europe",        series: SERIES.IMSA, team: "Porsche Penske Motorsport", titles: 0, wins: 8, status: "Active", debut: 2018 }, // verify
+  { name: "Colin Braun",         country: "United States",  continent: "North America", series: SERIES.IMSA, team: "JDC-Miller MotorSports",  titles: 0, wins: 10, status: "Active",  debut: 2007 }, // verify
+
+  // ================= WEC (incl. pre-2012 World Sportscar legends) =================
+  { name: "Sebastien Buemi",     country: "Switzerland",    continent: "Europe",        series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 4, wins: 25, status: "Active",  debut: 2012 },
+  { name: "Brendon Hartley",     country: "New Zealand",    continent: "Oceania",       series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 4, wins: 20, status: "Active",  debut: 2012 },
+  { name: "Ryo Hirakawa",        country: "Japan",          continent: "Asia",          series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 2, wins: 10, status: "Active",  debut: 2022 },
+  { name: "Andre Lotterer",      country: "Germany",        continent: "Europe",        series: SERIES.WEC, team: "Porsche Penske Motorsport", titles: 2, wins: 18, status: "Active", debut: 2012 },
+  { name: "Timo Bernhard",       country: "Germany",        continent: "Europe",        series: SERIES.WEC, team: "Porsche LMP Team",        titles: 2, wins: 12, status: "Retired", debut: 2014 },
+  { name: "Derek Bell",          country: "United Kingdom", continent: "Europe",        series: SERIES.WEC, team: "Rothmans Porsche",        titles: 2, wins: 20, status: "Retired", debut: 1970 }, // WSC era
+  { name: "Anthony Davidson",    country: "United Kingdom", continent: "Europe",        series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 1, wins: 10, status: "Retired", debut: 2012 },
+  { name: "Neel Jani",           country: "Switzerland",    continent: "Europe",        series: SERIES.WEC, team: "Porsche LMP Team",        titles: 1, wins: 8,  status: "Retired", debut: 2012 },
+  { name: "Romain Dumas",        country: "France",         continent: "Europe",        series: SERIES.WEC, team: "Glickenhaus Racing",      titles: 1, wins: 10, status: "Retired", debut: 2012 },
+  { name: "Marcel Fassler",      country: "Switzerland",    continent: "Europe",        series: SERIES.WEC, team: "Audi Sport Team Joest",   titles: 1, wins: 15, status: "Retired", debut: 2012 },
+  { name: "Benoit Treluyer",     country: "France",         continent: "Europe",        series: SERIES.WEC, team: "Audi Sport Team Joest",   titles: 1, wins: 12, status: "Retired", debut: 2012 },
+  { name: "Loic Duval",          country: "France",         continent: "Europe",        series: SERIES.WEC, team: "Peugeot TotalEnergies",   titles: 1, wins: 8,  status: "Active",  debut: 2012 },
+  { name: "Tom Kristensen",      country: "Denmark",        continent: "Europe",        series: SERIES.WEC, team: "Audi Sport Team Joest",   titles: 1, wins: 10, status: "Retired", debut: 1997 }, // 9x Le Mans winner
+  { name: "Allan McNish",        country: "United Kingdom", continent: "Europe",        series: SERIES.WEC, team: "Audi Sport Team Joest",   titles: 1, wins: 8,  status: "Retired", debut: 1997 },
+  { name: "Mike Conway",         country: "United Kingdom", continent: "Europe",        series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 1, wins: 15, status: "Active",  debut: 2014 },
+  { name: "Kamui Kobayashi",     country: "Japan",          continent: "Asia",          series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 1, wins: 15, status: "Active",  debut: 2016 },
+  { name: "Jose Maria Lopez",    country: "Argentina",      continent: "South America", series: SERIES.WEC, team: "Toyota Gazoo Racing",     titles: 1, wins: 15, status: "Active",  debut: 2017 },
+  { name: "Kevin Estre",         country: "France",         continent: "Europe",        series: SERIES.WEC, team: "Porsche Penske Motorsport", titles: 1, wins: 10, status: "Active", debut: 2016 },
+  { name: "Laurens Vanthoor",    country: "Belgium",        continent: "Europe",        series: SERIES.WEC, team: "Porsche Penske Motorsport", titles: 1, wins: 8, status: "Active", debut: 2017 },
+  { name: "Stefan Bellof",       country: "Germany",        continent: "Europe",        series: SERIES.WEC, team: "Brun Motorsport",         titles: 1, wins: 4,  status: "Retired", debut: 1983 }, // WSC era
+
+  // ================= WRC =================
+  { name: "Sebastien Loeb",      country: "France",         continent: "Europe",        series: SERIES.WRC, team: "M-Sport Ford",            titles: 9, wins: 80, status: "Retired", debut: 1999 },
+  { name: "Sebastien Ogier",     country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 8, wins: 62, status: "Active",  debut: 2008 }, // verify: possible 2025 title
+  { name: "Juha Kankkunen",      country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai",                 titles: 4, wins: 23, status: "Retired", debut: 1983 }, // verify last team
+  { name: "Tommi Makinen",       country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Subaru",                  titles: 4, wins: 24, status: "Retired", debut: 1987 },
+  { name: "Walter Rohrl",        country: "Germany",        continent: "Europe",        series: SERIES.WRC, team: "Audi Sport",              titles: 2, wins: 14, status: "Retired", debut: 1973 },
+  { name: "Carlos Sainz Sr",     country: "Spain",          continent: "Europe",        series: SERIES.WRC, team: "Citroen",                 titles: 2, wins: 26, status: "Retired", debut: 1987 },
+  { name: "Marcus Gronholm",     country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "BP Ford",                 titles: 2, wins: 30, status: "Retired", debut: 1989 },
+  { name: "Miki Biasion",        country: "Italy",          continent: "Europe",        series: SERIES.WRC, team: "Ford",                    titles: 2, wins: 17, status: "Retired", debut: 1983 },
+  { name: "Kalle Rovanpera",     country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 2, wins: 15, status: "Retired", debut: 2017 }, // left WRC for circuit racing after 2025
+  { name: "Richard Burns",       country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Peugeot",                 titles: 1, wins: 10, status: "Retired", debut: 1990 },
+  { name: "Petter Solberg",      country: "Norway",         continent: "Europe",        series: SERIES.WRC, team: "Ford World Rally Team",   titles: 1, wins: 13, status: "Retired", debut: 1998 }, // verify last team
+  { name: "Bjorn Waldegard",     country: "Sweden",         continent: "Europe",        series: SERIES.WRC, team: "Toyota",                  titles: 1, wins: 16, status: "Retired", debut: 1973 },
+  { name: "Ari Vatanen",         country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Ford",                    titles: 1, wins: 10, status: "Retired", debut: 1974 },
+  { name: "Hannu Mikkola",       country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Mazda Rally Team",        titles: 1, wins: 18, status: "Retired", debut: 1973 },
+  { name: "Timo Salonen",        country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Mazda Rally Team",        titles: 1, wins: 11, status: "Retired", debut: 1974 },
+  { name: "Stig Blomqvist",      country: "Sweden",         continent: "Europe",        series: SERIES.WRC, team: "Ford",                    titles: 1, wins: 11, status: "Retired", debut: 1973 },
+  { name: "Didier Auriol",       country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Skoda",                   titles: 1, wins: 20, status: "Retired", debut: 1988 },
+  { name: "Ott Tanak",           country: "Estonia",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 1, wins: 22, status: "Active",  debut: 2009 },
+  { name: "Thierry Neuville",    country: "Belgium",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 1, wins: 22, status: "Active",  debut: 2009 },
+  { name: "Colin McRae",         country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Citroen",                 titles: 1, wins: 25, status: "Retired", debut: 1986 },
+  { name: "Elfyn Evans",         country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 10, status: "Active",  debut: 2013 }, // verify: possible 2025 title
+  { name: "Jari-Matti Latvala",  country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 18, status: "Retired", debut: 2002 },
+  { name: "Mikko Hirvonen",      country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Citroen",                 titles: 0, wins: 15, status: "Retired", debut: 2002 },
+  { name: "Markku Alen",         country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Subaru",                  titles: 0, wins: 19, status: "Retired", debut: 1973 },
+  { name: "Henri Toivonen",      country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Martini Lancia",          titles: 0, wins: 3,  status: "Retired", debut: 1975 },
+  { name: "Michele Mouton",      country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Audi",                    titles: 0, wins: 4,  status: "Retired", debut: 1974 },
+  { name: "Dani Sordo",          country: "Spain",          continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 3,  status: "Retired", debut: 2006 },
+  { name: "Esapekka Lappi",      country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 1,  status: "Retired", debut: 2017 },
+  { name: "Kris Meeke",          country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 5,  status: "Retired", debut: 2009 },
+  { name: "Hayden Paddon",       country: "New Zealand",    continent: "Oceania",       series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 1,  status: "Retired", debut: 2013 },
+  { name: "Andreas Mikkelsen",   country: "Norway",         continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 3,  status: "Retired", debut: 2011 },
+  { name: "Craig Breen",         country: "Ireland",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 0,  status: "Retired", debut: 2016 },
+  { name: "Takamoto Katsuta",    country: "Japan",          continent: "Asia",          series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 0,  status: "Active",  debut: 2020 },
+  { name: "Adrien Fourmaux",     country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",      titles: 0, wins: 0,  status: "Active",  debut: 2021 },
+  { name: "Sami Pajari",         country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",     titles: 0, wins: 0,  status: "Active",  debut: 2024 },
+
+  // ================= MOTOGP (legacy v1 set, premier class) =================
+  { name: "Marc Marquez",        country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Ducati Lenovo",         titles: 7, wins: 73, status: "Active",  debut: 2013 }, // incl. 2025 title
   { name: "Valentino Rossi",     country: "Italy",          continent: "Europe",        series: SERIES.MOTOGP, team: "Petronas Yamaha SRT",   titles: 7, wins: 89, status: "Retired", debut: 2000 },
   { name: "Francesco Bagnaia",   country: "Italy",          continent: "Europe",        series: SERIES.MOTOGP, team: "Ducati Lenovo",         titles: 2, wins: 27, status: "Active",  debut: 2019 },
   { name: "Fabio Quartararo",    country: "France",         continent: "Europe",        series: SERIES.MOTOGP, team: "Monster Energy Yamaha", titles: 1, wins: 11, status: "Active",  debut: 2019 },
@@ -126,14 +422,4 @@ const DRIVERS = [
   { name: "Jorge Lorenzo",       country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Repsol Honda",          titles: 3, wins: 47, status: "Retired", debut: 2008 },
   { name: "Giacomo Agostini",    country: "Italy",          continent: "Europe",        series: SERIES.MOTOGP, team: "MV Agusta",             titles: 8, wins: 68, status: "Retired", debut: 1965 },
   { name: "Dani Pedrosa",        country: "Spain",          continent: "Europe",        series: SERIES.MOTOGP, team: "Repsol Honda",          titles: 0, wins: 31, status: "Retired", debut: 2006 },
-
-  // ---------- WRC ----------
-  { name: "Sebastien Loeb",      country: "France",         continent: "Europe",        series: SERIES.WRC, team: "M-Sport Ford",         titles: 9, wins: 80, status: "Retired", debut: 1999 },
-  { name: "Sebastien Ogier",     country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",  titles: 8, wins: 62, status: "Active",  debut: 2008 },
-  { name: "Kalle Rovanpera",     country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Toyota Gazoo Racing",  titles: 2, wins: 15, status: "Active",  debut: 2017 },
-  { name: "Ott Tanak",           country: "Estonia",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",   titles: 1, wins: 22, status: "Active",  debut: 2009 },
-  { name: "Thierry Neuville",    country: "Belgium",        continent: "Europe",        series: SERIES.WRC, team: "Hyundai Motorsport",   titles: 1, wins: 22, status: "Active",  debut: 2009 },
-  { name: "Colin McRae",         country: "United Kingdom", continent: "Europe",        series: SERIES.WRC, team: "Citroen",              titles: 1, wins: 25, status: "Retired", debut: 1986 },
-  { name: "Tommi Makinen",       country: "Finland",        continent: "Europe",        series: SERIES.WRC, team: "Subaru",               titles: 4, wins: 24, status: "Retired", debut: 1987 },
-  { name: "Michele Mouton",      country: "France",         continent: "Europe",        series: SERIES.WRC, team: "Audi",                 titles: 0, wins: 4,  status: "Retired", debut: 1974 },
 ];
