@@ -1,5 +1,9 @@
 # Racedle data import pipeline
 
+> **Source strategy:** see [DATA_SOURCES.md](DATA_SOURCES.md) — the per-series evaluation of
+> quality data sources. F1's primary source is moving from the Jolpica API scan to **F1DB**
+> (CC BY 4.0 bulk releases, verified 2026-07-07), with Jolpica retained as a cross-validator.
+
 Builds the driver database from **license-clean, reuse-friendly public sources** — the only
 sustainable way to reach "every full-season driver since 1970, all series." It deliberately
 does **not** use racing-reference.info: that site blocks automated access and its Terms of Use
