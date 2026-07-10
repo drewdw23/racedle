@@ -81,7 +81,12 @@ and queried directly (Node's built-in `node:sqlite`):
 - Cross-series dedup stays accent-insensitive ("Sébastien Bourdais" vs existing "Sebastien
   Bourdais") and dual-career drivers keep their non-F1 primary series, as in the last merge.
 
-## 4. Implementation plan
+## 4. Implementation plan — ✅ implemented 2026-07-08
+
+Status: steps 1–4 and 6 are live. `node run.js --series=f1` uses F1DB; `--validate` cross-checks
+Jolpica (first run: 253 drivers matched, **zero title/win disagreements**; 44 cosmetic
+team-naming / historical-debut variances logged in report.md); `node merge-f1.js` runs the
+golden tests and rewrote data.js to the trimmed pool (251 F1 = 241 full-timers + 10 legends).
 
 1. **New source `import/sources/f1db.js`** *(replaces the Jolpica scan as primary)*:
    download `f1db-sqlite.zip` from the latest GitHub release (version-pinned, checksum from

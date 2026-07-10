@@ -29,7 +29,8 @@ export const CONTACT = "racedle-import (https://github.com/drewdw23/racedle) - c
 export const SERIES_CONFIG = {
   f1: {
     series: "Formula 1",
-    engine: "jolpica", // uses the Ergast-successor API, not Wikipedia
+    engine: "f1db", // primary: F1DB SQLite release (see DATA_SOURCES.md)
+    validator: "jolpica", // independent cross-check via --validate
   },
 
   nascar: {

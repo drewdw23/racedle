@@ -2,6 +2,8 @@
      node run.js                     # all series
      node run.js --series=f1,wrc     # subset
      node run.js --debug             # per-season logging
+     node run.js --series=f1 --validate   # also run the series' validator
+                                          # source and diff the two in report.md
 
    Outputs (never touches ../data.js directly):
      output/drivers.generated.json   # full records + provenance
@@ -14,6 +16,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SERIES_CONFIG, YEAR_FROM, YEAR_TO } from "./config.js";
 import { collectF1 } from "./sources/f1.js";
+import { collectF1DB } from "./sources/f1db.js";
 import { collectSeasonRosters } from "./sources/wikipediaSeasons.js";
 import { enrichRoster } from "./enrich.js";
 import { emitDataJs } from "./lib/normalize.js";
@@ -24,10 +27,44 @@ mkdirSync(OUT, { recursive: true });
 
 const args = process.argv.slice(2);
 const debug = args.includes("--debug");
+const validate = args.includes("--validate");
 const seriesArg = args.find((a) => a.startsWith("--series="));
 const selected = seriesArg ? seriesArg.split("=")[1].split(",") : Object.keys(SERIES_CONFIG);
 const currentYear = new Date().getUTCFullYear();
 const log = (m) => process.stdout.write(m + "\n");
+const validationNotes = [];
+
+async function collect(engine) {
+  if (engine === "f1db") return collectF1DB(currentYear, log);
+  if (engine === "jolpica") return collectF1(currentYear, log);
+  return null;
+}
+
+/* Cross-source validation: diff primary vs validator per driver on the
+   stat fields. Disagreements are for human review, not auto-resolution —
+   two independent sources catching each other is the reliability story. */
+function diffSources(seriesLabel, primary, secondary, primaryName, secondaryName) {
+  const strip = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.'\-]/g, " ").replace(/\s+/g, " ").trim();
+  const sec = new Map(secondary.map((r) => [strip(r.name), r]));
+  const lines = [];
+  let matched = 0;
+  for (const p of primary) {
+    const s = sec.get(strip(p.name));
+    if (!s) continue;
+    matched++;
+    const diffs = [];
+    for (const f of ["titles", "wins", "team", "debut"]) {
+      if (p[f] != null && s[f] != null && String(p[f]) !== String(s[f])) diffs.push(`${f}: ${primaryName}=${p[f]} ${secondaryName}=${s[f]}`);
+    }
+    if (diffs.length) lines.push(`- ${p.name}: ${diffs.join("; ")}`);
+  }
+  validationNotes.push(
+    `### ${seriesLabel}: ${primaryName} vs ${secondaryName}\n` +
+    `${matched} drivers matched across sources; ${lines.length} with disagreements.\n` +
+    (lines.length ? lines.join("\n") : "- (no disagreements)")
+  );
+  log(`${seriesLabel} validation: ${matched} matched, ${lines.length} disagreements (details in report.md)`);
+}
 
 async function main() {
   log(`Racedle import — ${YEAR_FROM}-${YEAR_TO} — series: ${selected.join(", ")}\n`);
@@ -39,8 +76,13 @@ async function main() {
       log(`! unknown series "${id}" — skipping`);
       continue;
     }
-    if (cfg.engine === "jolpica") {
-      all.push(...(await collectF1(currentYear, log)));
+    const collected = await collect(cfg.engine);
+    if (collected) {
+      all.push(...collected);
+      if (validate && cfg.validator) {
+        const check = await collect(cfg.validator);
+        if (check) diffSources(cfg.series, collected, check, cfg.engine, cfg.validator);
+      }
     } else {
       const roster = await collectSeasonRosters(id, cfg, log, debug);
       all.push(...(await enrichRoster(id, cfg.series, roster, currentYear, log)));
@@ -110,6 +152,10 @@ function report(records) {
   L.push(`\nNew drivers found vs current (${newVsCurrent.length}) — candidates to add after curation:`);
   L.push(newVsCurrent.slice(0, 500).map((n) => `- ${n}`).join("\n"));
   if (newVsCurrent.length > 500) L.push(`- …and ${newVsCurrent.length - 500} more`);
+  if (validationNotes.length) {
+    L.push(`\n## Cross-source validation`);
+    L.push(validationNotes.join("\n\n"));
+  }
   return L.join("\n") + "\n";
 }
 

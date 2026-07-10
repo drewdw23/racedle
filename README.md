@@ -59,11 +59,23 @@ This is **v1 for user testing.** Things we want to hear about:
 
 ## Adding a driver
 
-Add one object to `DRIVERS` in [data.js](data.js) following the editorial rules in the file
-header (championships = top-class titles; debut = top-class debut; team = current, or last
-team for retired drivers). PRs welcome during testing.
+Non-F1 series: add one object to `DRIVERS` in [data.js](data.js) following the editorial rules
+in the file header (championships = top-class titles; debut = top-class debut; team = current,
+or last team for retired drivers). PRs welcome during testing.
+
+F1 is **generated, not hand-edited**: the section is produced from F1DB by the import pipeline
+(`cd import && node run.js --series=f1 && node merge-f1.js`) — see
+[import/DATA_SOURCES.md](import/DATA_SOURCES.md). Report F1 data errors upstream or as an issue
+here and we'll re-verify.
+
+## Data credits
+
+- **F1 driver data:** [F1DB](https://github.com/f1db/f1db), licensed
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cross-validated against the
+  [Jolpica-F1](https://github.com/jolpica/jolpica-f1) API.
+- Other series: compiled from public sources (Wikipedia/Wikidata), verification ongoing.
 
 ---
 
 *Racedle is an unofficial fan-made game, not affiliated with Formula 1, NASCAR, IndyCar,
-Supercars, IMSA, the FIA, or any series, team or driver. Driver data compiled from public sources.*
+Supercars, IMSA, the FIA, or any series, team or driver.*
