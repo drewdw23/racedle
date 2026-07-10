@@ -56,7 +56,7 @@ export const SERIES_CONFIG = {
 
   indycar: {
     series: "IndyCar",
-    engine: "wikipedia",
+    engine: "indycar", // modern IndyCar (2008+): entries Round(s) + winners table + champions (see DATA_SOURCES.md §6)
     wikipedia: {
       titleCandidates: (y) => [
         `${y} IndyCar Series`,

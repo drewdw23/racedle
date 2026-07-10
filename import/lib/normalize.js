@@ -32,14 +32,27 @@ const COUNTRY_TO_CONTINENT = {
   Estonia: "Europe", Ireland: "Europe", Poland: "Europe", "Czech Republic": "Europe",
   Hungary: "Europe", Liechtenstein: "Europe",
   Japan: "Asia", Thailand: "Asia", China: "Asia", India: "Asia", Indonesia: "Asia",
+  "United Arab Emirates": "Asia", Israel: "Asia",
   Australia: "Oceania", "New Zealand": "Oceania",
   "South Africa": "Africa", Zimbabwe: "Africa",
+  Barbados: "North America",
+};
+
+/* Wikidata often returns a state's official long name; map to the short
+   name the game uses. */
+const COUNTRY_ALIAS = {
+  "Kingdom of Denmark": "Denmark",
+  "Kingdom of the Netherlands": "Netherlands",
+  "United States of America": "United States",
+  "Czechia": "Czech Republic",
+  "State of Israel": "Israel",
 };
 
 export function toCountry(raw) {
   if (!raw) return null;
-  const s = raw.trim();
-  return DEMONYM_TO_COUNTRY[s] || (COUNTRY_TO_CONTINENT[s] ? s : s);
+  let s = raw.trim();
+  s = COUNTRY_ALIAS[s] || s.replace(/^Kingdom of (the )?/, "");
+  return DEMONYM_TO_COUNTRY[s] || s;
 }
 
 export function continentOf(country) {

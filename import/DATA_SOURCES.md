@@ -169,11 +169,10 @@ the full evaluation:
 
 ## 6. IndyCar / CART — evaluated candidates (verified 2026-07-10)
 
-**Verdict: no clean single source — the lowest automation-ROI series so far.** There is no
-F1DB/nascaR.data equivalent, the champions list can't cleanly attribute pre-1979 titles, and
-the CART era needs per-year table tuning. Modern IndyCar is tractable; the tail is not.
-Recommendation: a **modern-IndyCar-only pipeline (≈2008+) + keep the CART/pre-1979 tail
-hand-curated**, or leave the whole 47-driver hand-set as-is until it's a priority.
+**Verdict (evaluated): no clean single source.** No F1DB/nascaR.data equivalent; the champions
+list can't cleanly attribute pre-1979 titles; the CART era needs per-year tuning. Modern IndyCar
+is tractable; the tail is not. **Implemented as recommended:** a modern-IndyCar-only pipeline
+(2008+) with the CART/pre-1979 tail kept hand-curated — see the ✅ section below.
 
 | Source | License | Access | Verdict |
 |---|---|---|---|
@@ -205,13 +204,25 @@ hand-curated**, or leave the whole 47-driver hand-set as-is until it's a priorit
 - **Taxonomy is editorial.** Nothing in the data labels a driver "IndyCar" vs "CART" (the game
   splits them by career peak). That split stays a human call.
 
-### Recommended shape (if/when built)
-`sources/indycar.js`: modern IndyCar only (≈2008+) via the entries `Round(s)` column for the
-full-time rule; titles = champions list filtered to 1979+ **plus** a small hardcoded pre-1979
-legends title map; nationality/debut from Wikidata; CART/Champ Car left to the hand-curated set
-(or added coarsely from entry-list presence, clearly lower-confidence). Golden tests would
-anchor Dixon 6, Palou 4, Power 2 and assert Foyt/Andretti come from the hardcoded map, not the
-conflated list.
+### Implementation — ✅ built & shipped 2026-07-10
+`sources/indycar.js` (engine `indycar`): walks `YYYY IndyCar Series` "Confirmed entries" tables
+2008→now, keeps drivers with ≥60% of a season's rounds (Round(s) column) → **97-driver pool**;
+career **wins** from the Championship Car winners list Combined Total (absent = 0); **titles**
+from the champions list, IndyCar lineage **1996+** (sidesteps the USAC conflation entirely);
+**nationality** from Wikidata (+ a 1-name override the search missed); **debut** = first
+full-time season, overridden at merge with the curated real debut for pre-2008 debutants.
+`merge-indycar.js` is golden-test-gated (anchors Dixon 6/59, Palou 4/23, Power 2/45,
+Newgarden 2/34; Dixon→NZ; legends preserved; CART section byte-unchanged; flags; no dupes).
+
+**Result:** IndyCar 33 → **94** (87 modern + 7 preserved pre-1979/pre-2008 legends — Foyt at
+the correct **7** titles, not the conflated 18); CART/Champ Car (14) untouched; 10 dual-career
+drivers kept in their series (Bourdais/Wilson→CART, Montoya/Grosjean/Jimmie Johnson/…→their
+series). The Round(s) filter delivered the promise — one-off Indy 500 entries are excluded and
+Dixon's real 2001 debut survives via carryover. 13 obscure new drivers floor to debut=2008, but
+all debuted in the 2000s decade so the game's Decade tile is unaffected.
+
+Normalize.js gained general fixes found here (Wikidata "Kingdom of Denmark/Netherlands" →
+short names; UAE/Barbados/Israel continents) that benefit every series.
 
 ## 7. Applying the rubric to the remaining series
 
