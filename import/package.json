@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Data pipeline that builds Racedle's driver database from license-clean public sources (Wikidata CC0, Wikipedia CC BY-SA, Jolpica/Ergast for F1).",
+  "description": "Data pipeline that builds Racedle's driver database from license-clean public sources (F1DB CC BY 4.0, Wikidata CC0, Wikipedia CC BY-SA, Jolpica/Ergast for F1, nascaR.data for NASCAR).",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "build": "node run.js",
     "build:f1": "node run.js --series=f1",
+    "build:nascar": "node run.js --series=nascar",
     "clean": "node -e \"import('node:fs').then(fs=>fs.rmSync('.cache',{recursive:true,force:true}))\""
+  },
+  "dependencies": {
+    "hyparquet": "^1.17.1"
   }
 }

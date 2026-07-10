@@ -150,12 +150,21 @@ the full evaluation:
 - **Parquet-only** → requires `hyparquet` (tiny, pure-JS, MIT) — the import tool's first npm
   dependency (the game itself stays dependency-free).
 
-### Implementation sketch (when approved)
-`sources/nascar.js`: download the 1 MB parquet (cache by ETag) → aggregate per driver (starts
-per season → full-time rule; wins = Σ Finish 1; debut/last/status from seasons with starts;
-team = team of most recent start) → titles joined from the champions page → nationality map →
-`merge-nascar.js` gated by golden tests (all champions present, Petty 200/7, SVG nationality,
-no one-race leakage, flag coverage).
+### Implementation — ✅ built 2026-07-10 (merge held pending permission)
+- `lib/nascar.js` downloads the ~1 MB parquet, revalidating with the stored ETag (304 when
+  unchanged); `sources/nascar.js` reads it via `hyparquet`, applies the full-time rule, joins
+  titles from the Wikipedia champions list, and maps nationality (default US + 6 named non-US
+  regulars). `node run.js --series=nascar` → **249 full-time drivers**.
+- `merge-nascar.js` is golden-test-gated (champions present; Petty 7/200, Gordon 4/93, Johnson
+  7/83, Earnhardt 7/76, Larson 2/32 anchors; SVG→NZ; no one-race leakage; flag coverage; no
+  dupes). Merge preview: NASCAR section = **252** (243 full-timers + 9 pre-1970 legends), 6
+  dual-career drivers excluded (Montoya→F1, Ambrose→Supercars, Hornish/Patrick→IndyCar,
+  Pruett→IMSA, Speed→F1). Verified in-browser, then **data.js reverted** — see the license gate.
+- **Blocked on:** the [PERMISSION_REQUEST.md](PERMISSION_REQUEST.md) reply. Once granted, add
+  the nascaR.data + DriverAverages credit to the footer and re-run the two commands to ship.
+- Two golden-test catches worth noting: the champions page has multiple tables (initial parse
+  double-counted titles → 9 for Petty; fixed to use only the chronological table); and the
+  suite caught **my** bad assumption (I listed Christopher Bell as a champion — he isn't).
 
 ## 6. Applying the rubric to the remaining series
 

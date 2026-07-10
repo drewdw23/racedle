@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import { SERIES_CONFIG, YEAR_FROM, YEAR_TO } from "./config.js";
 import { collectF1 } from "./sources/f1.js";
 import { collectF1DB } from "./sources/f1db.js";
+import { collectNascar } from "./sources/nascar.js";
 import { collectSeasonRosters } from "./sources/wikipediaSeasons.js";
 import { enrichRoster } from "./enrich.js";
 import { emitDataJs } from "./lib/normalize.js";
@@ -37,6 +38,7 @@ const validationNotes = [];
 async function collect(engine) {
   if (engine === "f1db") return collectF1DB(currentYear, log);
   if (engine === "jolpica") return collectF1(currentYear, log);
+  if (engine === "nascar") return collectNascar(currentYear, log);
   return null;
 }
 

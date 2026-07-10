@@ -35,7 +35,9 @@ export const SERIES_CONFIG = {
 
   nascar: {
     series: "NASCAR Cup",
-    engine: "wikipedia",
+    engine: "nascar", // primary: nascaR.data Cup parquet (see DATA_SOURCES.md §5)
+    // Wikipedia config retained as the fallback roster source (see
+    // PERMISSION_REQUEST.md) and for the season-table validator.
     wikipedia: {
       // "1971 NASCAR Winston Cup Series", "2004 NASCAR Nextel Cup Series",
       // "2015 NASCAR Sprint Cup Series", "2020 NASCAR Cup Series" — the name
