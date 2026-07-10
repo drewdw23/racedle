@@ -1,11 +1,13 @@
-# Draft: data-reuse permission request (NOT yet sent)
+# Data-reuse permission request — ✅ GRANTED 2026-07-10
 
-Post this as a GitHub issue on **[kyleGrealis/nascaR.data](https://github.com/kyleGrealis/nascaR.data/issues)**
-before shipping NASCAR data in the live game. It also, in effect, asks after the
-DriverAverages.com permission chain — mention that upstream source explicitly.
+**Status:** permission granted by the nascaR.data maintainer. NASCAR data is live in `data.js`,
+with attribution to nascaR.data + DriverAverages.com in the site footer and README. Keep that
+credit while the data ships. The original request text is retained below for the record.
 
-**Do not send without the maintainer's handle filled in and a real contact.** Keep it short,
-appreciative, and specific about the (small, factual, attributed) use.
+---
+
+Posted as a GitHub issue on **[kyleGrealis/nascaR.data](https://github.com/kyleGrealis/nascaR.data/issues)**.
+It also, in effect, asked after the DriverAverages.com permission chain.
 
 ---
 

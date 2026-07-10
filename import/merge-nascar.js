@@ -3,12 +3,11 @@
    section. Same shape as merge-f1.js: golden-test-gated, preserves
    pre-1970 legends, excludes dual-career drivers kept in another series.
 
-   ⚠️ DATA LICENSE PENDING: nascaR.data has no explicit data license
-   (see PERMISSION_REQUEST.md). Do NOT commit/ship the resulting data.js
-   until permission is granted. For now this tool is run to validate,
-   then the change is reverted.
+   LICENSE: nascaR.data reuse was granted by the maintainer (2026-07-10,
+   see PERMISSION_REQUEST.md). Keep the nascaR.data + DriverAverages
+   attribution in the site footer while this data ships.
 
-   Usage: node merge-nascar.js
+   Usage: node merge-nascar.js   (then review `git diff ../data.js`)
 */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -126,4 +125,4 @@ console.log(`merged: NASCAR section = ${nascar.length} (${emit.length} generated
 console.log(`excluded ${excluded.length} dual-career drivers (kept in primary series): ${excluded.map((r) => r.name).join(", ") || "(none)"}`);
 console.log(`total DRIVERS: ${OUT.length}`);
 console.log(`\nAll golden tests passed. Review with: git diff ../data.js`);
-console.log(`⚠️  DATA LICENSE PENDING — revert data.js (git checkout data.js) until permission is granted.`);
+console.log(`Keep the nascaR.data + DriverAverages attribution in the site footer while this ships.`);

@@ -73,6 +73,9 @@ here and we'll re-verify.
 - **F1 driver data:** [F1DB](https://github.com/f1db/f1db), licensed
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cross-validated against the
   [Jolpica-F1](https://github.com/jolpica/jolpica-f1) API.
+- **NASCAR Cup driver data:** [nascaR.data](https://github.com/kyleGrealis/nascaR.data), used
+  with the maintainer's permission; upstream source [DriverAverages.com](https://www.driveraverages.com).
+  Championships from the Wikipedia champions list.
 - Other series: compiled from public sources (Wikipedia/Wikidata), verification ongoing.
 
 ---

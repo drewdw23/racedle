@@ -150,7 +150,7 @@ the full evaluation:
 - **Parquet-only** → requires `hyparquet` (tiny, pure-JS, MIT) — the import tool's first npm
   dependency (the game itself stays dependency-free).
 
-### Implementation — ✅ built 2026-07-10 (merge held pending permission)
+### Implementation — ✅ built & SHIPPED 2026-07-10 (permission granted)
 - `lib/nascar.js` downloads the ~1 MB parquet, revalidating with the stored ETag (304 when
   unchanged); `sources/nascar.js` reads it via `hyparquet`, applies the full-time rule, joins
   titles from the Wikipedia champions list, and maps nationality (default US + 6 named non-US
@@ -160,8 +160,9 @@ the full evaluation:
   dupes). Merge preview: NASCAR section = **252** (243 full-timers + 9 pre-1970 legends), 6
   dual-career drivers excluded (Montoya→F1, Ambrose→Supercars, Hornish/Patrick→IndyCar,
   Pruett→IMSA, Speed→F1). Verified in-browser, then **data.js reverted** — see the license gate.
-- **Blocked on:** the [PERMISSION_REQUEST.md](PERMISSION_REQUEST.md) reply. Once granted, add
-  the nascaR.data + DriverAverages credit to the footer and re-run the two commands to ship.
+- **Shipped:** permission granted (see [PERMISSION_REQUEST.md](PERMISSION_REQUEST.md)); NASCAR
+  section merged into `data.js` (252 drivers), nascaR.data + DriverAverages credit in the footer.
+  Refresh weekly in-season: `node run.js --series=nascar && node merge-nascar.js`.
 - Two golden-test catches worth noting: the champions page has multiple tables (initial parse
   double-counted titles → 9 for Petty; fixed to use only the chronological table); and the
   suite caught **my** bad assumption (I listed Christopher Bell as a champion — he isn't).
