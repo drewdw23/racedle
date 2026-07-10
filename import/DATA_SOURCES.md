@@ -105,14 +105,64 @@ golden tests and rewrote data.js to the trimmed pool (251 F1 = 241 full-timers +
 6. **Merge**: regenerate → trim the live 386-driver F1 set to the 257 full-timers → same
    dedup/preserve rules as the last merge (pre-1970 legends kept by hand).
 
-## 5. Applying the rubric to the other series (next up)
+## 5. NASCAR Cup — evaluated candidates (verified 2026-07-10)
 
-The F1 pattern — *bulk, openly-licensed, per-season-granular database first; API second;
-Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never* — is the template.
-Candidate leads to evaluate per series (unverified until given the F1DB treatment):
+| Source | License / lineage | Access | Verdict |
+|---|---|---|---|
+| **nascaR.data** ([github.com/kyleGrealis/nascaR.data](https://github.com/kyleGrealis/nascaR.data)) | GPL-3 (package); data scraped **with permission** from DriverAverages.com — no explicit data license (see caveat) | Bulk Parquet on Cloudflare R2 (`https://nascar.kylegrealis.com/cup_series.parquet`, ~1 MB), auto-updated Mondays in season | ✅ **PRIMARY** (with license action item) |
+| Wikipedia [List of NASCAR Cup Series champions](https://en.wikipedia.org/wiki/List_of_NASCAR_Cup_Series_champions) | CC BY-SA | One page | ✅ **TITLES SOURCE** (nascaR.data has no standings) |
+| Wikipedia season articles ("Teams and drivers") | CC BY-SA | Already parse (2015 → 76 entries) | ✅ Roster cross-validator |
+| Wikidata | CC0 | SPARQL | Nationality for the handful of non-US drivers |
+| racing-reference.info | ToU forbids scraping/derivatives; 403s bots | — | ❌ rejected (see §2) |
+| NASCAR.com internal feeds (cf.nascar.com) | Undocumented, no public license/ToU | JSON | ❌ same category as scraping the official site |
+| SportsDataIO / Sportradar NASCAR APIs | Commercial, paid | API | ❌ cost-prohibitive for a free game |
+| Neil-Paine-1/NASCAR-data (GitHub) | No license; racing-reference lineage | CSV | ❌ tainted lineage, staleness risk |
+| Kaggle NASCAR datasets | Mostly racing-reference scrapes, stale | — | ❌ |
 
-- **NASCAR Cup**: no F1DB equivalent known — likely Wikipedia season entry/results tables
-  (already parse) + Wikidata; evaluate community datasets carefully for license & staleness.
+### Why nascaR.data wins — verified empirically
+Downloaded `cup_series.parquet` (982 KB, parsed with the pure-JS `hyparquet` reader) and ran
+the full evaluation:
+
+| Check | Result |
+|---|---|
+| Coverage | **100,856 race-result rows, 1949–2026** (78 seasons); per-row: Season, Race, Driver, Finish, Start, Team, Make, Laps, Led, Win |
+| Currency | **19 races of 2026 recorded** — exactly the season's progress; teams current (Larson→Hendrick, Johnson→Legacy MC, SVG→Trackhouse) |
+| Historical accuracy | Races/season correct (1975 = 30, 2015 = 36); career wins **exactly match canon**: Petty 200, Pearson 105, Gordon 93, Johnson 83 |
+| Full-time rule (≥60% of season's races, some season ≥1970) | **249-driver pool** (of 1,094 who appear 1970+ — cuts 77% one-race noise); data contains only run races, so the current season is naturally "held to date" |
+| Champions sanity | All 26 champions since 1970 in the pool; one-to-three-start drivers excluded |
+| Active grid | 45 full-timers with 2026 starts ≈ the real charter grid |
+
+### Gaps and mitigations
+- **No championships data** → titles from the Wikipedia champions list. **Verified parseable**
+  with the existing table parser: Petty/Earnhardt/Johnson = 7, Gordon = 4, Larson = 2 (incl.
+  2025), Logano = 3.
+- **No nationality** → default "United States" + a small exceptions map (van Gisbergen→NZ,
+  Suárez→Mexico, Ambrose→Australia, Montoya→Colombia, Villeneuve→Canada, Earl Ross→Canada, …),
+  cross-checkable via Wikidata.
+- **⚠️ Data-license caveat (the one real weakness vs F1DB):** the dataset has no explicit
+  license; its legitimacy rests on DriverAverages' permission *to that project*, which doesn't
+  automatically extend downstream. Mitigations: (1) **action item — open a GitHub issue asking
+  kyleGrealis/DriverAverages for an explicit OK** for reuse in a free ad-supported game with
+  attribution; (2) the values we extract are uncopyrightable facts (wins, starts, teams), and
+  we re-derive nothing else; (3) attribute both nascaR.data and DriverAverages in the data
+  credits; (4) the Wikipedia validator path means the roster could be rebuilt from CC sources
+  if permission is declined.
+- **Parquet-only** → requires `hyparquet` (tiny, pure-JS, MIT) — the import tool's first npm
+  dependency (the game itself stays dependency-free).
+
+### Implementation sketch (when approved)
+`sources/nascar.js`: download the 1 MB parquet (cache by ETag) → aggregate per driver (starts
+per season → full-time rule; wins = Σ Finish 1; debut/last/status from seasons with starts;
+team = team of most recent start) → titles joined from the champions page → nationality map →
+`merge-nascar.js` gated by golden tests (all champions present, Petty 200/7, SVG nationality,
+no one-race leakage, flag coverage).
+
+## 6. Applying the rubric to the remaining series
+
+The template stands: *bulk, openly-licensed, per-season-granular database first; API second;
+Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never*. Candidate leads to
+evaluate (unverified until given the F1DB/NASCAR treatment):
+
 - **IndyCar / CART**: same approach; Wikipedia season pages are strong for entrants.
 - **WRC**: ewrc-results.com is the de-facto stats DB — **check ToU before anything**; else
   Wikipedia season pages.
