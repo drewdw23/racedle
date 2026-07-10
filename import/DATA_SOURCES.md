@@ -166,13 +166,57 @@ the full evaluation:
   double-counted titles → 9 for Petty; fixed to use only the chronological table); and the
   suite caught **my** bad assumption (I listed Christopher Bell as a champion — he isn't).
 
-## 6. Applying the rubric to the remaining series
+## 6. IndyCar / CART — evaluated candidates (verified 2026-07-10)
+
+**Verdict: no clean single source — the lowest automation-ROI series so far.** There is no
+F1DB/nascaR.data equivalent, the champions list can't cleanly attribute pre-1979 titles, and
+the CART era needs per-year table tuning. Modern IndyCar is tractable; the tail is not.
+Recommendation: a **modern-IndyCar-only pipeline (≈2008+) + keep the CART/pre-1979 tail
+hand-curated**, or leave the whole 47-driver hand-set as-is until it's a priority.
+
+| Source | License | Access | Verdict |
+|---|---|---|---|
+| Wikipedia season "Confirmed entries" tables | CC BY-SA | Already parse | ✅ **PRIMARY (modern IndyCar only)** — has a **Round(s) column** |
+| Wikipedia [American open-wheel national champions](https://en.wikipedia.org/wiki/List_of_American_open-wheel_racing_national_champions) | CC BY-SA | One page | ⚠️ **TITLES, 1979+ only** (see conflation bug) |
+| Wikidata | CC0 | SPARQL | ✅ nationality + debut |
+| [indycarpy](https://github.com/TMCabrera/indycarpy) | package code only | Scrapes IndyCar.com session data | ❌ scrapes the official site; modern-only; scraped-data license murky |
+| race-database.com | none stated | — | ❌ stops at 2015, no license |
+| champcarstats.com / openwheelworld.net | none stated | — | ❌ no bulk/license |
+| racing-reference.info | ToU forbids | — | ❌ (see §2) |
+
+### What was verified
+- **Full-time rule IS computable for modern IndyCar.** The "Confirmed entries" table on
+  `2015`/`2023 IndyCar Series` has a **`Round(s)` column** (e.g. "All", "1–5", "6"). This
+  solves the Indy 500 one-off problem directly — a one-race 500 entry shows a single round, a
+  full-timer shows "All" — so the ≥60% rule can be applied from the roster table itself.
+- **Titles source has a real conflation bug.** The champions list's `series` column is the
+  *sanctioning body* (AAA / USAC / CART / IRL / ICS / CCWS), **not the division**. USAC
+  sanctioned Indy car *and* sprint/midget/Silver Crown/stock car, all tagged "USAC", so summing
+  by driver gives **Foyt 18 and Andretti 10** (their all-division USAC totals) instead of the
+  Indy-car 7 and 4. Post-1979 is clean (CART/IRL/ICS/CCWS only crown Indy-car champions:
+  Dixon 6, Palou 4, Power 2, Bourdais 4 all verified correct). **Mitigation:** use the list for
+  1979+ titles only; hardcode the ~8 affected pre-1979 legends' Championship-car titles.
+- **CART era needs per-year tuning.** `2002`/`1998 CART FedEx Championship Series` use a
+  "Drivers and teams" / "Drivers and constructors" section (not "Confirmed entries") with **no
+  Round(s) column** — so full-time there degrades to entry-list presence (coarser; some
+  part-timers leak). The generic season scraper's `titleCandidates`/`sections` already cover
+  these but the rounds signal is absent.
+- **Taxonomy is editorial.** Nothing in the data labels a driver "IndyCar" vs "CART" (the game
+  splits them by career peak). That split stays a human call.
+
+### Recommended shape (if/when built)
+`sources/indycar.js`: modern IndyCar only (≈2008+) via the entries `Round(s)` column for the
+full-time rule; titles = champions list filtered to 1979+ **plus** a small hardcoded pre-1979
+legends title map; nationality/debut from Wikidata; CART/Champ Car left to the hand-curated set
+(or added coarsely from entry-list presence, clearly lower-confidence). Golden tests would
+anchor Dixon 6, Palou 4, Power 2 and assert Foyt/Andretti come from the hardcoded map, not the
+conflated list.
+
+## 7. Applying the rubric to the remaining series
 
 The template stands: *bulk, openly-licensed, per-season-granular database first; API second;
 Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never*. Candidate leads to
 evaluate (unverified until given the F1DB/NASCAR treatment):
-
-- **IndyCar / CART**: same approach; Wikipedia season pages are strong for entrants.
 - **WRC**: ewrc-results.com is the de-facto stats DB — **check ToU before anything**; else
   Wikipedia season pages.
 - **V8 Supercars / IMSA / WEC**: Wikipedia season pages + heavy curation (multi-class and
