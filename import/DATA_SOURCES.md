@@ -224,15 +224,59 @@ all debuted in the 2000s decade so the game's Decade tile is unaffected.
 Normalize.js gained general fixes found here (Wikidata "Kingdom of Denmark/Netherlands" →
 short names; UAE/Barbados/Israel continents) that benefit every series.
 
-## 7. Applying the rubric to the remaining series
+## 7. WEC — evaluated candidates (verified 2026-07-10)
+
+**Verdict: roster + titles are buildable from Wikipedia; career wins are the one gap with no
+clean source.** Scope note: "WEC" = the FIA World Endurance Championship (**2012+**); the
+pre-2012 World Sportscar Championship legends (Bell, Ickx, early Kristensen, …) stay
+hand-curated, like the CART tail. Top class = **LMP1 (2012–2020) → Hypercar (2021+)**.
+
+| Source | License | Access | Verdict |
+|---|---|---|---|
+| Wikipedia season "Entries" (per-class tables) + class **standings** sections | CC BY-SA | Already parse | ✅ **PRIMARY** — roster (top-class table + Rounds) *and* titles (champion = P1 of the class drivers' standings) |
+| Wikidata | CC0 | SPARQL | ✅ nationality |
+| **career wins** | — | — | ⚠️ **GAP** — no clean per-driver source (see below) |
+| Orange Cat Blacktop [API](https://ocblacktop.com/api) | commercial; free tier is **non-commercial only** | REST, key | ❌ our use is ad-supported → needs a paid plan ($9–24/mo recurring); the plan budgets ~$12/**yr** total |
+| Al Kamel timing ([fiawec.alkamelsystems.com](https://fiawec.alkamelsystems.com/)) | official, no reuse grant | per-session CSV | ❌ per-session, no bulk, unclear license |
+| Open Data Bay "WEC analytics" (2012–2022) | download | lap-timing, not career | ❌ 2022 cutoff; lap data, not driver records |
+| fiawec.com / api.fia.com | official ToU, no reuse grant | — | ❌ |
+
+### What was verified (2023 season page)
+- **Class filtering is clean.** The "Entries" section holds **one table per class** (2023:
+  Hypercar / LMP2 / LMGTE Am, confirmed by subsection headings). Taking the top-class table
+  (Hypercar, 46 rows ≈ 44 drivers incl. reserves) sidesteps the all-class noise that made the
+  naïve 2015 parse return 124 drivers.
+- **Full-time is computable.** The entries table has a **Rounds column** (endurance seasons are
+  ~6–8 rounds, so full-time ≈ ran ≥60% of them). Cars are one entry with **2–3 drivers per
+  cell** — parseable, but the per-car multi-driver shape is more work than one-driver-per-row.
+- **Titles are recoverable without a champions page.** There is **no** "List of WEC champions"
+  article, but every season page has a **"Hypercar/LMP1 World Endurance Drivers' Championship"
+  standings section**; the P1 crew (2–3 co-champions share the title) gives the titles map.
+- **Wins have no clean source.** Endurance "wins" is ambiguous (overall vs class vs Le Mans),
+  shared across a car's crew, and not tabulated per driver anywhere license-clean. Options:
+  count overall round winners from each season's results table (buildable but fiddly), or
+  hand-curate wins for the ~15 notable top-class winners and default the rest to 0.
+
+### Recommended shape (if built)
+`sources/wec.js`: top-class entries table per season (2012+) → Rounds-based full-time pool
+(~70–90 unique drivers); titles from the class drivers'-championship standings (P1 per season);
+nationality from Wikidata; **wins defaulted to 0 with a curated override map for the notable
+winners** (or a later pass counting overall round wins from results). `merge-wec.js`
+golden-gated (champions present, e.g. Buemi/Hartley multiple titles; top-class only — no LMP2/GT
+names; pre-2012 WSC legends preserved; flags; no dupes). Mid-ROI: it cleanly expands the modern
+Hypercar/LMP1 grid, but the wins gap means a curation step, so it is a smaller, less-automatic
+win than F1/NASCAR/modern-IndyCar.
+
+## 8. Applying the rubric to the remaining series
 
 The template stands: *bulk, openly-licensed, per-season-granular database first; API second;
 Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never*. Candidate leads to
 evaluate (unverified until given the F1DB/NASCAR treatment):
 - **WRC**: ewrc-results.com is the de-facto stats DB — **check ToU before anything**; else
   Wikipedia season pages.
-- **V8 Supercars / IMSA / WEC**: Wikipedia season pages + heavy curation (multi-class and
-  co-driver noise), as flagged in README.md.
+- **V8 Supercars / IMSA**: Wikipedia season pages + heavy curation (multi-class and co-driver
+  noise for IMSA; ATCC/Supercars lineage for V8). IMSA mirrors WEC's class-filter + wins-gap
+  shape; V8 Supercars is single-class (simpler) but has no clean bulk source either.
 
 Each series gets the same deliverable as this doc's §2–3: an evaluated source table and an
 empirically verified full-season pool before any merge.
