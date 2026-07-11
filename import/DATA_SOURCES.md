@@ -267,16 +267,59 @@ names; pre-2012 WSC legends preserved; flags; no dupes). Mid-ROI: it cleanly exp
 Hypercar/LMP1 grid, but the wins gap means a curation step, so it is a smaller, less-automatic
 win than F1/NASCAR/modern-IndyCar.
 
-## 8. Applying the rubric to the remaining series
+## 8. WRC — evaluated candidates (verified 2026-07-10)
+
+**Verdict: the cleanest Wikipedia-based series — fully buildable for modern WRC (roster, titles,
+wins, nationality all sourceable).** Single class, an explicit driver/co-driver split, clean
+titles with no conflation, and — because each rally has exactly one winning driver — even wins
+are cleanly countable. Scope: WRC is 1973+; modern seasons (≈2010+) parse cleanly, older eras
+need per-era table tuning (or stay hand-curated, like the CART/pre-2012 tails).
+
+| Source | License | Access | Verdict |
+|---|---|---|---|
+| Wikipedia season "Entrants/Teams and drivers" table | CC BY-SA | Already parse | ✅ **PRIMARY** — roster/full-time/team; **separate Driver vs Co-driver columns** + a Rounds column + Manufacturer |
+| Wikipedia main "World Rally Championship" champions table | CC BY-SA | One page | ✅ **titles** (P1 driver per season; verified, no conflation) |
+| Wikipedia season results (per-rally winners) | CC BY-SA | parse | ✅ **wins** — count the winning driver per event (one per rally, unambiguous) |
+| Wikidata | CC0 | SPARQL | ✅ nationality |
+| ewrc-results.com | no reuse license; only unofficial scrapers; its own community tooling says "keep usage low out of fairness" | scrape | ❌ scraping-hostile, no license grant (racing-reference category) |
+| nathanjliu/WRC-API, ArkaitzUlibarri/ewrc-results (GitHub) | wrappers over ewrc/official | scrape | ❌ inherit ewrc's licensing problem |
+| racing-reference | no rally coverage | — | ❌ |
+
+### What was verified
+- **Driver/co-driver split is explicit.** The entries table headers are `… | Driver name |
+  Co-driver name | Rounds` (2023) / `… | Drivers | Co-drivers | Rounds` (2015) — read the Driver
+  column, skip Co-drivers. No heuristic needed. The Manufacturer column gives the team.
+- **The one-off problem solves itself.** The "Entrants" table is already the registered
+  full-season crews (15 rows in 2023, 21 in 2015) — the hundreds of rally-by-rally privateers
+  that bloated the naïve full run (≈1,100 WRC "drivers") simply aren't in it. The **Rounds
+  column** tightens it further to true full-timers.
+- **Titles are clean and verified.** No "List of WRC champions" page, but the main article's
+  champions table gives one champion per season, 1973+ (53 champion-seasons), **no
+  multi-division conflation**: Loeb 9, Ogier 9, Mäkinen 4, Kankkunen 4, Grönholm 2, Rovanperä 2
+  — all correct. (One name-match nuance: "Carlos Sainz" links with a disambiguator; strip-match
+  at build time handles it.)
+- **Wins are countable, unlike WEC.** The records page has only an 18-row "most wins"
+  leaderboard (top winners), so it can't supply mid-tier win counts directly. But rally has
+  **one winning driver per event**, so counting per-rally winners across season results tables
+  yields exact career wins with no sharing/ambiguity — the approach WEC couldn't use.
+
+### Recommended shape (if built) — best next automation target
+`sources/wrc.js`: modern WRC (≈2010+) entries Driver column + Rounds → full-time pool
+(~15–21/season, ~60–100 unique); titles from the champions table (P1/season); wins by counting
+winning drivers across season results; nationality from Wikidata. Pre-2010 legends via per-era
+entries tuning or the hand-curated tail. `merge-wrc.js` golden-gated (Loeb 9/80, Ogier 9,
+Rovanperä 2; **driver-only — assert no co-drivers leak**; flags; no dupes; legends preserved).
+Highest-confidence build among the remaining series.
+
+## 9. Applying the rubric to the last two series
 
 The template stands: *bulk, openly-licensed, per-season-granular database first; API second;
-Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never*. Candidate leads to
-evaluate (unverified until given the F1DB/NASCAR treatment):
-- **WRC**: ewrc-results.com is the de-facto stats DB — **check ToU before anything**; else
-  Wikipedia season pages.
-- **V8 Supercars / IMSA**: Wikipedia season pages + heavy curation (multi-class and co-driver
-  noise for IMSA; ATCC/Supercars lineage for V8). IMSA mirrors WEC's class-filter + wins-gap
-  shape; V8 Supercars is single-class (simpler) but has no clean bulk source either.
+Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never*. Still to evaluate:
+- **V8 Supercars**: single-class (no class filter, no co-drivers except the enduro rounds), so
+  structurally close to WRC — likely the second-cleanest. No clean bulk source; Wikipedia
+  season "Teams and drivers" + championship standings + Wikidata.
+- **IMSA**: mirrors WEC's shape exactly — multi-class (needs the top-class table filter) and the
+  same wins gap; the buildable path is the same class-table + standings + Wikidata recipe.
 
-Each series gets the same deliverable as this doc's §2–3: an evaluated source table and an
-empirically verified full-season pool before any merge.
+Each series gets the same deliverable as §2–3: an evaluated source table and an empirically
+verified full-season pool before any merge.
