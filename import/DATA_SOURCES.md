@@ -269,11 +269,10 @@ win than F1/NASCAR/modern-IndyCar.
 
 ## 8. WRC — evaluated candidates (verified 2026-07-10)
 
-**Verdict: the cleanest Wikipedia-based series — fully buildable for modern WRC (roster, titles,
-wins, nationality all sourceable).** Single class, an explicit driver/co-driver split, clean
-titles with no conflation, and — because each rally has exactly one winning driver — even wins
-are cleanly countable. Scope: WRC is 1973+; modern seasons (≈2010+) parse cleanly, older eras
-need per-era table tuning (or stay hand-curated, like the CART/pre-2012 tails).
+**Verdict (evaluated, then built ✅): the cleanest Wikipedia-based series.** Single class, an
+explicit driver/co-driver split, clean titles with no conflation, and — because each rally has
+exactly one winning driver — even wins are countable. Built for modern WRC (2014+); the
+2003–2013 two-tier-header era and pre-2014 legends stay hand-curated. See the ✅ section below.
 
 | Source | License | Access | Verdict |
 |---|---|---|---|
@@ -303,13 +302,28 @@ need per-era table tuning (or stay hand-curated, like the CART/pre-2012 tails).
   **one winning driver per event**, so counting per-rally winners across season results tables
   yields exact career wins with no sharing/ambiguity — the approach WEC couldn't use.
 
-### Recommended shape (if built) — best next automation target
-`sources/wrc.js`: modern WRC (≈2010+) entries Driver column + Rounds → full-time pool
-(~15–21/season, ~60–100 unique); titles from the champions table (P1/season); wins by counting
-winning drivers across season results; nationality from Wikidata. Pre-2010 legends via per-era
-entries tuning or the hand-curated tail. `merge-wrc.js` golden-gated (Loeb 9/80, Ogier 9,
-Rovanperä 2; **driver-only — assert no co-drivers leak**; flags; no dupes; legends preserved).
-Highest-confidence build among the remaining series.
+### Implementation — ✅ built & shipped 2026-07-10
+`sources/wrc.js` (engine `wrc`): Wikipedia "Teams and drivers" tables **2014+** (Driver column,
+not Co-driver; Rounds → full-time) → **27-driver modern pool**; wins counted from each season's
+per-rally "Winning driver"/"Overall winners" column (1973+); titles from the champions table;
+nationality from Wikidata. `merge-wrc.js` golden-gated (Ogier 9 / Rovanperä 2 / Tänak 1 titles;
+Ogier→France; **co-driver-leak assertion** — Ingrassia/Elena/etc. must be absent; legends
+preserved; flags; no dupes).
+
+**Result:** WRC 35 → **47** (27 modern + 20 preserved pre-2014 legends); total DB **725**. Two
+build-time findings worth recording:
+- **Scope narrowed to 2014+.** The 2003–2013 season pages use a two-tier "Manufacturers"
+  super-header plus separate J-WRC/P-WRC support tables, which mis-parsed (Loeb vanished,
+  junior drivers leaked). Rather than special-case that era, it stays in the hand-curated tail —
+  Loeb, McRae, Mäkinen, Grönholm, Sainz et al. are preserved there.
+- **Wins use MAX(counted, curated).** Counted wins miss pre-2014 rallies (those results tables
+  don't parse) *and* curated wins go stale for active drivers, so MAX is correct in both
+  directions: Ogier 68 (curated > 37 counted), Rovanperä 18 (counted > 15 curated). Debut is
+  carried over from curated for pre-2014 debutants (Ogier 2008, Latvala 2002).
+
+Confirmed the §8 promise: the driver/co-driver column split and the "Entrants" table being the
+registered full-season crews made this the cleanest modern pipeline — one real bug (the
+two-tier era) resolved by scoping, not heuristics.
 
 ## 9. Applying the rubric to the last two series
 

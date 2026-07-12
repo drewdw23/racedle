@@ -30,7 +30,7 @@ const COUNTRY_TO_CONTINENT = {
   Switzerland: "Europe", Sweden: "Europe", Belgium: "Europe", Denmark: "Europe",
   Monaco: "Europe", Russia: "Europe", Portugal: "Europe", Norway: "Europe",
   Estonia: "Europe", Ireland: "Europe", Poland: "Europe", "Czech Republic": "Europe",
-  Hungary: "Europe", Liechtenstein: "Europe",
+  Hungary: "Europe", Liechtenstein: "Europe", Luxembourg: "Europe",
   Japan: "Asia", Thailand: "Asia", China: "Asia", India: "Asia", Indonesia: "Asia",
   "United Arab Emirates": "Asia", Israel: "Asia",
   Australia: "Oceania", "New Zealand": "Oceania",

@@ -138,7 +138,7 @@ export const SERIES_CONFIG = {
 
   wrc: {
     series: "WRC",
-    engine: "wikipedia",
+    engine: "wrc", // Wikipedia season "Teams and drivers" (Driver+Rounds) + winners + champions (see DATA_SOURCES.md §8)
     wikipedia: {
       titleCandidates: (y) => [
         `${y} World Rally Championship season`,
