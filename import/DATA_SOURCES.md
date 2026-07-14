@@ -325,15 +325,45 @@ Confirmed the §8 promise: the driver/co-driver column split and the "Entrants" 
 registered full-season crews made this the cleanest modern pipeline — one real bug (the
 two-tier era) resolved by scoping, not heuristics.
 
-## 9. Applying the rubric to the last two series
+## 9. V8 Supercars — evaluated & built ✅ (2026-07-10)
 
-The template stands: *bulk, openly-licensed, per-season-granular database first; API second;
-Wikipedia/Wikidata as cross-checks; scraping-hostile stat sites never*. Still to evaluate:
-- **V8 Supercars**: single-class (no class filter, no co-drivers except the enduro rounds), so
-  structurally close to WRC — likely the second-cleanest. No clean bulk source; Wikipedia
-  season "Teams and drivers" + championship standings + Wikidata.
-- **IMSA**: mirrors WEC's shape exactly — multi-class (needs the top-class table filter) and the
-  same wins gap; the buildable path is the same class-table + standings + Wikidata recipe.
+Single-class, structurally close to WRC. Built from Wikipedia + Wikidata; no clean bulk source
+exists (checked: no "List of Supercars race winners"/champions article). Scoped to the clean
+two-tier-entries era (**2005+**); pre-2005 ATCC legends (Brock, Moffat, Johnson, Richards,
+Perkins) stay hand-curated.
 
-Each series gets the same deliverable as §2–3: an evaluated source table and an empirically
-verified full-season pool before any merge.
+| Source | License | Verdict |
+|---|---|---|
+| Wikipedia season "Teams and drivers" (two-tier "Championship entries" header) | CC BY-SA | ✅ roster/full-time/team — **Driver name** column (not the "Endurance entries / Co-driver name" columns) + championship Rounds + Team |
+| Wikipedia "Australian Touring Car Championship" champions table (`Driver \| Championships \| Years`) | CC BY-SA | ✅ titles (count the listed years — Whincup 7, Skaife 5, Brock 3 verified) |
+| Wikipedia season round-results ("Winning driver" column) | CC BY-SA | ✅ race wins (count per season; ~29 races/yr) |
+| Wikidata | CC0 | ✅ nationality (default **Australia** for misses + a 1-name override; NZ/etc. resolve) |
+| ewrc/racing-reference/paid APIs | — | ❌ (no rally/sportscar reuse license; same categories as before) |
+
+### Build notes
+- **Two-tier header handled in-source.** The entries table wraps real columns under a
+  "Championship entries" super-header (the same shape that first tripped the generic parser);
+  `combinedHeader()` folds the header rows so the Driver-name / Rounds / Team columns resolve,
+  and the enduro Co-driver columns are explicitly excluded (a `Luke Youlden` absence assertion
+  guards it).
+- **Nationality defaults to Australia.** Supercars is ~90% Australian; Wikidata resolves the
+  non-AU regulars (SVG/McLaughlin NZ, Prémat FR, Engel DE, …) and its misses (all obscure
+  Australians) default to AU — Matt Payne (NZ) is the one override. Same pattern as NASCAR's
+  default-US.
+- **Wins MAX(counted, curated)** again (legends: Lowndes 110, Skaife 90, Whincup 124 from
+  curated; actives: Feeney 30, Kostecki 17 from counted). Debut carried over for pre-2005
+  debutants.
+
+**Result:** V8 Supercars 30 → **102** (97 modern + 5 preserved pre-2005 legends); total DB
+**797**. 3 dual-career drivers kept in their primary series — **McLaughlin→IndyCar, van
+Gisbergen→NASCAR, de Silvestro→IndyCar** (both Supercars champions now race elsewhere; the game
+lists each driver once, under their current series).
+
+## 10. IMSA — the last series to evaluate
+
+Mirrors WEC's shape exactly: **multi-class** (needs the top-class table filter, as the naïve
+parse returns all GTP/LMP2/GTD drivers) and the same **wins gap** (endurance wins are shared and
+ambiguous). The buildable path is the same class-table + per-season class-standings + Wikidata
+recipe used for the WEC evaluation; expect mid-ROI like WEC, not a clean WRC/Supercars build.
+Deliverable when tackled: the same evaluated source table + empirically verified top-class pool
+as §2–3.

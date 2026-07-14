@@ -88,7 +88,7 @@ export const SERIES_CONFIG = {
 
   supercars: {
     series: "V8 Supercars",
-    engine: "wikipedia",
+    engine: "supercars", // Wikipedia season "Teams and drivers" (Driver+Rounds, two-tier header) + winners + ATCC champions (DATA_SOURCES.md §9)
     wikipedia: {
       titleCandidates: (y) => [
         `${y} Supercars Championship`,

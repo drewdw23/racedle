@@ -20,6 +20,7 @@ import { collectF1DB } from "./sources/f1db.js";
 import { collectNascar } from "./sources/nascar.js";
 import { collectIndyCar } from "./sources/indycar.js";
 import { collectWRC } from "./sources/wrc.js";
+import { collectSupercars } from "./sources/supercars.js";
 import { collectSeasonRosters } from "./sources/wikipediaSeasons.js";
 import { enrichRoster } from "./enrich.js";
 import { emitDataJs } from "./lib/normalize.js";
@@ -43,6 +44,7 @@ async function collect(engine) {
   if (engine === "nascar") return collectNascar(currentYear, log);
   if (engine === "indycar") return collectIndyCar(currentYear, log);
   if (engine === "wrc") return collectWRC(currentYear, log);
+  if (engine === "supercars") return collectSupercars(currentYear, log);
   return null;
 }
 
