@@ -1,13 +1,12 @@
 /* Merge the generated modern-IndyCar set (output/drivers.generated.json
    from `node run.js --series=indycar`) into ../data.js, replacing the
-   IndyCar section. Only the modern unified series (2008+) is generated;
-   the CART/Champ Car section is left untouched.
+   IndyCar section (only the modern unified series, 2008+, is generated).
 
    Preserves: current IndyCar drivers NOT in the modern pool — the
    pre-1979 USAC legends (Foyt, the Unsers, Mario Andretti, Rutherford,
    Johncock) and other pre-2008 names.
-   Excludes: pool drivers assigned to another primary series (CART
-   drivers like Bourdais/Wilson; F1/NASCAR/WEC dual-career drivers).
+   Excludes: pool drivers assigned to another primary series
+   (F1/NASCAR/WEC dual-career drivers kept where they belong).
    Debut carryover: entries only reach 2008, so where a pool driver is
    already curated we keep the curated (real) debut.
 
@@ -76,9 +75,6 @@ for (const orig of gen) {
 const missingFlags = [...new Set(emit.map((r) => r.country))].filter((c) => !CUR.FLAGS[c]);
 if (missingFlags.length) fail(`countries missing from FLAGS: ${missingFlags.join(", ")} — add them first`);
 
-// CART section must be untouched.
-const cartBefore = CUR.DRIVERS.filter((d) => d.series === "CART / Champ Car").length;
-
 // ---------- rebuild the IndyCar section ----------
 const q = (s) => JSON.stringify(s);
 const row = (r) =>
@@ -96,25 +92,25 @@ const block =
   `  // Pre-2008 / pre-1979 USAC IndyCar drivers kept by hand (outside the modern import scope):\n` +
   preserved.map(row).join("\n") + "\n\n";
 
-const START = "  // ================= INDYCAR (modern series + pre-1979 USAC) =================\n";
-const END = "  // ================= CART / CHAMP CAR (peak 1979–2007) =================\n";
-const s = src.indexOf(START);
-const e = src.indexOf(END);
-if (s === -1 || e === -1 || e < s) fail("could not locate IndyCar section markers");
-src = src.slice(0, s) + block + src.slice(e);
+// The IndyCar section is bounded by its own header and the next section
+// (V8 Supercars — CART was removed from scope). Matches whichever IndyCar
+// header form is present, so the merge stays idempotent across re-runs.
+const START = ["  // ================= INDYCAR =================\n", "  // ================= INDYCAR (modern series + pre-1979 USAC) =================\n"]
+  .map((m) => src.indexOf(m)).find((i) => i !== -1);
+const END = src.indexOf("  // ================= V8 SUPERCARS =================\n");
+if (START == null || START === -1 || END === -1 || END < START) fail("could not locate IndyCar section markers");
+src = src.slice(0, START) + block + src.slice(END);
 
 writeFileSync(DATA_JS, src);
 
 // ---------- post-write verification ----------
 const OUT = Function(`${src}\n;return DRIVERS;`)();
 const indy = OUT.filter((d) => d.series === "IndyCar");
-const cartAfter = OUT.filter((d) => d.series === "CART / Champ Car").length;
-if (cartAfter !== cartBefore) fail(`CART section changed (${cartBefore} → ${cartAfter})`);
 const dupAll = new Set();
 for (const d of OUT) { const k = strip(d.name); if (dupAll.has(k)) fail(`post-merge duplicate across DB: ${d.name}`); dupAll.add(k); }
 
 const debutFloored = emit.filter((r) => r.debut === 2008 && !curByStrip.has(strip(r.name)));
-console.log(`merged: IndyCar section = ${indy.length} (${emit.length} modern + ${preserved.length} preserved); CART untouched (${cartAfter}).`);
+console.log(`merged: IndyCar section = ${indy.length} (${emit.length} modern + ${preserved.length} preserved).`);
 console.log(`excluded ${excluded.length} dual-career drivers (kept in primary series): ${excluded.map((r) => r.name).join(", ")}`);
 console.log(`total DRIVERS: ${OUT.length}`);
 if (debutFloored.length) console.log(`note: ${debutFloored.length} new drivers debut=2008 from the entries floor (all debuted in the 2000s decade, so the game's Decade tile is unaffected): ${debutFloored.map((r) => r.name).join(", ")}`);

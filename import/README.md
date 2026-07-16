@@ -15,7 +15,7 @@ legal footing (the "public facts" defense). See [../BUSINESS_PLAN.md](../BUSINES
 | Series | Source | Why |
 |---|---|---|
 | Formula 1 | **Jolpica-F1** API (the open successor to Ergast, retired end-2024) | Structured JSON, F1 1950–present: nationality, per-season champion, career wins, debut. No scraping needed. |
-| NASCAR, IndyCar, CART, V8 Supercars, IMSA, WEC, WRC | **Wikipedia** season articles (CC BY-SA) for the entry lists + **Wikidata** (CC0) for nationality/career span/status | Wikidata's SPARQL is queryable and public-domain; Wikipedia season pages are the reliable place to find who ran a full season. |
+| NASCAR, IndyCar, V8 Supercars, IMSA, WEC, WRC | **Wikipedia** season articles (CC BY-SA) for the entry lists + **Wikidata** (CC0) for nationality/career span/status | Wikidata's SPARQL is queryable and public-domain; Wikipedia season pages are the reliable place to find who ran a full season. |
 
 ## Requirements
 

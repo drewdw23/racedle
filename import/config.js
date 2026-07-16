@@ -70,22 +70,6 @@ export const SERIES_CONFIG = {
     },
   },
 
-  cart: {
-    series: "CART / Champ Car",
-    engine: "wikipedia",
-    wikipedia: {
-      titleCandidates: (y) => [
-        `${y} Champ Car season`,
-        `${y} CART season`,
-        `${y} CART World Series season`,
-        `${y} PPG Indy Car World Series season`,
-        `${y} Champ Car World Series season`,
-      ],
-      sections: ["Entries", "Entry list", "Teams and drivers", "Drivers"],
-      driverColumns: ["Driver", "Drivers"],
-    },
-  },
-
   supercars: {
     series: "V8 Supercars",
     engine: "supercars", // Wikipedia season "Teams and drivers" (Driver+Rounds, two-tier header) + winners + ATCC champions (DATA_SOURCES.md §9)

@@ -3,15 +3,13 @@
    ------------------------------------------------------------
    INCLUSION RULE: drivers who completed at least one full season
    (or were era-defining multi-season regulars) in one of:
-   Formula 1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars,
-   IMSA, WEC, WRC.
+   Formula 1, NASCAR Cup, IndyCar, V8 Supercars, IMSA, WEC, WRC.
 
    TAXONOMY:
    - Each driver appears once, under their PRIMARY series (the
      series they are most associated with — judgment call for
      multi-series careers, e.g. Montoya -> F1, SVG -> NASCAR).
    - IndyCar = modern IndyCar Series + pre-1979 USAC careers.
-     CART / Champ Car = drivers whose peak was 1979–2007 CART.
    - WEC includes pre-2012 World Sportscar Championship legends.
    - IMSA titles = top-class (GTP/DP/DPi/GTP) season championships,
      including the Grand-Am era.
@@ -34,7 +32,6 @@ const SERIES = {
   F1: "Formula 1",
   NASCAR: "NASCAR Cup",
   INDYCAR: "IndyCar",
-  CART: "CART / Champ Car",
   SUPERCARS: "V8 Supercars",
   IMSA: "IMSA",
   WEC: "WEC",
@@ -42,16 +39,15 @@ const SERIES = {
 };
 
 /* Playable genres. `series: null` means the full combined pool
-   ("Ultimate"). Small single-series pools are grouped — IndyCar and
-   CART/Champ Car share one lineage, and IMSA + WEC are both endurance
-   sportscar racing — so every genre has a big enough answer pool for
-   a fun daily rotation. The Series tile still distinguishes the exact
-   series within a genre. */
+   ("Ultimate"). IMSA + WEC are grouped (both endurance sportscar
+   racing) so every genre has a big enough answer pool for a fun daily
+   rotation. The Series tile still distinguishes the exact series within
+   a genre. */
 const GENRES = [
   { id: "ultimate",  label: "Ultimate",     series: null },
   { id: "f1",        label: "Formula 1",    series: [SERIES.F1] },
   { id: "nascar",    label: "NASCAR",       series: [SERIES.NASCAR] },
-  { id: "indycar",   label: "IndyCar",      series: [SERIES.INDYCAR, SERIES.CART] },
+  { id: "indycar",   label: "IndyCar",      series: [SERIES.INDYCAR] },
   { id: "supercars", label: "V8 Supercars", series: [SERIES.SUPERCARS] },
   { id: "endurance", label: "Endurance",    series: [SERIES.IMSA, SERIES.WEC] },
   { id: "rally",     label: "Rally",        series: [SERIES.WRC] },
@@ -692,22 +688,6 @@ const DRIVERS = [
   { name: "Bobby Unser", country: "United States", continent: "North America", series: SERIES.INDYCAR, team: "Patrick Racing", titles: 2, wins: 35, status: "Retired", debut: 1963 },
   { name: "Johnny Rutherford", country: "United States", continent: "North America", series: SERIES.INDYCAR, team: "Chaparral Racing", titles: 1, wins: 27, status: "Retired", debut: 1962 },
   { name: "Gordon Johncock", country: "United States", continent: "North America", series: SERIES.INDYCAR, team: "Patrick Racing", titles: 1, wins: 25, status: "Retired", debut: 1965 },
-
-  // ================= CART / CHAMP CAR (peak 1979–2007) =================
-  { name: "Sebastien Bourdais",  country: "France",         continent: "Europe",        series: SERIES.CART, team: "A.J. Foyt Enterprises",  titles: 4, wins: 37, status: "Retired", debut: 2003 }, // verify last team
-  { name: "Bobby Rahal",         country: "United States",  continent: "North America", series: SERIES.CART, team: "Team Rahal",             titles: 3, wins: 24, status: "Retired", debut: 1982 },
-  { name: "Rick Mears",          country: "United States",  continent: "North America", series: SERIES.CART, team: "Team Penske",            titles: 3, wins: 29, status: "Retired", debut: 1978 },
-  { name: "Alex Zanardi",        country: "Italy",          continent: "Europe",        series: SERIES.CART, team: "Chip Ganassi Racing",    titles: 2, wins: 15, status: "Retired", debut: 1996 },
-  { name: "Gil de Ferran",       country: "Brazil",         continent: "South America", series: SERIES.CART, team: "Team Penske",            titles: 2, wins: 12, status: "Retired", debut: 1995 },
-  { name: "Al Unser Jr.",        country: "United States",  continent: "North America", series: SERIES.CART, team: "Kelley Racing",          titles: 2, wins: 34, status: "Retired", debut: 1982 }, // verify last team
-  { name: "Jimmy Vasser",        country: "United States",  continent: "North America", series: SERIES.CART, team: "PKV Racing",             titles: 1, wins: 10, status: "Retired", debut: 1992 },
-  { name: "Cristiano da Matta",  country: "Brazil",         continent: "South America", series: SERIES.CART, team: "RuSPORT",                titles: 1, wins: 12, status: "Retired", debut: 1999 }, // verify
-  { name: "Paul Tracy",          country: "Canada",         continent: "North America", series: SERIES.CART, team: "Forsythe Racing",        titles: 1, wins: 31, status: "Retired", debut: 1991 },
-  { name: "Michael Andretti",    country: "United States",  continent: "North America", series: SERIES.CART, team: "Team Green",             titles: 1, wins: 42, status: "Retired", debut: 1983 },
-  { name: "Danny Sullivan",      country: "United States",  continent: "North America", series: SERIES.CART, team: "PacWest Racing",         titles: 1, wins: 17, status: "Retired", debut: 1982 },
-  { name: "Greg Moore",          country: "Canada",         continent: "North America", series: SERIES.CART, team: "Forsythe Racing",        titles: 0, wins: 5,  status: "Retired", debut: 1996 },
-  { name: "Adrian Fernandez",    country: "Mexico",         continent: "North America", series: SERIES.CART, team: "Fernandez Racing",       titles: 0, wins: 11, status: "Retired", debut: 1993 },
-  { name: "Justin Wilson",       country: "United Kingdom", continent: "Europe",        series: SERIES.CART, team: "Andretti Autosport",     titles: 0, wins: 7,  status: "Retired", debut: 2003 },
 
   // ================= V8 SUPERCARS =================
   // Modern era (2005+) generated 2026-07-14: roster/teams from Wikipedia season "Teams and

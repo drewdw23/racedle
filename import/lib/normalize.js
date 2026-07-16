@@ -88,7 +88,7 @@ export function buildRecord({ name, country, series, team, titles, wins, status,
 
 const SERIES_CONST = {
   "Formula 1": "SERIES.F1", "NASCAR Cup": "SERIES.NASCAR", IndyCar: "SERIES.INDYCAR",
-  "CART / Champ Car": "SERIES.CART", "V8 Supercars": "SERIES.SUPERCARS",
+  "V8 Supercars": "SERIES.SUPERCARS",
   IMSA: "SERIES.IMSA", WEC: "SERIES.WEC", WRC: "SERIES.WRC",
 };
 

@@ -1,6 +1,7 @@
 /* Modern IndyCar source (2008+ unified series) per DATA_SOURCES.md §6.
-   The pre-1979 USAC legends and the CART/Champ Car series stay
-   hand-curated — this only covers the modern unified IndyCar Series.
+   The pre-2008 IndyCar / pre-1979 USAC legends stay hand-curated — this
+   only covers the modern unified IndyCar Series. (CART was removed from
+   the game's scope, 2026-07-14.)
 
    Assembled from three license-clean Wikipedia/Wikidata sources:
    - roster + full-time + last team: "YYYY IndyCar Series" season pages'

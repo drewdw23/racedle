@@ -169,6 +169,12 @@ the full evaluation:
 
 ## 6. IndyCar / CART — evaluated candidates (verified 2026-07-10)
 
+> **Scope update (2026-07-14): CART/Champ Car was removed from the game.** The `SERIES.CART`
+> constant, its 14 hand-curated drivers, and its `config.js` engine entry are gone; the IndyCar
+> genre is now IndyCar-only. The CART discussion below is retained as the historical evaluation
+> record. Nothing changes for the shipped modern-IndyCar pipeline (2008+), which never covered
+> CART.
+
 **Verdict (evaluated): no clean single source.** No F1DB/nascaR.data equivalent; the champions
 list can't cleanly attribute pre-1979 titles; the CART era needs per-year tuning. Modern IndyCar
 is tractable; the tail is not. **Implemented as recommended:** a modern-IndyCar-only pipeline

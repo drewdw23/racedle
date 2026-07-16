@@ -15,8 +15,9 @@
    - nationality: Wikidata.
 
    Pre-1990 legends (Röhrl, Mikkola, Mouton, …) stay hand-curated — like
-   the CART/pre-2012 tails. debut = first full-time season; merge-wrc.js
-   overrides with the curated real debut where the driver already exists. */
+   the other series' pre-modern tails. debut = first full-time season;
+   merge-wrc.js overrides with the curated real debut where the driver
+   already exists. */
 
 import { resolveTitle, getSections, getSectionHtml, getFullPageHtml, parseTables } from "../lib/wikipedia.js";
 import { findDriver, driverFacts, occupationIsDriver } from "../lib/wikidata.js";
@@ -27,7 +28,7 @@ const ACC_FROM = 1973; // WRC start — accumulate wins/titles from here (all-ti
 const ROSTER_FROM = 2014; // clean single-tier "Teams and drivers" era; 2003–2013 uses two-tier
                           // "Manufacturers" super-headers + J-WRC/P-WRC support tables that
                           // mis-parse, so pre-2014 legends (Loeb, Grönholm, McRae, …) stay in
-                          // the hand-curated tail — same pattern as the CART/pre-2012 tails.
+                          // the hand-curated tail — same pattern as the other series' tails.
 const strip = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.'\-]/g, " ").replace(/\s+/g, " ").trim();
 const cleanName = (s) => s.replace(/\s*\([^)]*\)\s*$/, "").trim();
 const plausible = (s) => /^[\p{L}][\p{L}\p{M}.'-]*(?:\s+[\p{L}][\p{L}\p{M}.'-]*)+$/u.test(s);

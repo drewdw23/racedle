@@ -1,9 +1,9 @@
 # Racedle 🏁
 
 **The daily motorsports driver guessing game** — a Wordle/Loldle-style game for racing fans.
-Guess the mystery driver from **F1, NASCAR Cup, IndyCar, CART/Champ Car, V8 Supercars, IMSA,
-WEC, and WRC** using clues across seven categories. Pick a genre — **Formula 1, NASCAR,
-IndyCar, V8 Supercars, Endurance, Rally** — or play **🏆 Ultimate** across the whole database.
+Guess the mystery driver from **F1, NASCAR Cup, IndyCar, V8 Supercars, IMSA, WEC, and WRC**
+using clues across seven categories. Pick a genre — **Formula 1, NASCAR, IndyCar, V8 Supercars,
+Endurance, Rally** — or play **🏆 Ultimate** across the whole database.
 Every genre has its own daily puzzle, free play, and stats.
 
 ▶️ **Play it:** https://drewdw23.github.io/racedle/
@@ -46,7 +46,7 @@ This is **v1 for user testing.** Things we want to hear about:
 - Difficulty — too easy? too hard? is the continent hint too generous? Are deep-cut
   full-season drivers fun or frustrating as daily answers?
 - Missing drivers you'd expect (333 full-season drivers in the database).
-- Genre groupings — IndyCar includes CART/Champ Car, Endurance covers IMSA + WEC.
+- Genre groupings — Endurance covers IMSA + WEC.
   Should any genre be split out or combined differently?
 - Mobile experience, bugs, confusing UI.
 
@@ -78,7 +78,7 @@ here and we'll re-verify.
   Championships from the Wikipedia champions list.
 - **IndyCar driver data (modern, 2008+):** assembled from [Wikipedia](https://en.wikipedia.org/)
   season pages + champions/winners lists (CC BY-SA) and [Wikidata](https://www.wikidata.org/) (CC0).
-  Pre-2008 / CART drivers are hand-curated.
+  Pre-2008 IndyCar/USAC legends are hand-curated.
 - Other series: compiled from public sources (Wikipedia/Wikidata), verification ongoing.
 
 ---
