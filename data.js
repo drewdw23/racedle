@@ -315,18 +315,6 @@ const DRIVERS = [
   { name: "Yuki Tsunoda", country: "Japan", continent: "Asia", series: SERIES.F1, team: "Red Bull", titles: 0, wins: 0, status: "Active", debut: 2021 },
   { name: "Zsolt Baumgartner", country: "Hungary", continent: "Europe", series: SERIES.F1, team: "Minardi", titles: 0, wins: 0, status: "Retired", debut: 2003 },
 
-  // Pre-1970 F1 champions kept by hand (outside the import's 1970+ scope):
-  { name: "Jim Clark", country: "United Kingdom", continent: "Europe", series: SERIES.F1, team: "Lotus", titles: 2, wins: 25, status: "Retired", debut: 1960 },
-  { name: "Juan Manuel Fangio", country: "Argentina", continent: "South America", series: SERIES.F1, team: "Maserati", titles: 5, wins: 24, status: "Retired", debut: 1950 },
-  { name: "Phil Hill", country: "United States", continent: "North America", series: SERIES.F1, team: "Cooper", titles: 1, wins: 3, status: "Retired", debut: 1958 },
-  { name: "Mike Hawthorn", country: "United Kingdom", continent: "Europe", series: SERIES.F1, team: "Ferrari", titles: 1, wins: 3, status: "Retired", debut: 1952 },
-  { name: "Alberto Ascari", country: "Italy", continent: "Europe", series: SERIES.F1, team: "Lancia", titles: 2, wins: 13, status: "Retired", debut: 1950 },
-  { name: "Giuseppe Farina", country: "Italy", continent: "Europe", series: SERIES.F1, team: "Ferrari", titles: 1, wins: 5, status: "Retired", debut: 1950 },
-  { name: "Stirling Moss", country: "United Kingdom", continent: "Europe", series: SERIES.F1, team: "Lotus (Rob Walker)", titles: 0, wins: 16, status: "Retired", debut: 1951 },
-  { name: "Wolfgang von Trips", country: "Germany", continent: "Europe", series: SERIES.F1, team: "Ferrari", titles: 0, wins: 2, status: "Retired", debut: 1957 },
-  { name: "Tony Brooks", country: "United Kingdom", continent: "Europe", series: SERIES.F1, team: "BRM", titles: 0, wins: 6, status: "Retired", debut: 1956 },
-  { name: "Jose Froilan Gonzalez", country: "Argentina", continent: "South America", series: SERIES.F1, team: "Ferrari", titles: 0, wins: 2, status: "Retired", debut: 1950 },
-
   // ================= NASCAR CUP =================
   // Roster/wins/teams from nascaR.data (Cup parquet) on 2026-07-10; titles from the
   // Wikipedia champions list; nationality default US + exceptions. Pool = drivers who
@@ -575,17 +563,6 @@ const DRIVERS = [
   { name: "Wendell Scott", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Faustina Racing", titles: 0, wins: 1, status: "Retired", debut: 1961 },
   { name: "William Byron", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Hendrick Motorsports", titles: 0, wins: 16, status: "Active", debut: 2018 },
   { name: "Zane Smith", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Front Row Motorsports", titles: 0, wins: 0, status: "Active", debut: 2022 },
-
-  // Pre-1970 NASCAR legends kept by hand (outside the import's 1970+ scope):
-  { name: "Lee Petty", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Petty Enterprises", titles: 3, wins: 54, status: "Retired", debut: 1949 },
-  { name: "Ned Jarrett", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Bondy Long", titles: 2, wins: 50, status: "Retired", debut: 1953 },
-  { name: "Buck Baker", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Buck Baker Racing", titles: 2, wins: 46, status: "Retired", debut: 1949 },
-  { name: "Tim Flock", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Kiekhaefer Mercury", titles: 2, wins: 39, status: "Retired", debut: 1949 },
-  { name: "Herb Thomas", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Kiekhaefer Mercury", titles: 2, wins: 48, status: "Retired", debut: 1949 },
-  { name: "Joe Weatherly", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Bud Moore Engineering", titles: 2, wins: 25, status: "Retired", debut: 1952 },
-  { name: "Rex White", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "White & Clements", titles: 1, wins: 28, status: "Retired", debut: 1956 },
-  { name: "Junior Johnson", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Junior Johnson & Associates", titles: 0, wins: 50, status: "Retired", debut: 1953 },
-  { name: "Fireball Roberts", country: "United States", continent: "North America", series: SERIES.NASCAR, team: "Holman-Moody", titles: 0, wins: 33, status: "Retired", debut: 1950 },
 
   // ================= INDYCAR =================
   // Modern unified series (2008+) generated 2026-07-10: roster/teams from Wikipedia season

@@ -1,10 +1,10 @@
 /* Merge the generated F1 set (output/drivers.generated.json, produced by
    `node run.js --series=f1`) into ../data.js, replacing the F1 section.
 
-   Runs golden tests FIRST and refuses to write if any fail. Preserves:
-   - pre-1970 hand-kept legends (outside the import's 1970+ scope)
-   - dual-career drivers assigned to a non-F1 primary series (excluded
-     from the F1 emit so they aren't duplicated or recategorized)
+   Runs golden tests FIRST and refuses to write if any fail. The F1
+   section is entirely generated (drivers with a full-time season in
+   1970+); dual-career drivers assigned to a non-F1 primary series are
+   excluded from the F1 emit so they aren't duplicated or recategorized.
 
    Usage: node merge-f1.js          (then review `git diff ../data.js`)
 */
@@ -18,12 +18,6 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const DATA_JS = join(__dir, "..", "data.js");
 
 const strip = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.'\-]/g, " ").replace(/\s+/g, " ").trim();
-
-/* Pre-1970 champions kept by hand — the import scope starts at 1970. */
-const LEGENDS = [
-  "Jim Clark", "Juan Manuel Fangio", "Phil Hill", "Mike Hawthorn", "Alberto Ascari",
-  "Giuseppe Farina", "Stirling Moss", "Wolfgang von Trips", "Tony Brooks", "Jose Froilan Gonzalez",
-];
 
 /* Golden set: every World Champion who raced in 1970 or later. If any
    of these is missing from the generated pool, the source or the
@@ -71,12 +65,7 @@ for (const r of gen) {
   seen.set(k, r.name);
 }
 
-// ---------- carve out preserved / excluded sets ----------
-const legendRows = CUR.DRIVERS.filter((d) => d.series === "Formula 1" && LEGENDS.includes(d.name));
-if (legendRows.length !== LEGENDS.length) {
-  fail(`expected ${LEGENDS.length} preserved legends in data.js, found ${legendRows.length}`);
-}
-
+// ---------- carve out excluded set ----------
 const nonF1 = new Set(CUR.DRIVERS.filter((d) => d.series !== "Formula 1").map((d) => strip(d.name)));
 const excluded = gen.filter((r) => nonF1.has(strip(r.name)));
 const emit = gen.filter((r) => !nonF1.has(strip(r.name)));
@@ -98,15 +87,13 @@ const block =
   `  // Generated from F1DB (${tag}, CC BY 4.0 — attribution required, see site footer) on ${today}.\n` +
   `  // Pool = drivers who started >= ${FULL_SEASON_FRACTION * 100}% of a season's rounds (held to date) in some\n` +
   `  // season >= 1970. Regenerate: cd import && node run.js --series=f1 && node merge-f1.js\n` +
-  emit.slice().sort((a, b) => a.name.localeCompare(b.name)).map(row).join("\n") + "\n\n" +
-  `  // Pre-1970 F1 champions kept by hand (outside the import's 1970+ scope):\n` +
-  legendRows.map(row).join("\n") + "\n\n";
+  emit.slice().sort((a, b) => a.name.localeCompare(b.name)).map(row).join("\n") + "\n\n";
 
-const START = "  // ================= FORMULA 1 =================\n";
-const END = "  // ================= NASCAR CUP — active =================\n";
-const s = src.indexOf(START);
-const e = src.indexOf(END);
-if (s === -1 || e === -1 || e < s) fail("could not locate F1 section markers in data.js");
+const s = src.indexOf("  // ================= FORMULA 1 =================\n");
+// Match either NASCAR header form so the merge stays idempotent across re-runs.
+const e = ["  // ================= NASCAR CUP =================\n", "  // ================= NASCAR CUP — active =================\n"]
+  .map((m) => src.indexOf(m)).find((i) => i !== -1);
+if (s === -1 || e == null || e === -1 || e < s) fail("could not locate F1 section markers in data.js");
 src = src.slice(0, s) + block + src.slice(e);
 
 writeFileSync(DATA_JS, src);
@@ -120,7 +107,7 @@ for (const d of OUT) {
   if (dupAll.has(k)) fail(`post-merge duplicate across DB: ${d.name}`);
   dupAll.add(k);
 }
-console.log(`merged: F1 section = ${f1.length} (${emit.length} generated + ${legendRows.length} legends)`);
+console.log(`merged: F1 section = ${f1.length} (all generated, 1970+ full-time)`);
 console.log(`excluded ${excluded.length} dual-career drivers (kept in their primary series): ${excluded.map((r) => r.name).join(", ")}`);
 console.log(`total DRIVERS: ${OUT.length}`);
 console.log(`\nAll golden tests passed. Review with: git diff ../data.js`);
