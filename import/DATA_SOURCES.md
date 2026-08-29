@@ -417,9 +417,28 @@ All seven series evaluated. Build outcomes:
 | WRC | Wikipedia — cleanest (driver/co-driver split, countable wins) | ✅ shipped |
 | V8 Supercars | Wikipedia — clean (single class, countable race wins) | ✅ shipped |
 | IndyCar | Wikipedia — buildable (Round(s) filter; USAC title conflation handled) | ✅ shipped (modern) |
-| WEC | Wikipedia — roster+titles yes, **wins gap** | ⏸ evaluated, mid-ROI |
-| IMSA | Wikipedia — roster+titles yes, **wins gap** (WEC twin) | ⏸ evaluated, mid-ROI |
+| WEC | Wikipedia — roster+titles yes, **wins gap** | 🔨 built, **genre hidden** |
+| IMSA | Wikipedia — roster+titles yes, **wins gap** (WEC twin) | 🔨 built, **genre hidden** |
 
-The two endurance series (WEC + IMSA) are the only ones left unbuilt — both mid-ROI Wikipedia
-builds blocked on the same shared/ambiguous endurance-wins problem, and both feed the one
-Endurance genre. Everything with a clean or countable wins source is shipped.
+### Endurance (WEC + IMSA) — built but HIDDEN for a later release (2026-07-14)
+
+The shared pipeline is built and works — `sources/endurance.js` (engine `endurance`, driven by
+`config.js` per-series settings: top-class entries table + Rounds → full-time roster; titles
+from a **hardcoded champions map** since the per-season standings tables are too irregular to
+parse; nationality from Wikidata) plus `merge-endurance.js --series=wec|imsa`. Runs clean: WEC
+125 / IMSA 68 full-time top-class drivers, titles correct (WEC 38 credits, IMSA 24), 0 incomplete.
+
+But two problems remained unsolved and made it not worth shipping now:
+1. **Wins gap** — endurance results give the winning *team* per class per round, not the driver;
+   the source emits `wins: 0` (merge keeps curated winners' wins via MAX).
+2. **Dual-career scatter** — sportscar grids are full of F1/IndyCar names, so the "one primary
+   series" rule excludes ~25 champions each (Alonso→F1, Castroneves→IndyCar, Fittipaldi→F1, …),
+   leaving the endurance pool missing much of its own top talent.
+
+**Decision:** keep the clean hand-curated WEC (20) / IMSA (17) data in `data.js`, keep the
+pipeline for later, and **hide the Endurance genre** — it's removed from the genre list and
+IMSA/WEC are excluded from Ultimate (see the note in `data.js` GENRES; re-enable by restoring
+the genre and adding the two series back to Ultimate). Revisit wins + the dual-career taxonomy
+before un-hiding.
+
+Everything with a clean or countable wins source is shipped and live.

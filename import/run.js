@@ -21,6 +21,7 @@ import { collectNascar } from "./sources/nascar.js";
 import { collectIndyCar } from "./sources/indycar.js";
 import { collectWRC } from "./sources/wrc.js";
 import { collectSupercars } from "./sources/supercars.js";
+import { collectEndurance } from "./sources/endurance.js";
 import { collectSeasonRosters } from "./sources/wikipediaSeasons.js";
 import { enrichRoster } from "./enrich.js";
 import { emitDataJs } from "./lib/normalize.js";
@@ -38,13 +39,18 @@ const currentYear = new Date().getUTCFullYear();
 const log = (m) => process.stdout.write(m + "\n");
 const validationNotes = [];
 
-async function collect(engine) {
+async function collect(cfgOrEngine) {
+  // Accept a full series config (for engines that need extra settings) or
+  // a bare engine string (for the validator path).
+  const cfg = typeof cfgOrEngine === "string" ? { engine: cfgOrEngine } : cfgOrEngine;
+  const engine = cfg.engine;
   if (engine === "f1db") return collectF1DB(currentYear, log);
   if (engine === "jolpica") return collectF1(currentYear, log);
   if (engine === "nascar") return collectNascar(currentYear, log);
   if (engine === "indycar") return collectIndyCar(currentYear, log);
   if (engine === "wrc") return collectWRC(currentYear, log);
   if (engine === "supercars") return collectSupercars(currentYear, log);
+  if (engine === "endurance") return collectEndurance(currentYear, log, { ...cfg.endurance, series: cfg.series });
   return null;
 }
 
@@ -84,7 +90,7 @@ async function main() {
       log(`! unknown series "${id}" — skipping`);
       continue;
     }
-    const collected = await collect(cfg.engine);
+    const collected = await collect(cfg);
     if (collected) {
       all.push(...collected);
       if (validate && cfg.validator) {

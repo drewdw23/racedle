@@ -38,18 +38,21 @@ const SERIES = {
   WRC: "WRC",
 };
 
-/* Playable genres. `series: null` means the full combined pool
-   ("Ultimate"). IMSA + WEC are grouped (both endurance sportscar
-   racing) so every genre has a big enough answer pool for a fun daily
-   rotation. The Series tile still distinguishes the exact series within
-   a genre. */
+/* Playable genres. Each lists the series it draws from; "Ultimate" is the
+   combined pool of all *active* genres. The Series tile still distinguishes
+   the exact series within a genre.
+
+   NOTE: IMSA + WEC (the "Endurance" genre) are HIDDEN for now — their data
+   and import pipelines are kept (see import/sources/endurance.js) but the
+   genre is not listed and those drivers are excluded from Ultimate, pending
+   a later release. To re-enable: restore the endurance genre below and add
+   SERIES.IMSA / SERIES.WEC back to Ultimate. */
 const GENRES = [
-  { id: "ultimate",  label: "Ultimate",     series: null },
+  { id: "ultimate",  label: "Ultimate",     series: [SERIES.F1, SERIES.NASCAR, SERIES.INDYCAR, SERIES.SUPERCARS, SERIES.WRC] },
   { id: "f1",        label: "Formula 1",    series: [SERIES.F1] },
   { id: "nascar",    label: "NASCAR",       series: [SERIES.NASCAR] },
   { id: "indycar",   label: "IndyCar",      series: [SERIES.INDYCAR] },
   { id: "supercars", label: "V8 Supercars", series: [SERIES.SUPERCARS] },
-  { id: "endurance", label: "Endurance",    series: [SERIES.IMSA, SERIES.WEC] },
   { id: "rally",     label: "Rally",        series: [SERIES.WRC] },
 ];
 

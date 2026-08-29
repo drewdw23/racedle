@@ -87,36 +87,64 @@ export const SERIES_CONFIG = {
 
   imsa: {
     series: "IMSA",
-    engine: "wikipedia",
-    wikipedia: {
-      // NOTE: the entry-list table lists ALL classes (GTP/LMDh + LMP2 +
-      // GTD/GT). The scraper returns everyone; filtering to the top class
-      // (and dropping gentleman/am co-drivers) is a curation step. Same
-      // applies to WEC below.
-      titleCandidates: (y) => [
+    engine: "endurance", // top-class entries table (first in Entries) + Rounds + top-class standings (DATA_SOURCES.md §10)
+    endurance: {
+      from: 2014, // modern unified IMSA SportsCar Championship; pre-2014 stays hand-curated
+      titleFn: (y) => [
         `${y} IMSA SportsCar Championship`,
-        `${y} WeatherTech SportsCar Championship season`,
-        `${y} Rolex Sports Car Series season`,
-        `${y} IMSA GT Championship season`,
-        `${y} IMSA Camel GT Championship season`,
+        `${y} United SportsCar Championship`,
       ],
-      sections: ["Entries", "Entry list", "Teams and drivers"],
-      driverColumns: ["Drivers", "Driver"],
+      // Top-class (Prototype/DPi/GTP) drivers' co-champions per season
+      // (Wikipedia "List of IMSA SportsCar Championship champions"). IMSA's
+      // per-season standings tables are too irregular to parse reliably, so
+      // titles come from this hardcoded, verifiable map.
+      champions: {
+        2014: ["João Barbosa", "Christian Fittipaldi"],
+        2015: ["João Barbosa", "Christian Fittipaldi"],
+        2016: ["Dane Cameron", "Eric Curran"],
+        2017: ["Jordan Taylor", "Ricky Taylor"],
+        2018: ["Eric Curran", "Felipe Nasr"],
+        2019: ["Dane Cameron", "Juan Pablo Montoya"],
+        2020: ["Hélio Castroneves", "Ricky Taylor"],
+        2021: ["Felipe Nasr", "Pipo Derani"],
+        2022: ["Tom Blomqvist", "Oliver Jarvis"],
+        2023: ["Pipo Derani", "Alexander Sims"],
+        2024: ["Dane Cameron", "Felipe Nasr"],
+        2025: ["Matt Campbell", "Mathieu Jaminet"],
+      },
     },
   },
 
   wec: {
     series: "WEC",
-    engine: "wikipedia",
-    wikipedia: {
-      titleCandidates: (y) => [
+    engine: "endurance", // top-class entries table (first in Entries) + Rounds + top-class standings (DATA_SOURCES.md §7)
+    endurance: {
+      from: 2012, // FIA WEC start; pre-2012 World Sportscar legends stay hand-curated
+      titleFn: (y) => [
         `${y} FIA World Endurance Championship season`,
         `${y} FIA World Endurance Championship`,
-        `${y} World Sportscar Championship season`,
-        `${y} World Championship for Makes season`,
+        // 2018–19 and 2019–20 ran as hyphenated "superseasons".
+        `${y}–${String(y + 1).slice(2)} FIA World Endurance Championship`,
+        `${y - 1}–${String(y).slice(2)} FIA World Endurance Championship`,
       ],
-      sections: ["Entries", "Entry list", "Teams and drivers"],
-      driverColumns: ["Drivers", "Driver"],
+      // Top-class (LMP1/Hypercar) Drivers' World Champions per season
+      // (superseasons keyed by their first year). Hardcoded for the same
+      // reason as IMSA — the per-season standings vary too much to parse.
+      champions: {
+        2012: ["André Lotterer", "Benoît Tréluyer", "Marcel Fässler"],
+        2013: ["Allan McNish", "Tom Kristensen", "Loïc Duval"],
+        2014: ["Anthony Davidson", "Sébastien Buemi"],
+        2015: ["Timo Bernhard", "Mark Webber", "Brendon Hartley"],
+        2016: ["Marc Lieb", "Romain Dumas", "Neel Jani"],
+        2017: ["Timo Bernhard", "Brendon Hartley", "Earl Bamber"],
+        2018: ["Sébastien Buemi", "Fernando Alonso", "Kazuki Nakajima"], // 2018–19
+        2019: ["Mike Conway", "Kamui Kobayashi", "José María López"], // 2019–20
+        2021: ["Mike Conway", "Kamui Kobayashi", "José María López"],
+        2022: ["Sébastien Buemi", "Brendon Hartley", "Ryō Hirakawa"],
+        2023: ["Sébastien Buemi", "Brendon Hartley", "Ryō Hirakawa"],
+        2024: ["Kévin Estre", "André Lotterer", "Laurens Vanthoor"],
+        2025: ["James Calado", "Antonio Giovinazzi", "Alessandro Pier Guidi"],
+      },
     },
   },
 
