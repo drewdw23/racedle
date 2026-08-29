@@ -365,11 +365,61 @@ Perkins) stay hand-curated.
 Gisbergen→NASCAR, de Silvestro→IndyCar** (both Supercars champions now race elsewhere; the game
 lists each driver once, under their current series).
 
-## 10. IMSA — the last series to evaluate
+## 10. IMSA — evaluated candidates (verified 2026-07-14)
 
-Mirrors WEC's shape exactly: **multi-class** (needs the top-class table filter, as the naïve
-parse returns all GTP/LMP2/GTD drivers) and the same **wins gap** (endurance wins are shared and
-ambiguous). The buildable path is the same class-table + per-season class-standings + Wikidata
-recipe used for the WEC evaluation; expect mid-ROI like WEC, not a clean WRC/Supercars build.
-Deliverable when tackled: the same evaluated source table + empirically verified top-class pool
-as §2–3.
+**Verdict: WEC's twin — roster + titles buildable from Wikipedia for the modern era; career
+wins are the gap with no clean source.** Confirmed empirically that IMSA has exactly the WEC
+shape. Scope: the modern unified **IMSA SportsCar Championship (2014+)**; the fragmented
+pre-2014 history (IMSA GT / Camel GT 1971–98, ALMS + Grand-Am 1999–2013) stays hand-curated —
+more so than the other tails, since the "top class" changed name/format across five eras
+(Camel GTP → various → Daytona Prototype / P → DPi → GTP/LMDh).
+
+| Source | License | Verdict |
+|---|---|---|
+| Wikipedia season "Entries" (per-class tables) | CC BY-SA | ✅ roster/full-time/team — top-class table (first) + Rounds column |
+| Wikipedia season top-class **"Standings"** section (P1 = champion) | CC BY-SA | ✅ titles (verified: 2023 GTP co-champions Derani + Sims) |
+| Wikidata | CC0 | ✅ nationality |
+| **career wins** | — | ⚠️ **GAP** — season results give the winning *team* per class per round, not the driver |
+| [List of IMSA champions](https://en.wikipedia.org/wiki/List_of_IMSA_SportsCar_Championship_champions) | CC BY-SA | ⚠️ exists but fragmented across ~20 class/era tables — the per-season standings path is cleaner |
+| tobil/imsa (HuggingFace) | scraped from official Alkamel site | ❌ lap-data only, 2021+, scraping lineage |
+| TheSportsDB API | community, free | ❌ thin/incomplete for a driver database |
+| imsa.results.alkamelcloud.com | official, no reuse grant | ❌ scraping-hostile |
+
+### What was verified (2023 & 2015 season pages)
+- **Class filtering is clean.** The "Entries" section holds one table per class (2023:
+  GTP / LMP2 / LMP3 / GTD Pro / GTD; 2015: Prototype / PC / GTLM / GTD). Taking the top-class
+  table (GTP 2023+, DPi 2017–22, Prototype 2014–16) sidesteps the all-class noise that made the
+  naïve 2015 parse return 154 drivers. Cars carry **2–3 drivers per cell**.
+- **Full-time is computable** — every entries table has a **Rounds column** (~11–12 rounds/season).
+- **Titles are recoverable** without wrestling the fragmented champions page: each season page's
+  **"Standings: <top class>"** section gives the P1 crew (2–3 co-champions share the title).
+- **Wins have no clean source** — the season results table is `Rnd | GTP Winning Team | LMP2
+  Winning Team | …`: winning **teams**, not drivers. Deriving driver wins means mapping the
+  winning car → its 2–3 drivers per round (shared, ambiguous) — same wall as WEC.
+
+### Recommended shape (if built)
+Identical to the WEC recommendation: `sources/imsa.js` = top-class entries table per season
+(2014+) → Rounds-based full-time pool; titles from the top-class standings P1; nationality from
+Wikidata; **wins defaulted to 0 with a curated override for the notable winners** (or a later
+pass cross-referencing winning car → drivers). Mid-ROI. Since WEC and IMSA share both the shape
+*and* the Endurance genre, they're best built (or left curated) together.
+
+---
+
+## Survey complete — series scorecard
+
+All seven series evaluated. Build outcomes:
+
+| Series | Verdict | Built? |
+|---|---|---|
+| F1 | F1DB (CC BY 4.0) — clean bulk, complete | ✅ shipped |
+| NASCAR | nascaR.data (permission) — clean bulk, complete | ✅ shipped |
+| WRC | Wikipedia — cleanest (driver/co-driver split, countable wins) | ✅ shipped |
+| V8 Supercars | Wikipedia — clean (single class, countable race wins) | ✅ shipped |
+| IndyCar | Wikipedia — buildable (Round(s) filter; USAC title conflation handled) | ✅ shipped (modern) |
+| WEC | Wikipedia — roster+titles yes, **wins gap** | ⏸ evaluated, mid-ROI |
+| IMSA | Wikipedia — roster+titles yes, **wins gap** (WEC twin) | ⏸ evaluated, mid-ROI |
+
+The two endurance series (WEC + IMSA) are the only ones left unbuilt — both mid-ROI Wikipedia
+builds blocked on the same shared/ambiguous endurance-wins problem, and both feed the one
+Endurance genre. Everything with a clean or countable wins source is shipped.
