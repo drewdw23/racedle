@@ -35,23 +35,9 @@ export const SERIES_CONFIG = {
 
   nascar: {
     series: "NASCAR Cup",
-    engine: "nascar", // primary: nascaR.data Cup parquet (see DATA_SOURCES.md §5)
-    // Wikipedia config retained as the fallback roster source (see
-    // PERMISSION_REQUEST.md) and for the season-table validator.
-    wikipedia: {
-      // "1971 NASCAR Winston Cup Series", "2004 NASCAR Nextel Cup Series",
-      // "2015 NASCAR Sprint Cup Series", "2020 NASCAR Cup Series" — the name
-      // changed over the years, so we try several and use the first that exists.
-      titleCandidates: (y) => [
-        `${y} NASCAR Cup Series`,
-        `${y} NASCAR Sprint Cup Series`,
-        `${y} NASCAR Nextel Cup Series`,
-        `${y} NASCAR Winston Cup Series`,
-        `${y} NASCAR Grand National Series`,
-      ],
-      sections: ["Full-time", "Entry list", "Teams and drivers", "Drivers"],
-      driverColumns: ["Driver", "Driver(s)"],
-    },
+    engine: "nascar", // Wikipedia/Wikidata (1970+): season standings + "Teams and drivers"
+    // + champions list (see DATA_SOURCES.md §5). Reworked 2026 off the nascaR.data
+    // parquet — sources/nascar.js is self-contained (season titles/columns live there).
   },
 
   indycar: {

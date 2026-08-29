@@ -107,6 +107,11 @@ golden tests and rewrote data.js to the trimmed pool (251 F1 = 241 full-timers +
 
 ## 5. NASCAR Cup — evaluated candidates (verified 2026-07-10)
 
+> **⚠️ REWORKED 2026 → Wikipedia/Wikidata (see "Implementation" below).** NASCAR now uses the
+> same license-clean Wikipedia recipe as IndyCar/Supercars/WRC, so the game carries **no external
+> data dependency** (nascaR.data parquet + `hyparquet` retired). The nascaR.data evaluation below
+> is kept as historical context; the "Why nascaR.data wins" analysis no longer reflects the build.
+
 | Source | License / lineage | Access | Verdict |
 |---|---|---|---|
 | **nascaR.data** ([github.com/kyleGrealis/nascaR.data](https://github.com/kyleGrealis/nascaR.data)) | GPL-3 (package); data scraped **with permission** from DriverAverages.com — no explicit data license (see caveat) | Bulk Parquet on Cloudflare R2 (`https://nascar.kylegrealis.com/cup_series.parquet`, ~1 MB), auto-updated Mondays in season | ✅ **PRIMARY** (with license action item) |
@@ -150,19 +155,29 @@ the full evaluation:
 - **Parquet-only** → requires `hyparquet` (tiny, pure-JS, MIT) — the import tool's first npm
   dependency (the game itself stays dependency-free).
 
-### Implementation — ✅ built & SHIPPED 2026-07-10 (permission granted)
-- `lib/nascar.js` downloads the ~1 MB parquet, revalidating with the stored ETag (304 when
-  unchanged); `sources/nascar.js` reads it via `hyparquet`, applies the full-time rule, joins
-  titles from the Wikipedia champions list, and maps nationality (default US + 6 named non-US
-  regulars). `node run.js --series=nascar` → **249 full-time drivers**.
-- `merge-nascar.js` is golden-test-gated (champions present; Petty 7/200, Gordon 4/93, Johnson
-  7/83, Earnhardt 7/76, Larson 2/32 anchors; SVG→NZ; no one-race leakage; flag coverage; no
-  dupes). Merge preview: NASCAR section = **252** (243 full-timers + 9 pre-1970 legends), 6
-  dual-career drivers excluded (Montoya→F1, Ambrose→Supercars, Hornish/Patrick→IndyCar,
-  Pruett→IMSA, Speed→F1). Verified in-browser, then **data.js reverted** — see the license gate.
-- **Shipped:** permission granted (see [PERMISSION_REQUEST.md](PERMISSION_REQUEST.md)); NASCAR
-  section merged into `data.js` (252 drivers), nascaR.data + DriverAverages credit in the footer.
-  Refresh weekly in-season: `node run.js --series=nascar && node merge-nascar.js`.
+### Implementation — ✅ REWORKED to Wikipedia/Wikidata & SHIPPED 2026
+`sources/nascar.js` is now self-contained (no parquet, no `hyparquet`), same recipe as
+Supercars/IndyCar/WRC, scoped to the project's 1970+ floor:
+- **Roster + full-time + wins** ← each season's **points-standings** table, auto-detecting the two
+  Wikipedia layouts: the early-70s *summary* table (a starts count — "Starts"/"St"/"Races" — plus
+  "Wins") and the modern *per-race grid* (a started race = a non-empty result cell, a win = a
+  finish of "1"). Full-time season = Starts ≥ 60% of the season's races. Season titles are resolved
+  with a **year-guard** (bare "1968 NASCAR Cup Series" redirects to the generic page — rejected).
+- **Team** ← the "Teams and drivers" entry table (Driver→Team, most recent season).
+- **Titles** ← the champions list, counting **distinct** champion years (old rows rowspan-duplicate
+  otherwise — Weatherly's 1963 appears 9×). Career-complete (Petty 7, Pearson 3, Larson 2 incl. 2025).
+- **Nationality** ← default United States + a named non-US map (SVG→NZ, Suárez→Mexico, Ambrose→AU, …).
+- `node run.js --series=nascar` → **266 full-time drivers (1970+)**.
+
+`merge-nascar.js` is golden-gated (all 1970+ champions present; anchors Petty 7/200, Gordon 4/93,
+Johnson 7/83, Earnhardt 7/76, Pearson 3/105, Cale 3/83; SVG→NZ; Steve Park present; no venue leak;
+flags; no dupes). **Carryover** (same as merge-supercars): Wikipedia season pages only cover 1970+,
+so full-career **wins/debut** for the ~15 pre-1970-debut legends are carried from the outgoing data
+via MAX(wins)/MIN(debut), and a missing **team** falls back to the outgoing record (fills old
+privateers like Bobby Isaac). Result: NASCAR section = **259**; 6 dual-career drivers excluded
+(Montoya, Danica Patrick, Hornish, Pruett, Speed, Ambrose — kept in their primary series); 1 obscure
+teamless driver dropped. Verified in-browser (780 total, 0 dup/incomplete/missing-flag).
+Refresh weekly in-season: `node run.js --series=nascar && node merge-nascar.js`.
 - Two golden-test catches worth noting: the champions page has multiple tables (initial parse
   double-counted titles → 9 for Petty; fixed to use only the chronological table); and the
   suite caught **my** bad assumption (I listed Christopher Bell as a champion — he isn't).
@@ -413,7 +428,7 @@ All seven series evaluated. Build outcomes:
 | Series | Verdict | Built? |
 |---|---|---|
 | F1 | F1DB (CC BY 4.0) — clean bulk, complete | ✅ shipped |
-| NASCAR | nascaR.data (permission) — clean bulk, complete | ✅ shipped |
+| NASCAR | Wikipedia/Wikidata (1970+ standings + champions; reworked off nascaR.data) | ✅ shipped |
 | WRC | Wikipedia — cleanest (driver/co-driver split, countable wins) | ✅ shipped |
 | V8 Supercars | Wikipedia — clean (single class, countable race wins) | ✅ shipped |
 | IndyCar | Wikipedia — buildable (Round(s) filter; USAC title conflation handled) | ✅ shipped (modern) |
