@@ -1,8 +1,10 @@
-# Data-reuse permission request — ✅ GRANTED 2026-07-10
+# Data-reuse permission request — ✅ GRANTED 2026-07-10 · ⚠️ NO LONGER USED (2026)
 
-**Status:** permission granted by the nascaR.data maintainer. NASCAR data is live in `data.js`,
-with attribution to nascaR.data + DriverAverages.com in the site footer and README. Keep that
-credit while the data ships. The original request text is retained below for the record.
+**Superseded:** NASCAR was **reworked off the nascaR.data parquet onto license-clean
+Wikipedia/Wikidata in 2026** (see DATA_SOURCES.md §5). The game no longer ships nascaR.data, so
+its attribution has been removed from the footer and README. Permission was granted and the data
+shipped in good standing from 2026-07-10; this document and the request below are retained only as
+a historical record. No action needed.
 
 ---
 

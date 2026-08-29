@@ -73,9 +73,10 @@ here and we'll re-verify.
 - **F1 driver data:** [F1DB](https://github.com/f1db/f1db), licensed
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cross-validated against the
   [Jolpica-F1](https://github.com/jolpica/jolpica-f1) API.
-- **NASCAR Cup driver data:** [nascaR.data](https://github.com/kyleGrealis/nascaR.data), used
-  with the maintainer's permission; upstream source [DriverAverages.com](https://www.driveraverages.com).
-  Championships from the Wikipedia champions list.
+- **NASCAR Cup driver data (1970+):** assembled from [Wikipedia](https://en.wikipedia.org/)
+  season pages (points standings, "Teams and drivers", the champions list; CC BY-SA) and
+  [Wikidata](https://www.wikidata.org/) (CC0). Full-career wins/debut for the pre-1970 legends
+  are carried from the prior dataset. *(Reworked off the nascaR.data parquet in 2026.)*
 - **IndyCar driver data (modern, 2008+):** assembled from [Wikipedia](https://en.wikipedia.org/)
   season pages + champions/winners lists (CC BY-SA) and [Wikidata](https://www.wikidata.org/) (CC0).
   Pre-2008 IndyCar/USAC legends are hand-curated.
