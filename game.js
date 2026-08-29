@@ -192,6 +192,12 @@ function bindEvents() {
   $("free-new").addEventListener("click", startFreeGame);
   $("share-btn").addEventListener("click", shareResult);
 
+  const logo = $("logo-home");
+  logo.addEventListener("click", goHome);
+  logo.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goHome(); }
+  });
+
   $("btn-how").addEventListener("click", () => toggleModal("modal-how", true));
   $("btn-stats").addEventListener("click", () => {
     renderStats();
@@ -204,6 +210,28 @@ function bindEvents() {
 
 function toggleModal(id, show) {
   $(id).classList.toggle("open", show);
+}
+
+/* ---------- Home ---------- */
+/* Logo acts as a home button: reset to the starting page — Ultimate genre,
+   Daily mode, modals/suggestions closed, scrolled to top. Today's saved
+   progress for the Ultimate daily is restored (via startDaily), so this
+   returns the player home without wiping their game. */
+function goHome() {
+  document.querySelectorAll(".modal.open").forEach((m) => m.classList.remove("open"));
+  hideSuggestions();
+
+  state.genre = GENRES[0]; // Ultimate
+  state.mode = "daily";
+  document.querySelectorAll(".genre-tab").forEach((el) =>
+    el.classList.toggle("active", el.dataset.genre === state.genre.id)
+  );
+  $("tab-daily").classList.add("active");
+  $("tab-free").classList.remove("active");
+  $("free-new").classList.add("hidden");
+
+  startDaily();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* ---------- Genres & modes ---------- */
