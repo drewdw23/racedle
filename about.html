@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Racedle</title>
+  <meta name="description" content="About Racedle, the free daily motorsports driver guessing game — what it is, how it's built, where the driver data comes from, and how to report an error." />
+  <link rel="canonical" href="https://drewdw23.github.io/racedle/about.html" />
+  <meta property="og:title" content="About Racedle" />
+  <meta property="og:description" content="What Racedle is, how it's built, and where its motorsports driver data comes from." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://drewdw23.github.io/racedle/about.html" />
+  <meta property="og:image" content="https://drewdw23.github.io/racedle/og-image.png" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <a class="logo" href="index.html" title="Back to the game"><span class="flag">🏁</span> RACEDLE</a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="how-to-play.html">How to Play</a>
+      <a href="faq.html">FAQ</a>
+      <a href="about.html" aria-current="page">About</a>
+    </nav>
+  </header>
+
+  <main class="prose">
+    <h1>About Racedle</h1>
+    <p class="lead">Racedle is a free, browser-based daily guessing game for motorsports fans —
+      a Wordle-style puzzle where you guess the mystery racing driver from clues about their
+      nationality, series, team, championships, wins, and era. It's a fan project, built to be fast,
+      free, and playable on any device with no account and no install.</p>
+
+    <h2>How it works</h2>
+    <p>Every day, each genre serves one shared mystery driver that every player worldwide gets. You
+      guess driver names and Racedle grades each guess across seven categories with color clues until
+      you find the answer. There are seven genres — <strong>Ultimate</strong> (the combined pool) plus
+      <strong>Formula 1</strong>, <strong>NASCAR</strong>, <strong>IndyCar</strong>,
+      <strong>V8 Supercars</strong>, and <strong>Rally (WRC)</strong> — each with its own daily puzzle,
+      unlimited free-play mode, and personal stats. New to the game? Start with
+      <a href="how-to-play.html">How to Play</a>.</p>
+
+    <h2>Where the data comes from</h2>
+    <p>Racedle covers full-time drivers from 1970 onward across five racing series, compiled entirely
+      from open, license-clean public sources:</p>
+    <ul>
+      <li><strong>Formula 1</strong> — driver records from <a href="https://github.com/f1db/f1db" target="_blank" rel="noopener">F1DB</a>
+        (licensed CC BY 4.0), cross-checked against the open <a href="https://github.com/jolpica/jolpica-f1" target="_blank" rel="noopener">Jolpica-F1</a> API.</li>
+      <li><strong>NASCAR Cup, IndyCar, V8 Supercars, and WRC</strong> — assembled from
+        <a href="https://en.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a> season pages
+        (CC BY-SA) and <a href="https://www.wikidata.org/" target="_blank" rel="noopener">Wikidata</a> (CC0).</li>
+    </ul>
+    <p>The information Racedle uses — names, nationalities, teams, championships, and win counts — are
+      publicly documented facts. Racedle uses <strong>no team logos, driver photographs, or series
+      wordmarks</strong>. Championships and wins reflect each driver's primary series.</p>
+
+    <h2>Accuracy &amp; corrections</h2>
+    <p>The database is large and compiled from public records, so occasional errors are possible. If
+      you spot a driver whose team, title count, or other detail looks wrong, please
+      <a href="https://github.com/drewdw23/racedle/issues" target="_blank" rel="noopener">open an issue on GitHub</a>
+      — corrections are welcome and get fixed quickly.</p>
+
+    <h2>Privacy</h2>
+    <p>Racedle has no accounts and no server-side database. Your game progress, streaks, and stats
+      live only in your own browser. See the full <a href="privacy.html">privacy policy</a> for details.</p>
+
+    <h2>Disclaimer</h2>
+    <p>Racedle is an independent, unofficial fan-made game. It is not affiliated with, endorsed by, or
+      associated with Formula 1, NASCAR, IndyCar, Supercars, the FIA, or any racing series, team, or
+      driver mentioned.</p>
+
+    <p class="back-link"><a href="index.html">← Play today's puzzle</a></p>
+  </main>
+
+  <footer>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="how-to-play.html">How to Play</a>
+      <a href="faq.html">FAQ</a>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://github.com/drewdw23/racedle/issues" target="_blank" rel="noopener">Report an issue</a>
+    </nav>
+    Racedle is an unofficial fan-made game and is not affiliated with, endorsed by, or associated with
+    Formula 1, NASCAR, IndyCar, Supercars, the FIA, or any series, team or driver mentioned.
+  </footer>
+</body>
+</html>

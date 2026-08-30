@@ -366,7 +366,48 @@ footer a { color: var(--text-dim); }
 
 .hidden { display: none !important; }
 
+/* ---------- Site nav (content pages) ---------- */
+a.logo { text-decoration: none; color: inherit; }
+.site-nav { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.site-nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+.site-nav a:hover { color: var(--text); }
+.site-nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); }
+
+/* ---------- Prose (content pages) ---------- */
+.prose { max-width: 760px; line-height: 1.7; }
+.prose h1 { font-size: 1.8rem; margin: 0 0 6px; }
+.prose h2 { font-size: 1.25rem; margin: 32px 0 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.prose h3 { font-size: 1.05rem; margin: 22px 0 6px; }
+.prose p, .prose li { color: var(--text); }
+.prose a { color: #f2685f; }
+.prose ul { padding-left: 20px; }
+.prose li { margin: 5px 0; }
+.prose .lead { color: var(--text-dim); font-size: 1.08rem; }
+.prose table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+.prose th, .prose td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.prose th { color: var(--text-dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.prose .chip {
+  display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+  margin-right: 5px; vertical-align: -1px;
+}
+.back-link { margin-top: 34px; }
+.back-link a { color: var(--accent); text-decoration: none; font-weight: 700; }
+
+/* ---------- Footer nav ---------- */
+.footer-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 10px; }
+.footer-nav a { color: var(--text); font-weight: 600; text-decoration: none; }
+.footer-nav a:hover { color: var(--accent); }
+
 @media (max-width: 600px) {
   .logo { font-size: 1.2rem; letter-spacing: 2px; }
   .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  header { flex-wrap: wrap; gap: 8px; }
+  .site-nav { gap: 12px; }
 }
