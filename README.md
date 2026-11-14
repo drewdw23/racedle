@@ -7,7 +7,7 @@ Guess the mystery **NASCAR Cup Series** driver using clues across five categorie
 Ultimate). Every mode has its own daily puzzle,
 free play, and stats.
 
-▶️ **Play it:** https://drewdw23.github.io/racedle/
+▶️ **Play it:** https://racedle.net/
 
 ## How to play
 

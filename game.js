@@ -12,7 +12,7 @@
 
 /* ---------- Config ---------- */
 const EPOCH_UTC = Date.UTC(2026, 6, 5); // puzzle #1 = July 5, 2026 (UTC)
-const SITE_URL = "https://drewdw23.github.io/racedle/";
+const SITE_URL = "https://racedle.net/";
 
 const WIN_BANDS = [
   { max: 0, label: "0" },

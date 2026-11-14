@@ -10,7 +10,7 @@
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. NASCAR has a large, passionate, weekly-engaged fan base with deep history — decades of drivers, rivalries and stats that fans argue about — which is exactly what a daily trivia habit feeds on.
 
-**Status:** live at https://drewdw23.github.io/racedle/ — 265 Cup drivers, seven modes, How to Play / FAQ / About / Privacy pages. Next steps: custom domain, Google Search Console, AdSense application, frozen daily-answer calendar.
+**Status:** live at https://racedle.net/ — 265 Cup drivers, seven modes, How to Play / FAQ / About / Privacy pages. Next steps: custom domain, Google Search Console, AdSense application, frozen daily-answer calendar.
 
 ---
 
@@ -110,7 +110,7 @@ racedle/
 
 ### Primary: Google AdSense display ads
 Setup sequence (accounts can't be created programmatically — owner actions):
-1. **Buy a custom domain** (e.g., `racedle.com` / `.io` / `.gg`, ~$12/yr). AdSense approval on a bare `*.github.io` subdomain is unreliable; a custom domain also protects the brand and makes the site portable. GitHub Pages supports custom domains free (repo Settings → Pages → Custom domain + DNS CNAME).
+1. ✅ **Custom domain: racedle.net** (bought Nov 2026; racedle.com was already taken). AdSense approval on a bare `*.github.io` subdomain is unreliable; a custom domain also protects the brand and makes the site portable. Served by GitHub Pages via the repo's `CNAME` file + DNS at GoDaddy.
 2. Add the site to **Google Search Console** and submit `sitemap.xml`.
 3. Apply at [adsense.google.com](https://adsense.google.com) with the Google account that should receive payouts. Already in place: original content pages (How to Play, FAQ, About), privacy policy with ad-cookie disclosures, cross-site navigation, robots.txt/sitemap. Approval typically takes days to a few weeks.
 4. On approval, paste the AdSense `<script>` into `index.html` (the tag is already there, commented, with instructions) and replace the two placeholder `.ad-slot` divs with ad units. Recommended: one 728×90/responsive banner below the header, one below the game. **Never** interstitials or ads inside the game board — session length is the asset; don't poison it.

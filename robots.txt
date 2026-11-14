@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://drewdw23.github.io/racedle/sitemap.xml
+Sitemap: https://racedle.net/sitemap.xml
