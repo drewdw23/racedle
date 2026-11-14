@@ -267,8 +267,7 @@ function startDaily() {
   clearBoard();
   $("win-panel").classList.add("hidden");
   setInputEnabled(true);
-  $("puzzle-number").textContent = "#" + state.puzzle;
-  $("puzzle-genre").textContent = state.genre.label;
+  renderPuzzleLabel();
   restoreDaily();
   renderYesterday();
 }
@@ -281,7 +280,21 @@ function startFreeGame() {
   clearBoard();
   $("win-panel").classList.add("hidden");
   setInputEnabled(true);
+  renderPuzzleLabel();
   updateGuessCount();
+}
+
+/* Label above the board: "Daily puzzle #N — <mode>" or "Free play — <mode>"
+   (the number and mode in accent spans). */
+function renderPuzzleLabel() {
+  const accent = (text) => Object.assign(document.createElement("span"), { textContent: text });
+  const label = $("puzzle-label");
+  label.replaceChildren();
+  if (state.mode === "daily") {
+    label.append("Daily puzzle ", accent("#" + state.puzzle), " — ", accent(state.genre.label));
+  } else {
+    label.append("Free play — ", accent(state.genre.label));
+  }
 }
 
 /* ---------- Daily persistence ---------- */
