@@ -67,10 +67,15 @@ function todayPuzzleNumber() {
   return Math.max(1, Math.floor((todayUTC - EPOCH_UTC) / 86400000) + 1);
 }
 
-/* Each genre gets its own independent daily driver by mixing the
-   genre id into the seed. */
+/* The daily answer comes from the frozen calendar (answers.js) when it
+   lists this puzzle and mode and the driver is still in the pool;
+   otherwise each genre gets a seeded pick, mixing the genre id into the
+   seed. */
 function driverForPuzzle(n, genre) {
   const pool = genrePool(genre);
+  const scheduled = typeof ANSWERS !== "undefined" && ANSWERS[n] && ANSWERS[n][genre.id];
+  const fromCalendar = scheduled && pool.find((d) => d.name === scheduled);
+  if (fromCalendar) return fromCalendar;
   const seed = (Math.imul(n, 2654435761) ^ hashStr(genre.id)) >>> 0;
   const rand = mulberry32(seed)();
   return pool[Math.floor(rand * pool.length)];

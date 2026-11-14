@@ -54,6 +54,25 @@ The merge refuses to write unless:
 - Steve Park is present, and no racetrack names leaked in.
 - No duplicates, and the pool is 240–290 drivers.
 
+## Answer calendar (build-calendar.js)
+
+The game's daily answers come from `../answers.js`, a frozen calendar of named answers per
+puzzle and mode. `build-calendar.js` creates or extends it:
+
+```bash
+node build-calendar.js --until=2027-05-01                    # extend; existing days unchanged
+node build-calendar.js --until=2027-05-01 --rebuild-from=150 # regenerate #150 onward
+```
+
+- Weighting: star (a Cup title or 10+ wins) = 8, known (1–9 wins, or Active) = 3, deep cut = 1.
+- Cooldown: a driver can't repeat in a mode until half that mode's pool has passed (max 90 days).
+- Ultimate never repeats one of that day's decade answers.
+- Today and earlier are never generated or rebuilt; missing ones are filled with the game's
+  seeded pick, so publishing never changes a live answer.
+
+`merge-nascar.js` refuses to write if a refresh would leave a scheduled answer (today or later)
+outside its mode's pool, and warns when the calendar has under 30 days left.
+
 ## Architecture
 
 ```
@@ -61,6 +80,7 @@ import/
 ├── config.js            # year range + full-time rule (60% of a season's races)
 ├── run.js               # orchestrator: collect → emit output/
 ├── merge-nascar.js      # hardcoded legends + team fallbacks, golden tests, write ../data.js
+├── build-calendar.js    # frozen daily-answer calendar → ../answers.js
 ├── sources/
 │   └── nascar.js        # season standings + "Teams and drivers" + champions list
 ├── lib/

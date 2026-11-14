@@ -13,7 +13,7 @@
    Usage: node merge-nascar.js   (then review `git diff ../data.js`)
 */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -160,6 +160,38 @@ for (const junk of ["Infineon Raceway", "Sonoma Raceway"]) if (byStrip.has(strip
 {
   const seen = new Map();
   for (const r of emit) { const k = strip(r.name); if (seen.has(k)) fail(`duplicate in pool: ${r.name} vs ${seen.get(k)}`); seen.set(k, r.name); }
+}
+
+// ---------- frozen answer calendar (../answers.js) ----------
+// Every answer scheduled for today or later must still be in its mode's pool,
+// or the game would silently fall back to a different driver that day.
+const ANSWERS_JS = join(__dir, "..", "answers.js");
+if (existsSync(ANSWERS_JS)) {
+  const ANSWERS = Function(`${readFileSync(ANSWERS_JS, "utf8")}\n;return ANSWERS;`)();
+  const GENRES = Function(`${src}\n;return GENRES;`)();
+  const EPOCH_UTC = Date.UTC(2026, 6, 5); // must match game.js
+  const now = new Date();
+  const today = Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - EPOCH_UTC) / 86400000) + 1;
+  const byName = new Map(emit.map((r) => [r.name, r]));
+  const broken = [];
+  for (const [n, row] of Object.entries(ANSWERS)) {
+    if (Number(n) < today) continue;
+    for (const g of GENRES) {
+      const d = byName.get(row[g.id]);
+      const inPool = d && (!g.decades || g.decades.includes(Math.floor(d.debut / 10) * 10));
+      if (!inPool) broken.push({ n: Number(n), text: `#${n} ${row.date} ${g.label}: "${row[g.id]}"` });
+    }
+  }
+  if (broken.length) {
+    const firstFixable = Math.max(today + 1, Math.min(...broken.map((b) => b.n)));
+    const last = Object.values(ANSWERS).at(-1).date;
+    fail(`${broken.length} scheduled answer(s) no longer fit their mode after this refresh:\n  ` +
+      broken.map((b) => b.text).join("\n  ") +
+      `\nFix the data, or regenerate those days: cd import && node build-calendar.js --until=${last} --rebuild-from=${firstFixable}` +
+      (broken.some((b) => b.n === today) ? "\n(Today's answer can't be rebuilt — players have seen it.)" : ""));
+  }
+  const lastN = Math.max(...Object.keys(ANSWERS).map(Number));
+  if (lastN - today < 30) console.log(`NOTE: the answer calendar ends in ${lastN - today} day(s) (${ANSWERS[lastN].date}) — extend it with build-calendar.js.`);
 }
 
 // ---------- rebuild the DRIVERS list ----------

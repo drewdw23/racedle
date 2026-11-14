@@ -70,6 +70,22 @@ career wins and debut year hardcoded in [import/merge-nascar.js](import/merge-na
 Wikipedia's pre-1970 season pages aren't reliable enough to count from. Report data errors as
 an issue and we'll re-verify.
 
+## Daily answers
+
+Daily answers come from a **frozen calendar**, [answers.js](answers.js): puzzle number → the
+answer for each mode, generated ahead of time and never changed once written, so data
+refreshes can't change past or upcoming answers. It runs through 1 February 2027; extend it
+before then:
+
+```bash
+cd import && node build-calendar.js --until=YYYY-MM-DD
+```
+
+Picks are weighted toward recognizable drivers (stars 8 : known 3 : deep cuts 1), with a
+cooldown so no driver repeats too soon — see the header of
+[import/build-calendar.js](import/build-calendar.js). Days outside the calendar fall back to a
+seeded random pick.
+
 ## Data credits
 
 - **NASCAR Cup driver data:** assembled from [Wikipedia](https://en.wikipedia.org/) (CC BY-SA)

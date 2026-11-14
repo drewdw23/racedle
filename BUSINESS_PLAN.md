@@ -101,7 +101,7 @@ racedle/
 - **Sourcing decision (do NOT scrape racing-reference.info):** it blocks automated access (403) and its Terms of Use forbid scraping and building tools on its data; bulk-copying it would also convert our "public facts" legal posture into a database-rights/ToU liability.
 - Editorial rules (in `data.js` header): titles = Cup championships; wins = career Cup wins; debut = first Cup season; Active = full-time this season or last; team = current, or last for inactive drivers.
 - ⚠️ **Refresh cadence:** regenerate after every season finale at minimum (and every few weeks in season) so active drivers' wins, teams and titles stay current.
-- ⚠️ **Answer-pool churn:** the daily driver is picked by seeding into each mode's pool, so changing a pool's size re-rolls upcoming daily answers. Before promoting widely, build a frozen answer calendar (pre-generated answers per date per mode) and publish data refreshes at the midnight-UTC rollover.
+- **Frozen answer calendar:** daily answers come from `answers.js` (pre-generated per date per mode, never changed once written), so data refreshes no longer re-roll answers. Picks are weighted toward recognizable drivers (stars 8 : known 3 : deep cuts 1) with a repeat cooldown. It runs through Feb 1 2027 — extend it with `import/build-calendar.js` before then.
 - User testing doubles as data QA: the README and site footer invite error reports via GitHub Issues.
 
 ---
@@ -176,9 +176,10 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 | **v1.0** ✅ | Daily + free play, clue categories, share, stats, ad slots ready | shipped |
 | **v1.x** ✅ | Driver database, per-mode daily puzzles, Wikipedia import pipeline with golden tests, public launch on GitHub Pages, AdSense-readiness content pages | shipped |
 | **v2.0** ✅ | NASCAR-only focus: 265 Cup drivers (1970+), Ultimate + six debut-decade modes (1970s–2020s; pre-1970 debutants in Ultimate), self-contained data build | shipped (Nov 2026) |
-| v2.1 | Frozen daily-answer calendar (weighted toward recognizable drivers), end-of-2026 data refresh, custom domain, AdSense live | +4 weeks |
-| v2.2 | Another mode (e.g., **Career mode**: guess from a career-path clue chain — teams listed one by one), unit tests + CI | +3 months |
-| v2.3 | Archive of past puzzles for new players; colorblind mode | +5 months |
+| **v2.1** ✅ | End-of-2026 data refresh; frozen daily-answer calendar weighted toward recognizable drivers (through Feb 1 2027) | shipped (Nov 2026) |
+| v2.2 | Custom domain, AdSense live | +4 weeks |
+| v2.3 | Another mode (e.g., **Career mode**: guess from a career-path clue chain — teams listed one by one), unit tests + CI | +3 months |
+| v2.4 | Archive of past puzzles for new players; colorblind mode | +5 months |
 | v3.0 | Only if traction: accounts, global leaderboards, head-to-head race mode (thin serverless API) | 6–12 months |
 
 ---
@@ -188,7 +189,7 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 | Risk | Likelihood | Mitigation |
 |---|---|---|
 | Data errors annoy hardcore fans | High (initially) | Testing phase = QA; visible "report an issue" link; fast fixes build goodwill |
-| Obscure daily answers frustrate players | High | Weight the answer calendar toward drivers with wins/titles; keep everyone guessable |
+| Obscure daily answers frustrate players | High → Medium | The answer calendar is weighted toward drivers with wins/titles (shipped); everyone stays guessable |
 | Clones copy the idea | Medium | Move fast, own the community, keep best data quality |
 | AdSense rejection/delay | Medium | Custom domain + privacy policy + original content pages maximize approval odds; Ezoic/Monumetric as fallback networks |
 | NASCAR/team IP complaint | Low | No logos/photos/marks; facts only; disclaimer; rename-ready |

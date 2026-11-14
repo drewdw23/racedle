@@ -87,8 +87,10 @@ node merge-nascar.js
 ```
 
 Run after the season finale at minimum, and ideally every few weeks in season so active drivers'
-wins and teams stay current. Note that changing a mode's pool size changes that mode's daily
-answers (they're chosen by index into the pool), so publish refreshes at the midnight-UTC rollover.
+wins and teams stay current. Daily answers come from the frozen calendar (`../answers.js`), so
+a refresh no longer changes them and can be published at any time of day. The merge stops if a
+refresh would drop or move a driver who's scheduled as an upcoming answer — see "Answer
+calendar" in [README.md](README.md).
 
 ## 7. Known gaps
 
