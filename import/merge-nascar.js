@@ -7,8 +7,10 @@
    - LEGENDS: the 36 drivers who debuted before 1970. Their career Cup wins
      and real debut year (counting from 1970 would cut Petty to 99 wins and
      a 1970 debut). Values come from per-race Cup records.
-   - TEAM_FALLBACK: older privateers whose season "Teams and drivers" table
-     lists no team. Used only when the build found no team.
+   - TEAM_FALLBACK: older privateers with no team in their own article or the
+     season "Teams and drivers" table. Used only when the build found none.
+   - TEAM_ALIASES: one spelling per team, so the Team clue matches drivers of
+     the same team (it compares names exactly).
 
    Usage: node merge-nascar.js   (then review `git diff ../data.js`)
 */
@@ -62,34 +64,39 @@ const LEGENDS = {
   "Walter Ballard": [0, 1966],
 };
 
-/* Last team for drivers whose Wikipedia entry tables list none. */
+/* Last team for privateers whose article has no Cup results table and whose
+   season entry tables list no team. */
 const TEAM_FALLBACK = {
   "Ben Arnold": "Arnold Racing",
   "Bill Champion": "Champion Racing",
   "Bill Seifert": "Oswald Racing",
-  "Bill Shirey": "David Ray Boggs",
-  "Bobby Isaac": "Neil Castles",
   "Carl Adams": "Adams Racing",
   "Charlie Roberts": "Roberts Racing",
-  "David Ray Boggs": "Warren Racing",
-  "David Sisco": "Sisco Racing",
-  "Dean Dalton": "Champion Racing",
-  "Earl Ross": "DeWitt Racing",
   "Friday Hassler": "Friday Hassler",
-  "Henley Gray": "Gray Racing",
-  "Jackie Rogers": "Viglione Racing",
-  "Janet Guthrie": "McClure Motors",
   "John Sears": "Sears Racing",
   "Larry Smith": "Harley Smith",
   "Neil Castles": "Neil Castles",
   "Raymond Williams": "Bobby Reeves",
   "Richie Panch": "Puro Racing",
   "Ron Keselowski": "Lubinski Racing",
-  "Sam Sommers": "Vandiver Racing",
-  "Terry Bivins": "H Miller Racing",
   "Vic Parsons": "Strong Racing",
-  "Wendell Scott": "Faustina Racing",
 };
+
+/* Same team, different spelling across driver articles (or the owner's name
+   in one place and the team name in another). Canonical name on the right. */
+const TEAM_ALIASES = {
+  "Go FAS Racing": "Go Fas Racing",
+  "Frank Warren": "Warren Racing",          // Frank Warren's own team
+  "Don Robertson": "Robertson Racing",      // Don Robertson's team (Jabe Thomas, Terry Bivins)
+  "NASCAR operations of Team Penske": "Team Penske",
+};
+
+/* Current teams that must come out exactly like this (catches a regression
+   back to article titles such as "NASCAR operations of Team Penske"). */
+const TEAM_ANCHORS = [
+  ["Joey Logano", "Team Penske"], ["Ryan Blaney", "Team Penske"], ["Denny Hamlin", "Joe Gibbs Racing"],
+  ["Kyle Larson", "Hendrick Motorsports"], ["Kyle Busch", "Richard Childress Racing"],
+];
 
 /* Cup champions since 1970 — all must survive the full-time filter and carry
    >= 1 career title. */
@@ -136,6 +143,7 @@ for (const orig of gen) {
     rec.debut = debut;
   }
   if (!rec.team && teams.has(key)) rec.team = teams.get(key);
+  if (rec.team && TEAM_ALIASES[rec.team]) rec.team = TEAM_ALIASES[rec.team];
   rec._complete = Boolean(rec.team && Number.isFinite(rec.titles) && Number.isFinite(rec.wins) && rec.status && Number.isFinite(rec.debut));
   if (!rec._complete) { dropped.push(rec); continue; }
   emit.push(rec);
@@ -166,6 +174,24 @@ for (const [name, t, w, d] of ANCHORS) {
     fail(`${off.length} driver(s) disagree with the all-time Cup winners list:\n  ` +
       off.map((r) => `${r.name}: counted ${r.wins}, list says ${r._cupWinsList}`).join("\n  ") +
       `\nIf a race just ran, the list may not be updated yet — rerun later. Otherwise fix the parser.`);
+  }
+}
+// Team names: page text, not article titles, and one spelling per team —
+// the Team clue compares names exactly, so "Go Fas"/"Go FAS" would read as
+// two different teams.
+{
+  for (const r of emit) {
+    if (/[()]|NASCAR operations|\[|\]/.test(r.team)) fail(`${r.name}: team looks like an article title or footnote: "${r.team}" (add a TEAM_ALIASES entry)`);
+  }
+  const spell = new Map();
+  for (const r of emit) {
+    const k = r.team.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (spell.has(k) && spell.get(k) !== r.team) fail(`one team, two spellings: "${spell.get(k)}" vs "${r.team}" (add a TEAM_ALIASES entry)`);
+    spell.set(k, r.team);
+  }
+  for (const [name, team] of TEAM_ANCHORS) {
+    const r = byStrip.get(strip(name));
+    if (!r || r.team !== team) fail(`team anchor ${name}: expected "${team}", got "${r?.team}"`);
   }
 }
 if (!byStrip.has(strip("Steve Park"))) fail("Steve Park (full-time 1999-2001) missing — venue filter regression?");
@@ -224,9 +250,10 @@ const row = (r) =>
 const today = new Date().toISOString().slice(0, 10);
 const block =
   `  // ================= NASCAR CUP =================\n` +
-  `  // Generated ${today} from Wikipedia (1970+): roster/teams/status from season "Teams and\n` +
-  `  // drivers" + points standings (Starts >= 60% of races = full-time), wins counted from the\n` +
-  `  // standings (Cup points races only, checked against the all-time Cup winners list),\n` +
+  `  // Generated ${today} from Wikipedia (1970+): roster/status from the season points\n` +
+  `  // standings (Starts >= 60% of races = full-time); team = the team each driver made the most\n` +
+  `  // starts for in their final Cup season (their own article's Cup results table); wins counted\n` +
+  `  // from the standings (Cup points races only, checked against the all-time Cup winners list);\n` +
   `  // titles from the champions list.\n` +
   `  // Pre-1970 debutants' career wins/debut are hardcoded in merge-nascar.js (LEGENDS).\n` +
   `  // Regenerate: cd import && node run.js && node merge-nascar.js\n` +

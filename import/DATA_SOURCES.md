@@ -21,7 +21,8 @@ license compatible with an ad-supported (commercial) game.*
 
 | Source | License / lineage | Verdict |
 |---|---|---|
-| **Wikipedia** — each "YYYY NASCAR Cup Series" season article (points standings, "Teams and drivers") | CC BY-SA | ✅ **PRIMARY** — roster, starts, wins, teams |
+| **Wikipedia** — each "YYYY NASCAR Cup Series" season article (points standings, "Teams and drivers") | CC BY-SA | ✅ **PRIMARY** — roster, starts, wins |
+| **Wikipedia** — each driver's own article (Cup results table) | CC BY-SA | ✅ **TEAMS** |
 | **Wikipedia** — [List of NASCAR Cup Series champions](https://en.wikipedia.org/wiki/List_of_NASCAR_Cup_Series_champions) | CC BY-SA | ✅ **TITLES** |
 | nascaR.data ([github.com/kyleGrealis/nascaR.data](https://github.com/kyleGrealis/nascaR.data)) | GPL-3 package; data gathered with permission from DriverAverages.com, no explicit data license | ⏸ Used July–August 2026 with the maintainer's permission, then retired so the game has no external data dependency (see [PERMISSION_REQUEST.md](PERMISSION_REQUEST.md)) |
 | racing-reference.info | Terms of Use forbid scraping and derivative tools; blocks bots | ❌ rejected |
@@ -36,8 +37,7 @@ license compatible with an ad-supported (commercial) game.*
 
 - 60% (`FULL_SEASON_FRACTION` in `config.js`) absorbs injury-shortened full-time campaigns while
   excluding one-off and part-time entries.
-- Applied to the 1970→now standings it yields a **266-driver** generated pool (265 after the merge
-  drops one driver with no recorded team).
+- Applied to the 1970→now standings it yields a **266-driver** pool.
 
 ## 4. How the build works — `sources/nascar.js`
 
@@ -57,7 +57,12 @@ For every season from 1970 to the current year:
   names for the Cup Series; Busch Grand National/Xfinity, Truck and ARCA wins aren't in it). The
   merge fails if any driver's total differs.
 - **Full-time** = starts ≥ 60% of that season's races.
-- **Team** ← the season's "Teams and drivers" entry table (Driver → Team), most recent season.
+- **Team** ← the driver's **own article**, Cup results table ("Year | Team | No. | Make | 1 … 36"):
+  the team they made the **most starts for in their final Cup season** (ties go to the team that
+  raced later), as the page displays it. For active drivers that's their current team. A driver's
+  very last race is often a one-off (Richard Childress's 1981 finale was in a Junior Johnson car),
+  so "most starts that season" is used rather than "last race". If the article has no Cup results
+  table, the season "Teams and drivers" table (most recent season) is used instead.
 - **Titles** ← the champions list, counting each champion **year once** — the older rows are
   rowspan-duplicated in the HTML (Joe Weatherly's 1963 appears 9×). Titles are career totals,
   including pre-1970 championships.
@@ -75,12 +80,19 @@ tables fill what the 1970+ season pages can't:
   Yarborough, Isaac, Baker, …). Their career Cup wins and real debut year are hardcoded; counting
   only from 1970 would give Petty 99 wins and a 1970 debut. These drivers are long retired, so the
   values are final. They were taken from per-race Cup records.
-- **`TEAM_FALLBACK`** — last team for 25 older privateers (including 1970 champion Bobby Isaac)
-  whose season entry tables list no team. Used only when the build finds none.
+- **`TEAM_FALLBACK`** — last team for 13 1970s privateers with no Cup results table in their own
+  article and no team in the season entry tables. Used only when the build finds none.
+- **`TEAM_ALIASES`** — one spelling per team ("Go FAS Racing" → "Go Fas Racing", an owner's name →
+  their team's name). The Team clue compares names exactly, so two spellings of one team would
+  read as different teams.
 
 Golden tests (nothing is written if any fails): every Cup champion since 1970 present with ≥ 1
 title; anchors Petty 7/200/1958, Pearson 3/105/1960, Yarborough 3/83/1957, Gordon 4/93/1992,
 Johnson 7/83/2001, Earnhardt 7/76/1975; every driver's wins match the all-time Cup winners list;
+no team name that looks like an article title or footnote ("NASCAR operations of Team Penske",
+"(NASCAR team)"), no team spelled two ways, and current-team anchors (Logano and Blaney → Team
+Penske, Hamlin → Joe Gibbs Racing, Larson → Hendrick Motorsports, Kyle Busch → Richard Childress
+Racing);
 every hardcoded name still in the pool; no legend's 1970+ count above its hardcoded career total;
 Steve Park present; no venue names; no duplicates; pool size 240–290.
 
@@ -107,3 +119,7 @@ moves a driver who's scheduled as an upcoming answer, the merge stops and prints
 - **1970s debuts can read a year or two late** for minor drivers: some early-'70s standings
   tables list only the top finishers. The debut *decade* is unaffected except at decade
   boundaries.
+- **Off-season moves show late** — an active driver's team is the one they raced for most this
+  season, so a move announced for next year appears once they start racing for the new team.
+- **Old privateer teams are often an owner's name** ("Neil Castles", "Tom Pistone") because
+  that is how the 1970s–80s results tables list them.

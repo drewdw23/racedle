@@ -53,6 +53,10 @@ The merge refuses to write unless:
   (Cup points races only, so no Xfinity/Busch, Truck, ARCA, Duel or Clash wins). Names the
   list spells differently go in `LIST_ALIASES` in `sources/nascar.js`. Right after a race the
   list can lag a day or two; rerun later if only that race's winner disagrees.
+- Team names are page text, not article titles (no "NASCAR operations of Team Penske" or
+  "(NASCAR team)"), each team is spelled one way (else add a `TEAM_ALIASES` entry), and the
+  current-team anchors hold (Logano/Blaney → Team Penske, Hamlin → Joe Gibbs Racing, Larson →
+  Hendrick Motorsports, Kyle Busch → Richard Childress Racing).
 - Every hardcoded legend / team-fallback name is still in the generated pool.
 - No legend's 1970+ win count exceeds its hardcoded career total.
 - Steve Park is present, and no racetrack names leaked in.

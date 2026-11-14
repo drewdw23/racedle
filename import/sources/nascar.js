@@ -14,7 +14,10 @@
      Full-time season = Starts >= FULL_SEASON_FRACTION x races.
      Wins = sum across 1970+ seasons, cross-checked (merge-nascar.js) against
      the "List of all-time NASCAR Cup Series winners".
-   - team ← the "Teams and drivers" table (Driver->Team), most-recent season.
+   - team ← the driver's own article: its Cup results table, final season
+     with a start, the team with the most starts that season (ties -> the
+     later team). Falls back to the season "Teams and drivers" table
+     (Driver->Team, most-recent season) when the article has no such table.
    - debut ← earliest 1970+ standings appearance.
    - titles ← Wikipedia "List of NASCAR Cup Series champions" (chronological,
      distinct years — the old rows rowspan-duplicate otherwise).
@@ -116,7 +119,7 @@ function parseStandings(tabs) {
         const starts = parseInt((t[i][si]?.text || "").replace(/[^\d]/g, ""), 10) || 0;
         const wins = wi !== -1 ? parseInt((t[i][wi]?.text || "").replace(/[^\d]/g, ""), 10) || 0 : 0;
         races = Math.max(races, starts);
-        keep(out, strip(name), { name, starts, wins });
+        keep(out, strip(name), { name, starts, wins, title: t[i][di]?.links?.[0] || null });
       }
     } else {
       // ---- modern grid: race columns sit between Driver and Points ----
@@ -138,7 +141,7 @@ function parseStandings(tabs) {
           else if (/^(dnf|dns|dnq|wd|w\/d|c|dsq)\b/i.test(v)) starts++;
         }
         if (starts === 0) continue;
-        keep(out, strip(name), { name, starts, wins });
+        keep(out, strip(name), { name, starts, wins, title: t[i][di]?.links?.[0] || null });
       }
     }
     if (out.size && (!best || out.size > best.drivers.size)) best = { drivers: out, races };
@@ -159,7 +162,7 @@ function parseTeams(tabs) {
     for (let i = dataFrom; i < t.length; i++) {
       const cell = t[i][di];
       if (!cell || cell.header) continue;
-      const team = (t[i][ti]?.links?.[0] || t[i][ti]?.text || "").trim();
+      const team = cleanTeam(t[i][ti]?.text) || cleanTeam(t[i][ti]?.links?.[0]); // display text, as the page shows it
       if (!team) continue;
       const names = cell.links?.length ? cell.links : [cell.text];
       for (const raw of names) {
@@ -234,6 +237,60 @@ async function cupWinsFromList(log) {
   return (name) => wins.get(strip(LIST_ALIASES[name] || name)) || 0;
 }
 
+/* Team display text as the page shows it: drop footnote markers ("[ 3 ]",
+   "[a]") and trailing disambiguators ("(NASCAR team)"). Display text, not
+   the link target — a link to "NASCAR operations of Team Penske" reads
+   "Team Penske" on the page. */
+const cleanTeam = (s) => (s || "").replace(/\[[^\]]*\]/g, "").replace(/\s*\([^)]*\)\s*$/, "").replace(/\s+/g, " ").trim();
+
+const CUP_HEAD = /cup series|winston cup|grand national series|strictly stock/i;
+const NOT_CUP = /busch|nationwide|xfinity|o'reilly|truck|west|east|north|south|late model|modified|baby grand|international|pro series|arca|euro|pinty|canada|mexico|whelen|k&n|all-star/i;
+const isCupHeading = (s) => CUP_HEAD.test(s) && !NOT_CUP.test(s);
+const isStart = (v) => /^\d/.test(v.trim().replace(/^[A-Za-z]{2,4}\s*/, "")); // "DAY 22" / "22" — not "DAY DNQ", "RCH"
+
+/* From a driver's article, their team in their final Cup season: the Cup
+   results table ("Year | Team | No. | Make | 1 … 36 | rank | Pts"), last
+   year with a start, the team with the most starts that year (ties -> the
+   team that raced later). Null if the article has no Cup results table. */
+async function finalSeasonTeam(title) {
+  const html = await getFullPageHtml(title);
+  if (!html) return null;
+  const heads = [...html.matchAll(/<h([2-6])[^>]*>([\s\S]*?)<\/h\1>/g)].map((m) => ({ at: m.index, text: m[2].replace(/<[^>]+>/g, "") }));
+  const rows = [];
+  for (const m of html.matchAll(/<table[\s\S]*?<\/table>/g)) {
+    const t0 = parseTables(m[0])[0];
+    if (!t0 || t0.length < 2) continue;
+    const hi = t0.slice(0, 3).findIndex((r) => r.some((c) => /^year$/i.test(c.text.trim())));
+    if (hi === -1) continue;
+    const label = `${heads.filter((x) => x.at < m.index).at(-1)?.text || ""} ${hi > 0 ? t0[0][0].text : ""}`;
+    if (!isCupHeading(label)) continue;
+    const t = t0.slice(hi), h = t[0].map((c) => c.text.trim());
+    const yi = h.findIndex((x) => /^year$/i.test(x)), ti = h.findIndex((x) => /^team$/i.test(x));
+    if (ti === -1) continue;
+    const from = Math.max(ti, h.findIndex((x) => /^no\.?$/i.test(x)), h.findIndex((x) => /^make$/i.test(x))) + 1;
+    const pts = h.findIndex((x, i) => i >= from && /^(pts\.?|points)$/i.test(x));
+    const to = pts > 0 ? pts - 1 : h.length - 3; // the rank column sits just before Pts
+    for (const r of t.slice(1)) {
+      const year = parseInt(r[yi]?.text, 10);
+      const team = cleanTeam(r[ti]?.text);
+      if (!year || !team) continue;
+      let starts = 0, last = -1;
+      for (let c = from; c < to; c++) if (r[c] && isStart(r[c].text)) { starts++; last = c; }
+      if (starts) rows.push({ year, team, starts, last });
+    }
+  }
+  if (!rows.length) return null;
+  const year = Math.max(...rows.map((r) => r.year));
+  const byTeam = new Map();
+  for (const r of rows.filter((r) => r.year === year)) {
+    const b = byTeam.get(r.team) || { team: r.team, starts: 0, last: -1 };
+    b.starts += r.starts; b.last = Math.max(b.last, r.last);
+    byTeam.set(r.team, b);
+  }
+  const best = [...byTeam.values()].sort((a, b) => b.starts - a.starts || b.last - a.last)[0];
+  return { team: best.team, year };
+}
+
 export async function collectNascar(currentYear, log) {
   const titles = await titlesFromChampions(log);
   const listWins = await cupWinsFromList(log);
@@ -251,7 +308,8 @@ export async function collectNascar(currentYear, log) {
 
     for (const [key, info] of st.drivers) {
       let d = drivers.get(key);
-      if (!d) { d = { name: info.name, seasons: new Set(), full: new Set(), wins: 0, lastYear: 0, lastTeam: null }; drivers.set(key, d); }
+      if (!d) { d = { name: info.name, title: null, seasons: new Set(), full: new Set(), wins: 0, lastYear: 0, lastTeam: null }; drivers.set(key, d); }
+      if (!d.title && info.title) d.title = info.title;
       d.seasons.add(year);
       d.wins += info.wins;
       if (st.races > 0 && info.starts >= FULL_SEASON_FRACTION * st.races) d.full.add(year);
@@ -262,11 +320,14 @@ export async function collectNascar(currentYear, log) {
   log(`NASCAR: parsed ${parsed} seasons ${HISTORY_FROM}-${currentYear}`);
 
   const records = [];
+  let fromPage = 0;
   for (const d of drivers.values()) {
     if (![...d.full].some((y) => y >= YEAR_FROM)) continue; // full-time in some year >= 1970
     const debut = Math.min(...d.seasons);
     const lastFull = Math.max(...d.full);
-    const team = d.lastTeam ? d.lastTeam.trim() : null;
+    const page = d.title ? await finalSeasonTeam(d.title) : null;
+    if (page) fromPage++;
+    const team = page ? page.team : d.lastTeam ? cleanTeam(d.lastTeam) || null : null;
     records.push({
       name: d.name,
       series: "NASCAR Cup",
@@ -278,10 +339,11 @@ export async function collectNascar(currentYear, log) {
       debut,
       _complete: Boolean(team && Number.isFinite(debut)),
       _fullSeasons: d.full.size,
+      _teamSource: page ? `driver article (${page.year})` : d.lastTeam ? "season entry table" : null,
       _source: "wikipedia (NASCAR standings+teams)",
     });
   }
 
-  log(`NASCAR (${YEAR_FROM}+ full-time): ${records.length} drivers.`);
+  log(`NASCAR (${YEAR_FROM}+ full-time): ${records.length} drivers; team from the driver's own article for ${fromPage}.`);
   return records;
 }
