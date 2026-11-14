@@ -77,17 +77,13 @@ function driverForPuzzle(n, genre) {
 /*
  * Compare a guessed driver against the answer.
  * Returns 6 cells: { value, status: green|yellow|gray, arrow: up|down|null }
- *  - Nationality: yellow = same continent
  *  - Titles / Wins band / Decade: yellow = off by one step, arrow points
  *    toward the answer's value
  */
 function evaluateGuess(guess, answer) {
   const cells = [];
 
-  const natStatus =
-    guess.country === answer.country ? "green" :
-    guess.continent === answer.continent ? "yellow" : "gray";
-  cells.push({ value: `${flagFor(guess.country)} ${guess.country}`, status: natStatus, arrow: null });
+  cells.push({ value: `${flagFor(guess.country)} ${guess.country}`, status: guess.country === answer.country ? "green" : "gray", arrow: null });
   cells.push({ value: guess.team, status: guess.team === answer.team ? "green" : "gray", arrow: null });
 
   const titleDiff = answer.titles - guess.titles;

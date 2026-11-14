@@ -137,7 +137,7 @@ for (const orig of gen) {
     rec.debut = debut;
   }
   if (!rec.team && teams.has(key)) rec.team = teams.get(key);
-  rec._complete = Boolean(rec.country && rec.continent && rec.team && Number.isFinite(rec.titles) && Number.isFinite(rec.wins) && rec.status && Number.isFinite(rec.debut));
+  rec._complete = Boolean(rec.country && rec.team && Number.isFinite(rec.titles) && Number.isFinite(rec.wins) && rec.status && Number.isFinite(rec.debut));
   if (!rec._complete) { dropped.push(rec); continue; }
   emit.push(rec);
 }
@@ -169,7 +169,7 @@ if (missingFlags.length) fail(`countries missing from FLAGS: ${missingFlags.join
 // ---------- rebuild the DRIVERS list ----------
 const q = (s) => JSON.stringify(s);
 const row = (r) =>
-  `  { name: ${q(r.name)}, country: ${q(r.country)}, continent: ${q(r.continent)}, series: SERIES.NASCAR, ` +
+  `  { name: ${q(r.name)}, country: ${q(r.country)}, series: SERIES.NASCAR, ` +
   `team: ${q(r.team)}, titles: ${r.titles}, wins: ${r.wins}, status: ${q(r.status)}, debut: ${r.debut} },`;
 
 const today = new Date().toISOString().slice(0, 10);

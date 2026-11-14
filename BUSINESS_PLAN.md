@@ -47,7 +47,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 
 | Category | 🟩 Green | 🟧 Orange (close) | ⬛ Gray |
 |---|---|---|---|
-| Nationality | Same country | Same continent | Different continent |
+| Nationality | Same country | — | Different country |
 | Current/last team | Exact match | — | Different |
 | Cup championships | Exact number | Off by one (+ ▲▼ hint) | Wrong (+ ▲▼ hint) |
 | Cup wins (banded: 0, 1–9, 10–24, 25–49, 50–99, 100+) | Same band | Adjacent band (+ ▲▼) | Farther (+ ▲▼) |
@@ -144,7 +144,7 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 
 ### Phase 0 — Private testing (now → 2 weeks)
 - Share the link with friends and NASCAR Discords for feedback on difficulty, mobile UX, and **data errors** (GitHub Issues as the feedback channel).
-- Fix data, tune feedback (are deep-cut full-time drivers fun as daily answers? is the continent hint useful when most drivers are American?).
+- Fix data, tune feedback (are deep-cut full-time drivers fun as daily answers? is Nationality useful when most drivers are American?).
 
 ### Phase 1 — Community seeding (weeks 2–6)
 - **Reddit is the engine.** r/NASCAR is the core audience. **Read the sub's self-promo rules first** — the safe pattern is participating genuinely, then one well-timed "I made a free daily guessing game for us" post with a screenshot of a solved grid. Loldle's initial spike came from exactly one such Reddit post.

@@ -66,6 +66,6 @@ import/
 ├── lib/
 │   ├── http.js          # throttle + retry + disk cache (built-in fetch)
 │   ├── wikipedia.js     # MediaWiki API + tolerant HTML table parser
-│   └── normalize.js     # continent map, status rule, data.js emitter
+│   └── normalize.js     # status rule, data.js emitter
 └── output/              # generated artifacts (git-ignored)
 ```

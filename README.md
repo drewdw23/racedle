@@ -15,7 +15,7 @@ everyone). Type a name, pick from the autocomplete, and each guess reveals six t
 
 | Tile | Green 🟩 | Orange 🟧 | Gray ⬛ |
 |---|---|---|---|
-| Nationality | same country | same continent | — |
+| Nationality | same country | — | — |
 | Current/last team | match | — | — |
 | Cup championships | exact | off by one (▲▼ hint) | ▲▼ hint |
 | Cup wins (banded) | same band | adjacent band (▲▼) | ▲▼ |

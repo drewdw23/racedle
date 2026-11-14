@@ -21,7 +21,7 @@
    Pool = drivers with a full-time season in some year >= YEAR_FROM (1970). */
 
 import { resolveTitle, getFullPageHtml, parseTables } from "../lib/wikipedia.js";
-import { continentOf, inferStatus } from "../lib/normalize.js";
+import { inferStatus } from "../lib/normalize.js";
 import { YEAR_FROM, FULL_SEASON_FRACTION } from "../config.js";
 
 const HISTORY_FROM = YEAR_FROM; // 1970 — the project's roster/stat floor; older seasons are out of scope
@@ -233,14 +233,13 @@ export async function collectNascar(currentYear, log) {
     records.push({
       name: d.name,
       country,
-      continent: continentOf(country),
       series: "NASCAR Cup",
       team,
       titles: titles.get(strip(d.name)) || 0,
       wins: d.wins,
       status: inferStatus(lastFull, null, currentYear),
       debut,
-      _complete: Boolean(country && continentOf(country) && team && Number.isFinite(debut)),
+      _complete: Boolean(country && team && Number.isFinite(debut)),
       _fullSeasons: d.full.size,
       _source: "wikipedia (NASCAR standings+teams)",
     });

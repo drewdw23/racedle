@@ -1,23 +1,5 @@
-/* Normalization: map countries to the continents the game's data.js
-   uses, infer active/retired, and emit records in the exact DRIVERS
-   shape. */
-
-const COUNTRY_TO_CONTINENT = {
-  "United States": "North America", Canada: "North America", Mexico: "North America",
-  Brazil: "South America", Argentina: "South America", Colombia: "South America",
-  Venezuela: "South America", Uruguay: "South America", Chile: "South America",
-  "United Kingdom": "Europe", Germany: "Europe", Italy: "Europe", France: "Europe",
-  Spain: "Europe", Netherlands: "Europe", Finland: "Europe", Austria: "Europe",
-  Switzerland: "Europe", Sweden: "Europe", Belgium: "Europe", Denmark: "Europe",
-  Ireland: "Europe", Poland: "Europe", "Czech Republic": "Europe",
-  Japan: "Asia", China: "Asia",
-  Australia: "Oceania", "New Zealand": "Oceania",
-  "South Africa": "Africa",
-};
-
-export function continentOf(country) {
-  return COUNTRY_TO_CONTINENT[country] || null;
-}
+/* Normalization: infer active/retired and emit records in the exact
+   DRIVERS shape. */
 
 /* Active if the driver's last full-time season is this year or last. */
 export function inferStatus(lastSeason, workEnd, currentYear) {
@@ -33,7 +15,7 @@ export function emitDataJs(records) {
   const q = (s) => JSON.stringify(s ?? "");
   const lines = records.map((r) => {
     const body =
-      `{ name: ${q(r.name)}, country: ${q(r.country)}, continent: ${q(r.continent)}, ` +
+      `{ name: ${q(r.name)}, country: ${q(r.country)}, ` +
       `series: SERIES.NASCAR, team: ${q(r.team)}, ` +
       `titles: ${r.titles ?? "null"}, wins: ${r.wins ?? "null"}, ` +
       `status: ${q(r.status)}, debut: ${r.debut ?? "null"} },`;
