@@ -186,7 +186,7 @@ function bindEvents() {
 
   $("tab-daily").addEventListener("click", () => switchMode("daily"));
   $("tab-free").addEventListener("click", () => switchMode("free"));
-  $("free-new").addEventListener("click", startFreeGame);
+  $("free-new").addEventListener("click", newFreeDriver);
   $("share-btn").addEventListener("click", shareResult);
 
   const logo = $("logo-home");
@@ -404,9 +404,27 @@ function addGuessRow(driver, cells, animate) {
 }
 
 function updateGuessCount() {
+  $("guess-count").classList.remove("notice");
   $("guess-count").textContent =
     state.guesses.length === 0 ? "" :
     state.guesses.length === 1 ? "1 guess" : `${state.guesses.length} guesses`;
+}
+
+/* Free play "New driver": start a fresh round and make it visible — a
+   short message in the guess-count line plus a glow on the input, since
+   an empty board otherwise looks unchanged. */
+function newFreeDriver() {
+  startFreeGame();
+  const note = $("guess-count");
+  note.textContent = "🏁 New driver loaded — start guessing!";
+  restartAnimation(note, "notice");
+  restartAnimation($("guess-input"), "pulse");
+}
+
+function restartAnimation(el, cls) {
+  el.classList.remove(cls);
+  void el.offsetWidth; // reflow so the animation replays on repeat clicks
+  el.classList.add(cls);
 }
 
 function showWinPanel(animate) {

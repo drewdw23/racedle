@@ -189,6 +189,23 @@ main {
 
 .guess-count { text-align: center; color: var(--text-dim); font-size: 0.85rem; min-height: 1.2em; }
 
+/* Free play "New driver" feedback */
+.guess-count.notice { color: var(--accent); font-weight: 700; animation: noticeFade 2.6s ease forwards; }
+@keyframes noticeFade {
+  0%   { opacity: 0; transform: translateY(-4px); }
+  12%  { opacity: 1; transform: none; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+#guess-input.pulse { animation: inputPulse 0.9s ease; }
+@keyframes inputPulse {
+  0%   { border-color: var(--accent); box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.6); }
+  100% { box-shadow: 0 0 0 12px rgba(225, 6, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .guess-count.notice, #guess-input.pulse { animation: none; }
+}
+
 /* ---------- Board ---------- */
 .board-scroll { overflow-x: auto; margin-top: 18px; }
 #board { min-width: 560px; }
