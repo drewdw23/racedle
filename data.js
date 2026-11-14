@@ -21,12 +21,10 @@ const SERIES = {
 };
 
 /* Playable modes. "Ultimate" is every driver; each other mode is the
-   drivers whose Cup debut falls in the listed decade(s). The 1950s has
-   too few drivers for a daily puzzle on its own, so it shares a mode
-   with the 1960s. */
+   drivers whose Cup debut falls in the listed decade. Drivers who
+   debuted before 1970 are in Ultimate only. */
 const GENRES = [
   { id: "ultimate",  label: "Ultimate",  decades: null },
-  { id: "1950s-60s", label: "1950s–60s", decades: [1950, 1960] },
   { id: "1970s",     label: "1970s",     decades: [1970] },
   { id: "1980s",     label: "1980s",     decades: [1980] },
   { id: "1990s",     label: "1990s",     decades: [1990] },

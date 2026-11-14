@@ -2,8 +2,9 @@
 
 **The daily NASCAR driver guessing game** — a Wordle/Loldle-style game for NASCAR fans.
 Guess the mystery **NASCAR Cup Series** driver using clues across five categories. Play
-**🏆 Ultimate** across every era, or pick a decade — **1950s–60s, 1970s, 1980s, 1990s, 2000s,
-2010s, 2020s** — to play only the drivers who debuted then. Every mode has its own daily puzzle,
+**🏆 Ultimate** across every era, or pick a decade — **1970s, 1980s, 1990s, 2000s, 2010s,
+2020s** — to play only the drivers who debuted then (drivers who debuted before 1970 are in
+Ultimate). Every mode has its own daily puzzle,
 free play, and stats.
 
 ▶️ **Play it:** https://drewdw23.github.io/racedle/

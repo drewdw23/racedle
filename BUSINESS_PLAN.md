@@ -6,11 +6,11 @@
 
 ## 1. Executive summary
 
-**Racedle** is a free, browser-based daily guessing game for NASCAR fans. Players pick a **mode** — **🏆 Ultimate** (every Cup driver since 1970) or a debut decade (**1950s–60s, 1970s, 1980s, 1990s, 2000s, 2010s, 2020s**) — and each day, every player worldwide gets the same mystery driver per mode. Players guess driver names; each guess reveals color-coded feedback across five categories (current/last team, Cup championships, Cup wins band, active/retired, debut decade) until the driver is found. Eight daily puzzles per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
+**Racedle** is a free, browser-based daily guessing game for NASCAR fans. Players pick a **mode** — **🏆 Ultimate** (every Cup driver since 1970) or a debut decade (**1970s, 1980s, 1990s, 2000s, 2010s, 2020s**) — and each day, every player worldwide gets the same mystery driver per mode. Players guess driver names; each guess reveals color-coded feedback across five categories (current/last team, Cup championships, Cup wins band, active/retired, debut decade) until the driver is found. Seven daily puzzles per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. NASCAR has a large, passionate, weekly-engaged fan base with deep history — decades of drivers, rivalries and stats that fans argue about — which is exactly what a daily trivia habit feeds on.
 
-**Status:** live at https://drewdw23.github.io/racedle/ — 265 Cup drivers, eight modes, How to Play / FAQ / About / Privacy pages. Next steps: custom domain, Google Search Console, AdSense application, frozen daily-answer calendar.
+**Status:** live at https://drewdw23.github.io/racedle/ — 265 Cup drivers, seven modes, How to Play / FAQ / About / Privacy pages. Next steps: custom domain, Google Search Console, AdSense application, frozen daily-answer calendar.
 
 ---
 
@@ -41,7 +41,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 ## 3. Product & gameplay design
 
 ### Core loop (shipped)
-1. Player picks a mode (defaults to 🏆 Ultimate — the full pool). Each mode has an independent daily driver, free-play mode, stats, and streaks, so a fan can play up to eight dailies per visit.
+1. Player picks a mode (defaults to 🏆 Ultimate — the full pool). Each mode has an independent daily driver, free-play mode, stats, and streaks, so a fan can play up to seven dailies per visit.
 2. Player types a driver name; autocomplete suggests from that mode's pool (265 drivers in Ultimate).
 3. On guess, a row of five tiles flips, one per category:
 
@@ -175,7 +175,7 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 |---|---|---|
 | **v1.0** ✅ | Daily + free play, clue categories, share, stats, ad slots ready | shipped |
 | **v1.x** ✅ | Driver database, per-mode daily puzzles, Wikipedia import pipeline with golden tests, public launch on GitHub Pages, AdSense-readiness content pages | shipped |
-| **v2.0** ✅ | NASCAR-only focus: 265 Cup drivers (1970+), Ultimate + seven debut-decade modes, self-contained data build | shipped (Nov 2026) |
+| **v2.0** ✅ | NASCAR-only focus: 265 Cup drivers (1970+), Ultimate + six debut-decade modes (1970s–2020s; pre-1970 debutants in Ultimate), self-contained data build | shipped (Nov 2026) |
 | v2.1 | Frozen daily-answer calendar (weighted toward recognizable drivers), end-of-2026 data refresh, custom domain, AdSense live | +4 weeks |
 | v2.2 | Another mode (e.g., **Career mode**: guess from a career-path clue chain — teams listed one by one), unit tests + CI | +3 months |
 | v2.3 | Archive of past puzzles for new players; colorblind mode | +5 months |
