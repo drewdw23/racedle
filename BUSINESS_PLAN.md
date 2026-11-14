@@ -51,7 +51,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 | Cup championships | Exact number | Off by one (+ ▲▼ hint) | Wrong (+ ▲▼ hint) |
 | Cup wins (banded: 0, 1–9, 10–24, 25–49, 50–99, 100+) | Same band | Adjacent band (+ ▲▼) | Farther (+ ▲▼) |
 | Active/Retired | Match | — | Different |
-| Decade debuted | Same decade | Adjacent decade (+ ▲▼) | Farther (+ ▲▼) |
+| Decade debuted (Ultimate only; hidden in decade modes) | Same decade | Adjacent decade (+ ▲▼) | Farther (+ ▲▼) |
 
 4. Unlimited guesses (like Loldle). Win screen shows the driver, guess count, share button, and countdown to the next puzzle.
 5. **Share** copies a spoiler-free emoji grid (tagged with the mode) + link to the clipboard — the viral loop.

@@ -46,6 +46,11 @@ function genrePool(genre) {
   return genre.decades ? DRIVERS.filter((d) => genre.decades.includes(decadeOf(d.debut))) : DRIVERS;
 }
 
+/* Decade modes hide the Debut clue — every answer debuted in that decade. */
+function showsDebut(genre) {
+  return !genre.decades;
+}
+
 /* Deterministic PRNG so every player gets the same daily driver. */
 function mulberry32(seed) {
   return function () {
@@ -73,11 +78,12 @@ function driverForPuzzle(n, genre) {
 
 /*
  * Compare a guessed driver against the answer.
- * Returns 5 cells: { value, status: green|yellow|gray, arrow: up|down|null }
+ * Returns 5 cells (4 when showDebut is false):
+ *   { value, status: green|yellow|gray, arrow: up|down|null }
  *  - Titles / Wins band / Decade: yellow = off by one step, arrow points
  *    toward the answer's value
  */
-function evaluateGuess(guess, answer) {
+function evaluateGuess(guess, answer, showDebut = true) {
   const cells = [];
 
   cells.push({ value: guess.team, status: guess.team === answer.team ? "green" : "gray", arrow: null });
@@ -98,6 +104,7 @@ function evaluateGuess(guess, answer) {
 
   cells.push({ value: guess.status, status: guess.status === answer.status ? "green" : "gray", arrow: null });
 
+  if (!showDebut) return cells;
   const decDiff = (decadeOf(answer.debut) - decadeOf(guess.debut)) / 10;
   cells.push({
     value: `${decadeOf(guess.debut)}s`,
@@ -324,7 +331,7 @@ function submitGuess(driver) {
 
 function applyGuess(driver, animate) {
   state.guesses.push(driver);
-  const cells = evaluateGuess(driver, state.answer);
+  const cells = evaluateGuess(driver, state.answer, showsDebut(state.genre));
   addGuessRow(driver, cells, animate);
 
   $("guess-input").value = "";
@@ -349,6 +356,7 @@ function setInputEnabled(enabled) {
 function clearBoard() {
   $("board-body").innerHTML = "";
   $("board").classList.add("hidden");
+  $("board").classList.toggle("no-debut", !showsDebut(state.genre));
 }
 
 function addGuessRow(driver, cells, animate) {
@@ -484,7 +492,7 @@ function tickCountdown() {
 function shareResult() {
   const emoji = { green: "\u{1F7E9}", yellow: "\u{1F7E7}", gray: "⬛" };
   const lines = state.guesses.map((d) =>
-    evaluateGuess(d, state.answer).map((c) => emoji[c.status]).join("")
+    evaluateGuess(d, state.answer, showsDebut(state.genre)).map((c) => emoji[c.status]).join("")
   );
   const text = `Racedle ${state.genre.label} #${state.puzzle} \u{1F3C1} ${state.guesses.length}/∞\n\n${lines.join("\n")}\n\n${SITE_URL}`;
 

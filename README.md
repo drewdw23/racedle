@@ -19,7 +19,7 @@ everyone). Type a name, pick from the autocomplete, and each guess reveals five 
 | Cup championships | exact | off by one (▲▼ hint) | ▲▼ hint |
 | Cup wins (banded) | same band | adjacent band (▲▼) | ▲▼ |
 | Active/Retired | match | — | — |
-| Decade debuted | same decade | adjacent decade (▲▼) | ▲▼ |
+| Decade debuted (Ultimate only — hidden in decade modes) | same decade | adjacent decade (▲▼) | ▲▼ |
 
 Unlimited guesses. Share your spoiler-free emoji grid when you win. **Free play** mode gives
 unlimited random practice rounds in whichever mode you're playing. Streaks and stats are

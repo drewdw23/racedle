@@ -198,6 +198,9 @@ main {
   gap: 6px;
   margin-bottom: 6px;
 }
+/* Decade modes: no Debut column. */
+#board.no-debut .board-header, #board.no-debut .board-row { grid-template-columns: 1.5fr 1.5fr 0.7fr 0.8fr 0.9fr; }
+#board.no-debut .col-debut { display: none; }
 .board-header div {
   font-size: 0.72rem;
   text-transform: uppercase;
