@@ -281,6 +281,7 @@ function startFreeGame() {
   $("win-panel").classList.add("hidden");
   setInputEnabled(true);
   renderPuzzleLabel();
+  renderYesterday();
   updateGuessCount();
 }
 
