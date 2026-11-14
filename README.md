@@ -19,7 +19,7 @@ everyone). Type a name, pick from the autocomplete, and each guess reveals five 
 | Current/last team | match | — | — |
 | Cup championships | exact | off by one (▲▼ hint) | ▲▼ hint |
 | Cup wins (banded) | same band | adjacent band (▲▼) | ▲▼ |
-| Active/Retired | match | — | — |
+| Active/Inactive | match | — | — |
 | Decade debuted (Ultimate only — hidden in decade modes) | same decade | adjacent decade (▲▼) | ▲▼ |
 
 Unlimited guesses. Share your spoiler-free emoji grid when you win. **Free play** mode gives
@@ -40,7 +40,7 @@ No build step, no dependencies — it's a plain static site:
 Things we want to hear about:
 
 - **Data errors** — wrong team, wrong title count, wrong debut decade, someone marked
-  Active who retired.
+  Active who's no longer racing full-time.
 - Difficulty — too easy? too hard? Are deep-cut full-time drivers fun or frustrating as daily
   answers?
 - Missing drivers you'd expect (265 drivers: everyone with a full-time Cup season since 1970).

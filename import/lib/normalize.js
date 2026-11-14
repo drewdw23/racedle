@@ -1,11 +1,12 @@
-/* Normalization: infer active/retired and emit records in the exact
+/* Normalization: infer active/inactive and emit records in the exact
    DRIVERS shape. */
 
-/* Active if the driver's last full-time season is this year or last. */
+/* Active if the driver's last full-time season is this year or last;
+   otherwise Inactive. */
 export function inferStatus(lastSeason, workEnd, currentYear) {
-  if (workEnd) return "Retired";
+  if (workEnd) return "Inactive";
   if (lastSeason && currentYear - lastSeason <= 1) return "Active";
-  return "Retired";
+  return "Inactive";
 }
 
 /* Emit a data.js-compatible DRIVERS array string. Records missing

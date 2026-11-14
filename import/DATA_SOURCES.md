@@ -11,7 +11,7 @@ license compatible with an ad-supported (commercial) game.*
 | Criterion | Why it matters |
 |---|---|
 | **Per-season granularity** | "Ran a full-time season" needs starts-per-season vs races-per-season. Career totals alone can't answer it — a one-race start still appears in a season's standings. |
-| **Field coverage** | Must supply or derive every field the game uses: current/last team, Cup championships, career Cup wins, active/retired, debut year. |
+| **Field coverage** | Must supply or derive every field the game uses: current/last team, Cup championships, career Cup wins, active/inactive, debut year. |
 | **License permits commercial use** | The game will run ads. CC0 / CC BY / CC BY-SA are fine (with attribution where required). "Non-commercial" or scraping-prohibited terms are disqualifying. |
 | **Access mode** | Bulk download ≫ API ≫ scraping. Cached, polite access keeps reruns cheap. |
 | **Currency & cadence** | Teams, wins and titles change every season; the source must keep up. |

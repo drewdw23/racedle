@@ -6,7 +6,7 @@
 
 ## 1. Executive summary
 
-**Racedle** is a free, browser-based daily guessing game for NASCAR fans. Players pick a **mode** — **🏆 Ultimate** (every Cup driver since 1970) or a debut decade (**1970s, 1980s, 1990s, 2000s, 2010s, 2020s**) — and each day, every player worldwide gets the same mystery driver per mode. Players guess driver names; each guess reveals color-coded feedback across five categories (current/last team, Cup championships, Cup wins band, active/retired, debut decade) until the driver is found. Seven daily puzzles per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
+**Racedle** is a free, browser-based daily guessing game for NASCAR fans. Players pick a **mode** — **🏆 Ultimate** (every Cup driver since 1970) or a debut decade (**1970s, 1980s, 1990s, 2000s, 2010s, 2020s**) — and each day, every player worldwide gets the same mystery driver per mode. Players guess driver names; each guess reveals color-coded feedback across five categories (current/last team, Cup championships, Cup wins band, active/inactive, debut decade) until the driver is found. Seven daily puzzles per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. NASCAR has a large, passionate, weekly-engaged fan base with deep history — decades of drivers, rivalries and stats that fans argue about — which is exactly what a daily trivia habit feeds on.
 
@@ -50,7 +50,7 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 | Current/last team | Exact match | — | Different |
 | Cup championships | Exact number | Off by one (+ ▲▼ hint) | Wrong (+ ▲▼ hint) |
 | Cup wins (banded: 0, 1–9, 10–24, 25–49, 50–99, 100+) | Same band | Adjacent band (+ ▲▼) | Farther (+ ▲▼) |
-| Active/Retired | Match | — | Different |
+| Active/Inactive | Match | — | Different |
 | Decade debuted (Ultimate only; hidden in decade modes) | Same decade | Adjacent decade (+ ▲▼) | Farther (+ ▲▼) |
 
 4. Unlimited guesses (like Loldle). Win screen shows the driver, guess count, share button, and countdown to the next puzzle.
@@ -99,7 +99,7 @@ racedle/
 - **Source:** Wikipedia (CC BY-SA) — each season's points standings and "Teams and drivers" tables, and the list of Cup champions — assembled by the [import pipeline](import/) and written into `data.js` by a golden-tested merge. Details in [import/DATA_SOURCES.md](import/DATA_SOURCES.md).
 - The 36 drivers who debuted before 1970 have their career wins and debut year hardcoded in the merge, since Wikipedia's pre-1970 season pages aren't reliable enough to count from.
 - **Sourcing decision (do NOT scrape racing-reference.info):** it blocks automated access (403) and its Terms of Use forbid scraping and building tools on its data; bulk-copying it would also convert our "public facts" legal posture into a database-rights/ToU liability.
-- Editorial rules (in `data.js` header): titles = Cup championships; wins = career Cup wins; debut = first Cup season; Active = full-time this season or last; team = current, or last for retired drivers.
+- Editorial rules (in `data.js` header): titles = Cup championships; wins = career Cup wins; debut = first Cup season; Active = full-time this season or last; team = current, or last for inactive drivers.
 - ⚠️ **Refresh cadence:** regenerate after every season finale at minimum (and every few weeks in season) so active drivers' wins, teams and titles stay current.
 - ⚠️ **Answer-pool churn:** the daily driver is picked by seeding into each mode's pool, so changing a pool's size re-rolls upcoming daily answers. Before promoting widely, build a frozen answer calendar (pre-generated answers per date per mode) and publish data refreshes at the midnight-UTC rollover.
 - User testing doubles as data QA: the README and site footer invite error reports via GitHub Issues.
