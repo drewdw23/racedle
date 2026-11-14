@@ -49,6 +49,13 @@ For every season from 1970 to the current year:
 - **Starts + wins** ← the **points-standings** table, in one of two layouts:
   - *Early-1970s summary table*: a starts count ("Starts", "St" or "Races") plus "Wins".
   - *Modern per-race grid*: a started race is a non-empty result cell; a win is a finish of "1".
+    Columns for non-points races (the 2017 grid lists the Can-Am Duels as "D1"/"D2") are
+    skipped, as are footnote rows that span the table (a 2015 note about Denny Hamlin once read
+    as 37 wins).
+- **Wins cross-check** ← Wikipedia's "List of all-time NASCAR Cup Series winners", which
+  counts Cup points races only (Grand National 1949–70 and Winston Cup 1971–2003 are earlier
+  names for the Cup Series; Busch Grand National/Xfinity, Truck and ARCA wins aren't in it). The
+  merge fails if any driver's total differs.
 - **Full-time** = starts ≥ 60% of that season's races.
 - **Team** ← the season's "Teams and drivers" entry table (Driver → Team), most recent season.
 - **Titles** ← the champions list, counting each champion **year once** — the older rows are
@@ -73,9 +80,9 @@ tables fill what the 1970+ season pages can't:
 
 Golden tests (nothing is written if any fails): every Cup champion since 1970 present with ≥ 1
 title; anchors Petty 7/200/1958, Pearson 3/105/1960, Yarborough 3/83/1957, Gordon 4/93/1992,
-Johnson 7/83/2001, Earnhardt 7/76/1975; every hardcoded name still in the pool; no legend's 1970+
-count above its hardcoded career total; Steve Park present; no venue names; no duplicates;
-pool size 240–290.
+Johnson 7/83/2001, Earnhardt 7/76/1975; every driver's wins match the all-time Cup winners list;
+every hardcoded name still in the pool; no legend's 1970+ count above its hardcoded career total;
+Steve Park present; no venue names; no duplicates; pool size 240–290.
 
 ## 6. Refresh
 
@@ -88,9 +95,10 @@ node merge-nascar.js
 
 Run after the season finale at minimum, and ideally every few weeks in season so active drivers'
 wins and teams stay current. Daily answers come from the frozen calendar (`../answers.js`), so
-a refresh no longer changes them and can be published at any time of day. The merge stops if a
-refresh would drop or move a driver who's scheduled as an upcoming answer — see "Answer
-calendar" in [README.md](README.md).
+a refresh no longer changes them and can be published at any time of day. If a refresh drops or
+moves a driver who's scheduled as an upcoming answer, the merge stops and prints the
+`build-calendar.js --repair` command that re-picks just those days — see "Answer calendar" in
+[README.md](README.md).
 
 ## 7. Known gaps
 

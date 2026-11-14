@@ -11,6 +11,7 @@
    ============================================================ */
 
 const ANSWERS = {
+  132: { date: "2026-11-13", "ultimate": "Coo Coo Marlin", "1970s": "D.K. Ulrich", "1980s": "Rich Bickle", "1990s": "Bobby Labonte", "2000s": "Bobby Hamilton Jr.", "2010s": "Erik Jones", "2020s": "Austin Cindric" },
   133: { date: "2026-11-14", "ultimate": "Kurt Busch", "1970s": "Charlie Roberts", "1980s": "Rusty Wallace", "1990s": "Steve Grissom", "2000s": "Travis Kvapil", "2010s": "William Byron", "2020s": "Harrison Burton" },
   134: { date: "2026-11-15", "ultimate": "Ward Burton", "1970s": "Vic Parsons", "1980s": "Dale Jarrett", "1990s": "Jeff Gordon", "2000s": "Regan Smith", "2010s": "Matt Tifft", "2020s": "Todd Gilliland" },
   135: { date: "2026-11-16", "ultimate": "Bobby Isaac", "1970s": "Neil Bonnett", "1980s": "Hut Stricklin", "1990s": "Dale Earnhardt Jr.", "2000s": "Denny Hamlin", "2010s": "Chase Elliott", "2020s": "Shane van Gisbergen" },
@@ -55,7 +56,7 @@ const ANSWERS = {
   174: { date: "2026-12-25", "ultimate": "Harry Gant", "1970s": "Dale Earnhardt", "1980s": "Chet Fillip", "1990s": "Ted Musgrave", "2000s": "Andy Lally", "2010s": "Bubba Wallace", "2020s": "Shane van Gisbergen" },
   175: { date: "2026-12-26", "ultimate": "Denny Hamlin", "1970s": "John Anderson", "1980s": "Ken Schrader", "1990s": "Jerry Nadeau", "2000s": "Carl Edwards", "2010s": "Ryan Truex", "2020s": "Ty Gibbs" },
   176: { date: "2026-12-27", "ultimate": "Butch Miller", "1970s": "Harry Gant", "1980s": "Alan Kulwicki", "1990s": "Dale Earnhardt Jr.", "2000s": "Martin Truex Jr.", "2010s": "Josh Bilicki", "2020s": "Chase Briscoe" },
-  177: { date: "2026-12-28", "ultimate": "Brendan Gaughan", "1970s": "Raymond Williams", "1980s": "Ron Bouchard", "1990s": "Ron Barfield Jr.", "2000s": "Jimmie Johnson", "2010s": "Landon Cassill", "2020s": "Harrison Burton" },
+  177: { date: "2026-12-28", "ultimate": "Brendan Gaughan", "1970s": "Raymond Williams", "1980s": "Ron Bouchard", "1990s": "Ricky Craven", "2000s": "Jimmie Johnson", "2010s": "Landon Cassill", "2020s": "Harrison Burton" },
   178: { date: "2026-12-29", "ultimate": "Juan Pablo Montoya", "1970s": "Jody Ridley", "1980s": "Brett Bodine", "1990s": "Ron Hornaday Jr.", "2000s": "Kasey Kahne", "2010s": "Ryan Preece", "2020s": "Christopher Bell" },
   179: { date: "2026-12-30", "ultimate": "Terry Labonte", "1970s": "Ricky Rudd", "1980s": "Michael Waltrip", "1990s": "Mike Wallace", "2000s": "Michael McDowell", "2010s": "Erik Jones", "2020s": "Todd Gilliland" },
   180: { date: "2026-12-31", "ultimate": "Kyle Busch", "1970s": "Sam Sommers", "1980s": "Rusty Wallace", "1990s": "Mike Bliss", "2000s": "Paul Menard", "2010s": "Ross Chastain", "2020s": "Josh Berry" },
@@ -84,7 +85,7 @@ const ANSWERS = {
   203: { date: "2027-01-23", "ultimate": "Carson Hocevar", "1970s": "Ron Keselowski", "1980s": "Michael Waltrip", "1990s": "Jeff Gordon", "2000s": "Joey Logano", "2010s": "Ryan Truex", "2020s": "Christopher Bell" },
   204: { date: "2027-01-24", "ultimate": "Daniel Suárez", "1970s": "Skip Manning", "1980s": "Larry Pearson", "1990s": "Todd Bodine", "2000s": "Michael McDowell", "2010s": "Danica Patrick", "2020s": "Austin Cindric" },
   205: { date: "2027-01-25", "ultimate": "Cale Yarborough", "1970s": "Roger Hamby", "1980s": "Rusty Wallace", "1990s": "Matt Kenseth", "2000s": "Jason Leffler", "2010s": "Alex Bowman", "2020s": "Austin Hill" },
-  206: { date: "2027-01-26", "ultimate": "William Byron", "1970s": "Ricky Rudd", "1980s": "Mike Alexander", "1990s": "Ron Barfield Jr.", "2000s": "Andy Houston", "2010s": "Trevor Bayne", "2020s": "Shane van Gisbergen" },
+  206: { date: "2027-01-26", "ultimate": "William Byron", "1970s": "Ricky Rudd", "1980s": "Mike Alexander", "1990s": "Stacy Compton", "2000s": "Andy Houston", "2010s": "Trevor Bayne", "2020s": "Shane van Gisbergen" },
   207: { date: "2027-01-27", "ultimate": "Carl Edwards", "1970s": "Jody Ridley", "1980s": "Ron Bouchard", "1990s": "Loy Allen Jr.", "2000s": "Johnny Sauter", "2010s": "Austin Dillon", "2020s": "Riley Herbst" },
   208: { date: "2027-01-28", "ultimate": "Bobby Hillin Jr.", "1970s": "Earl Ross", "1980s": "Brett Bodine", "1990s": "Steve Park", "2000s": "Martin Truex Jr.", "2010s": "Ryan Preece", "2020s": "Ty Gibbs" },
   209: { date: "2027-01-29", "ultimate": "Friday Hassler", "1970s": "Bill Elliott", "1980s": "Dale Jarrett", "1990s": "John Andretti", "2000s": "Kevin Harvick", "2010s": "Bubba Wallace", "2020s": "Anthony Alfredo" },

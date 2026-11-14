@@ -49,6 +49,10 @@ The merge refuses to write unless:
 - Every Cup champion since 1970 is present with at least one title.
 - Anchors match (titles / wins / debut): Petty 7/200/1958, Pearson 3/105/1960,
   Yarborough 3/83/1957, Gordon 4/93/1992, Johnson 7/83/2001, Earnhardt 7/76/1975.
+- Every driver's career wins equal Wikipedia's "List of all-time NASCAR Cup Series winners"
+  (Cup points races only, so no Xfinity/Busch, Truck, ARCA, Duel or Clash wins). Names the
+  list spells differently go in `LIST_ALIASES` in `sources/nascar.js`. Right after a race the
+  list can lag a day or two; rerun later if only that race's winner disagrees.
 - Every hardcoded legend / team-fallback name is still in the generated pool.
 - No legend's 1970+ win count exceeds its hardcoded career total.
 - Steve Park is present, and no racetrack names leaked in.
@@ -61,7 +65,8 @@ puzzle and mode. `build-calendar.js` creates or extends it:
 
 ```bash
 node build-calendar.js --until=2027-05-01                    # extend; existing days unchanged
-node build-calendar.js --until=2027-05-01 --rebuild-from=150 # regenerate #150 onward
+node build-calendar.js --until=2027-05-01 --repair           # re-pick only answers that left their pool
+node build-calendar.js --until=2027-05-01 --rebuild-from=150 # regenerate #150 onward, every mode
 ```
 
 - Weighting: star (a Cup title or 10+ wins) = 8, known (1–9 wins, or Active) = 3, deep cut = 1.
@@ -70,8 +75,10 @@ node build-calendar.js --until=2027-05-01 --rebuild-from=150 # regenerate #150 o
 - Today and earlier are never generated or rebuilt; missing ones are filled with the game's
   seeded pick, so publishing never changes a live answer.
 
-`merge-nascar.js` refuses to write if a refresh would leave a scheduled answer (today or later)
-outside its mode's pool, and warns when the calendar has under 30 days left.
+If a refresh would leave **today's** answer outside its mode's pool, `merge-nascar.js` refuses
+to write. If only later days break, it writes `data.js` and then stops with the `--repair`
+command to run, which re-picks just those entries using the same rules. It also warns when
+the calendar has under 30 days left.
 
 ## Architecture
 

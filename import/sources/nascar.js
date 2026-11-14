@@ -9,8 +9,11 @@
        · summary (early-70s): a starts count ("Starts"/"St"/"Races") + "Wins".
        · modern grid: one column per race; a started race is a non-empty
          result cell, a win is a finish of "1". races = race-column count.
+         Non-points columns (Duels/Clash) and spanning footnote rows are
+         skipped.
      Full-time season = Starts >= FULL_SEASON_FRACTION x races.
-     Wins = sum across 1970+ seasons.
+     Wins = sum across 1970+ seasons, cross-checked (merge-nascar.js) against
+     the "List of all-time NASCAR Cup Series winners".
    - team ← the "Teams and drivers" table (Driver->Team), most-recent season.
    - debut ← earliest 1970+ standings appearance.
    - titles ← Wikipedia "List of NASCAR Cup Series champions" (chronological,
@@ -50,21 +53,41 @@ async function resolveSeasonTitle(y) {
 }
 
 /* Combine the leading run of header rows into one lowercased header per
-   column, returning the first data-row index too. */
+   column (and the article titles those header cells link to), returning
+   the first data-row index too. */
 function headerCols(t) {
   const hrs = [];
   for (const r of t) { if (r.filter((c) => c.header).length >= r.length / 2) hrs.push(r); else break; }
   if (!hrs.length) hrs.push(t[0]);
   const width = Math.max(...t.map((r) => r.length));
-  const cols = [];
-  for (let i = 0; i < width; i++) cols[i] = hrs.map((r) => (r[i] ? r[i].text.toLowerCase() : "")).join(" ").trim();
-  return { cols, dataFrom: t.indexOf(hrs[hrs.length - 1]) + 1 };
+  const cols = [], refs = [];
+  for (let i = 0; i < width; i++) {
+    cols[i] = hrs.map((r) => (r[i] ? r[i].text.toLowerCase() : "")).join(" ").trim();
+    refs[i] = hrs.flatMap((r) => (r[i] ? r[i].links : [])).join(" ").toLowerCase();
+  }
+  return { cols, refs, dataFrom: t.indexOf(hrs[hrs.length - 1]) + 1 };
 }
 
 const nameFromCell = (cell) => {
   const raw = cell?.links?.length ? cell.links[0] : cell?.text;
   return raw ? cleanName(raw) : null;
 };
+
+/* Non-points races that some seasons list in the standings grid (2017 shows
+   the two Can-Am Duels as "D1"/"D2" under DAY). A Duel or Clash win is not
+   an official Cup win, so those columns are skipped entirely. */
+const EXHIBITION = /\bduels?\b|\bclash\b|\bunlimited\b|\bshootout\b|all-star/i;
+
+/* A footnote under the standings is one cell spanning every column. If it
+   mentions a driver ("1 Due to neck spasms Denny Hamlin …") it would read as
+   that driver's row, with a "1" (a win) in every race column. */
+const isSpanningRow = (row, di) => row[di] && row[di] === row[di + 1];
+
+/* Keep a driver's fuller row if a name appears twice in one table. */
+function keep(out, key, rec) {
+  const prev = out.get(key);
+  if (!prev || rec.starts > prev.starts) out.set(key, rec);
+}
 
 /* From all tables on a season page, read the points standings: per driver
    { starts, wins } plus the season's race count. Handles both the summary
@@ -73,7 +96,7 @@ const nameFromCell = (cell) => {
 function parseStandings(tabs) {
   let best = null;
   for (const t of tabs) {
-    const { cols, dataFrom } = headerCols(t);
+    const { cols, refs, dataFrom } = headerCols(t);
     const di = cols.findIndex((c) => /\bdriver\b/.test(c) && !/crew/.test(c));
     if (di === -1 || t.length - dataFrom < 8) continue;
 
@@ -87,23 +110,27 @@ function parseStandings(tabs) {
       // ---- summary format: explicit Starts / Wins columns ----
       const wi = cols.findIndex((c) => /\bwins\b|\bw\b/.test(c));
       for (let i = dataFrom; i < t.length; i++) {
+        if (isSpanningRow(t[i], di)) continue;
         const name = nameFromCell(t[i][di]);
         if (!name || !plausible(name)) continue;
         const starts = parseInt((t[i][si]?.text || "").replace(/[^\d]/g, ""), 10) || 0;
         const wins = wi !== -1 ? parseInt((t[i][wi]?.text || "").replace(/[^\d]/g, ""), 10) || 0 : 0;
         races = Math.max(races, starts);
-        out.set(strip(name), { name, starts, wins });
+        keep(out, strip(name), { name, starts, wins });
       }
     } else {
       // ---- modern grid: race columns sit between Driver and Points ----
       const pi = cols.findIndex((c, idx) => idx > di && /\bpoints\b|^pts\b|\bpts\.?$/.test(c));
       if (pi === -1 || pi - di - 1 < 5) continue;
-      races = pi - di - 1;
+      const raceCols = [];
+      for (let c = di + 1; c < pi; c++) if (!EXHIBITION.test(`${cols[c]} ${refs[c]}`)) raceCols.push(c);
+      races = raceCols.length;
       for (let i = dataFrom; i < t.length; i++) {
+        if (isSpanningRow(t[i], di)) continue;
         const name = nameFromCell(t[i][di]);
         if (!name || !plausible(name)) continue;
         let starts = 0, wins = 0;
-        for (let c = di + 1; c < pi; c++) {
+        for (const c of raceCols) {
           const v = (t[i][c]?.text || "").trim();
           if (!v || /^[–—-]$/.test(v)) continue;
           const m = v.match(/^(\d+)/);
@@ -111,7 +138,7 @@ function parseStandings(tabs) {
           else if (/^(dnf|dns|dnq|wd|w\/d|c|dsq)\b/i.test(v)) starts++;
         }
         if (starts === 0) continue;
-        out.set(strip(name), { name, starts, wins });
+        keep(out, strip(name), { name, starts, wins });
       }
     }
     if (out.size && (!best || out.size > best.drivers.size)) best = { drivers: out, races };
@@ -177,8 +204,39 @@ async function titlesFromChampions(log) {
   return titles;
 }
 
+/* Independent check on career wins: Wikipedia's "List of all-time NASCAR Cup
+   Series winners" — one row per Cup race winner with a combined total that
+   counts Cup points races only (Strictly Stock/Grand National 1949–1970,
+   Winston Cup 1971–2003, 2004–present). No Xfinity/Busch, Truck, ARCA, Duel
+   or Clash wins. Drivers absent from it have 0 Cup wins.
+   Returns name -> wins. Names must match exactly; LIST_ALIASES covers the
+   few drivers the list names differently (never guess Jr./Sr. — Bobby
+   Hamilton Jr. has 0 Cup wins, his father 4). */
+const LIST_ALIASES = { "Johnny Benson": "Johnny Benson Jr." };
+async function cupWinsFromList(log) {
+  const html = await getFullPageHtml("List of all-time NASCAR Cup Series winners");
+  let table = null;
+  for (const t of parseTables(html)) {
+    const h = t[0].map((c) => c.text.toLowerCase());
+    if (h.some((c) => /\bdriver\b/.test(c)) && h.some((c) => c.includes("combined"))) { table = t; break; }
+  }
+  if (!table) { log("  ! NASCAR: all-time winners list not found — wins can't be cross-checked"); return null; }
+  const h = table[0].map((c) => c.text.toLowerCase());
+  const di = h.findIndex((c) => /\bdriver\b/.test(c));
+  const wi = h.findIndex((c) => c.includes("combined"));
+  const wins = new Map();
+  for (const r of table.slice(1)) {
+    const name = cleanName((r[di]?.links?.[0] || r[di]?.text || "").replace(/[*^#°]/g, "")).trim();
+    const w = parseInt(r[wi]?.text, 10);
+    if (name && Number.isFinite(w)) wins.set(strip(name), w);
+  }
+  log(`NASCAR: all-time winners list — ${wins.size} winners, ${[...wins.values()].reduce((a, b) => a + b, 0)} wins`);
+  return (name) => wins.get(strip(LIST_ALIASES[name] || name)) || 0;
+}
+
 export async function collectNascar(currentYear, log) {
   const titles = await titlesFromChampions(log);
+  const listWins = await cupWinsFromList(log);
 
   const drivers = new Map(); // strip -> { name, seasons:Set, full:Set, wins, lastYear, lastTeam }
   let parsed = 0;
@@ -215,6 +273,7 @@ export async function collectNascar(currentYear, log) {
       team,
       titles: titles.get(strip(d.name)) || 0,
       wins: d.wins,
+      _cupWinsList: listWins ? listWins(d.name) : null, // cross-checked in merge-nascar.js
       status: inferStatus(lastFull, null, currentYear),
       debut,
       _complete: Boolean(team && Number.isFinite(debut)),

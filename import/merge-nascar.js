@@ -155,6 +155,19 @@ for (const [name, t, w, d] of ANCHORS) {
     fail(`anchor ${name}: expected ${t}t/${w}w/${d}, got ${r?.titles}t/${r?.wins}w/${r?.debut}`);
   }
 }
+// Career Cup wins must match Wikipedia's all-time Cup winners list (an
+// independent source that counts Cup points races only — no Xfinity/Busch,
+// Truck, ARCA, Duel or Clash wins). Catches standings-parse slips like a
+// footnote row read as a driver's results.
+{
+  if (emit.some((r) => typeof r._cupWinsList !== "number")) fail("no all-time Cup winners list in the build — can't verify wins (rerun node run.js)");
+  const off = emit.filter((r) => r.wins !== r._cupWinsList);
+  if (off.length) {
+    fail(`${off.length} driver(s) disagree with the all-time Cup winners list:\n  ` +
+      off.map((r) => `${r.name}: counted ${r.wins}, list says ${r._cupWinsList}`).join("\n  ") +
+      `\nIf a race just ran, the list may not be updated yet — rerun later. Otherwise fix the parser.`);
+  }
+}
 if (!byStrip.has(strip("Steve Park"))) fail("Steve Park (full-time 1999-2001) missing — venue filter regression?");
 for (const junk of ["Infineon Raceway", "Sonoma Raceway"]) if (byStrip.has(strip(junk))) fail(`venue leaked into pool: ${junk}`);
 {
@@ -165,7 +178,11 @@ for (const junk of ["Infineon Raceway", "Sonoma Raceway"]) if (byStrip.has(strip
 // ---------- frozen answer calendar (../answers.js) ----------
 // Every answer scheduled for today or later must still be in its mode's pool,
 // or the game would silently fall back to a different driver that day.
+// Today's answer breaking is fatal (players are mid-puzzle). Later days are
+// re-picked by build-calendar.js --repair, which reads the pool from data.js
+// — so data.js is written first and the merge then stops with the command.
 const ANSWERS_JS = join(__dir, "..", "answers.js");
+let calendarRepair = null;
 if (existsSync(ANSWERS_JS)) {
   const ANSWERS = Function(`${readFileSync(ANSWERS_JS, "utf8")}\n;return ANSWERS;`)();
   const GENRES = Function(`${src}\n;return GENRES;`)();
@@ -182,13 +199,17 @@ if (existsSync(ANSWERS_JS)) {
       if (!inPool) broken.push({ n: Number(n), text: `#${n} ${row.date} ${g.label}: "${row[g.id]}"` });
     }
   }
+  const nowBroken = broken.filter((b) => b.n === today);
+  if (nowBroken.length) {
+    fail(`today's answer no longer fits its mode after this refresh (data.js NOT written):\n  ` +
+      nowBroken.map((b) => b.text).join("\n  ") +
+      `\nPlayers are already on today's puzzle — fix the data so this driver stays in the pool.`);
+  }
   if (broken.length) {
-    const firstFixable = Math.max(today + 1, Math.min(...broken.map((b) => b.n)));
     const last = Object.values(ANSWERS).at(-1).date;
-    fail(`${broken.length} scheduled answer(s) no longer fit their mode after this refresh:\n  ` +
+    calendarRepair = `${broken.length} scheduled answer(s) no longer fit their mode after this refresh:\n  ` +
       broken.map((b) => b.text).join("\n  ") +
-      `\nFix the data, or regenerate those days: cd import && node build-calendar.js --until=${last} --rebuild-from=${firstFixable}` +
-      (broken.some((b) => b.n === today) ? "\n(Today's answer can't be rebuilt — players have seen it.)" : ""));
+      `\ndata.js is written. Re-pick just those days, then review both diffs:\n  cd import && node build-calendar.js --until=${last} --repair`;
   }
   const lastN = Math.max(...Object.keys(ANSWERS).map(Number));
   if (lastN - today < 30) console.log(`NOTE: the answer calendar ends in ${lastN - today} day(s) (${ANSWERS[lastN].date}) — extend it with build-calendar.js.`);
@@ -205,7 +226,8 @@ const block =
   `  // ================= NASCAR CUP =================\n` +
   `  // Generated ${today} from Wikipedia (1970+): roster/teams/status from season "Teams and\n` +
   `  // drivers" + points standings (Starts >= 60% of races = full-time), wins counted from the\n` +
-  `  // standings, titles from the champions list.\n` +
+  `  // standings (Cup points races only, checked against the all-time Cup winners list),\n` +
+  `  // titles from the champions list.\n` +
   `  // Pre-1970 debutants' career wins/debut are hardcoded in merge-nascar.js (LEGENDS).\n` +
   `  // Regenerate: cd import && node run.js && node merge-nascar.js\n` +
   emit.slice().sort((a, b) => a.name.localeCompare(b.name)).map(row).join("\n") + "\n";
@@ -223,4 +245,8 @@ const dupAll = new Set();
 for (const d of OUT) { const k = strip(d.name); if (dupAll.has(k)) fail(`post-merge duplicate: ${d.name}`); dupAll.add(k); }
 console.log(`merged: ${OUT.length} NASCAR drivers (${legends.size} pre-1970 legends hardcoded, ${emit.filter((r) => teams.has(strip(r.name))).length} team fallbacks)`);
 console.log(`dropped ${dropped.length} still-incomplete: ${dropped.map((r) => r.name).join(", ") || "(none)"}`);
+if (calendarRepair) {
+  process.stderr.write(`\nCALENDAR NEEDS REPAIR: ${calendarRepair}\n`);
+  process.exit(1);
+}
 console.log(`\nAll golden tests passed. Review with: git diff ../data.js`);

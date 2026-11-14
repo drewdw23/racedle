@@ -39,7 +39,8 @@ const DRIVERS = [
   // ================= NASCAR CUP =================
   // Generated 2026-11-14 from Wikipedia (1970+): roster/teams/status from season "Teams and
   // drivers" + points standings (Starts >= 60% of races = full-time), wins counted from the
-  // standings, titles from the champions list.
+  // standings (Cup points races only, checked against the all-time Cup winners list),
+  // titles from the champions list.
   // Pre-1970 debutants' career wins/debut are hardcoded in merge-nascar.js (LEGENDS).
   // Regenerate: cd import && node run.js && node merge-nascar.js
   { name: "A. J. Allmendinger", series: SERIES.NASCAR, team: "Kaulig Racing", titles: 0, wins: 3, status: "Active", debut: 2006 },
@@ -96,7 +97,7 @@ const DRIVERS = [
   { name: "Chad Little", series: SERIES.NASCAR, team: "BACE Motorsports", titles: 0, wins: 0, status: "Inactive", debut: 1986 },
   { name: "Charlie Roberts", series: SERIES.NASCAR, team: "Roberts Racing", titles: 0, wins: 0, status: "Inactive", debut: 1970 },
   { name: "Chase Briscoe", series: SERIES.NASCAR, team: "Joe Gibbs Racing", titles: 0, wins: 8, status: "Active", debut: 2021 },
-  { name: "Chase Elliott", series: SERIES.NASCAR, team: "Hendrick Motorsports", titles: 1, wins: 24, status: "Active", debut: 2015 },
+  { name: "Chase Elliott", series: SERIES.NASCAR, team: "Hendrick Motorsports", titles: 1, wins: 23, status: "Active", debut: 2015 },
   { name: "Chet Fillip", series: SERIES.NASCAR, team: "Fillip Racing", titles: 0, wins: 0, status: "Inactive", debut: 1985 },
   { name: "Chris Buescher", series: SERIES.NASCAR, team: "RFK Racing", titles: 0, wins: 6, status: "Active", debut: 2015 },
   { name: "Christopher Bell", series: SERIES.NASCAR, team: "Joe Gibbs Racing", titles: 0, wins: 14, status: "Active", debut: 2020 },
@@ -128,7 +129,7 @@ const DRIVERS = [
   { name: "David Sisco", series: SERIES.NASCAR, team: "Sisco Racing", titles: 0, wins: 0, status: "Inactive", debut: 1972 },
   { name: "David Stremme", series: SERIES.NASCAR, team: "Hillman-Circle Sport LLC", titles: 0, wins: 0, status: "Inactive", debut: 2005 },
   { name: "Dean Dalton", series: SERIES.NASCAR, team: "Champion Racing", titles: 0, wins: 0, status: "Inactive", debut: 1971 },
-  { name: "Denny Hamlin", series: SERIES.NASCAR, team: "Joe Gibbs Racing", titles: 0, wins: 100, status: "Active", debut: 2005 },
+  { name: "Denny Hamlin", series: SERIES.NASCAR, team: "Joe Gibbs Racing", titles: 0, wins: 64, status: "Active", debut: 2005 },
   { name: "Derrike Cope", series: SERIES.NASCAR, team: "Rick Ware Racing", titles: 0, wins: 2, status: "Inactive", debut: 1982 },
   { name: "Dick Brooks", series: SERIES.NASCAR, team: "Petty Enterprises", titles: 0, wins: 1, status: "Inactive", debut: 1969 },
   { name: "Dick May", series: SERIES.NASCAR, team: "Beahr Racing", titles: 0, wins: 0, status: "Inactive", debut: 1970 },
@@ -258,7 +259,6 @@ const DRIVERS = [
   { name: "Robert Pressley", series: SERIES.NASCAR, team: "Morgan-McClure Motorsports", titles: 0, wins: 0, status: "Inactive", debut: 1989 },
   { name: "Rodney Combs", series: SERIES.NASCAR, team: "Mueller Brothers Racing", titles: 0, wins: 0, status: "Inactive", debut: 1982 },
   { name: "Roger Hamby", series: SERIES.NASCAR, team: "Roger Hamby", titles: 0, wins: 0, status: "Inactive", debut: 1977 },
-  { name: "Ron Barfield Jr.", series: SERIES.NASCAR, team: "David Blair Motorsports", titles: 0, wins: 0, status: "Inactive", debut: 1996 },
   { name: "Ron Bouchard", series: SERIES.NASCAR, team: "Ellington Racing", titles: 0, wins: 1, status: "Inactive", debut: 1981 },
   { name: "Ron Hornaday Jr.", series: SERIES.NASCAR, team: "The Motorsports Group", titles: 0, wins: 0, status: "Inactive", debut: 1991 },
   { name: "Ron Keselowski", series: SERIES.NASCAR, team: "Lubinski Racing", titles: 0, wins: 0, status: "Inactive", debut: 1970 },

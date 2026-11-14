@@ -4,10 +4,13 @@
      node build-calendar.js --until=2027-02-01
          Create the calendar, or extend it up to that date. Days already in
          the calendar are never changed.
+     node build-calendar.js --until=2027-02-01 --repair
+         Re-pick only the future answers whose driver no longer fits its mode
+         (e.g. a data fix dropped them from the pool). Every other day and
+         mode stays exactly as it is.
      node build-calendar.js --until=2027-02-01 --rebuild-from=150
-         Regenerate puzzles #150 onward (e.g. after a data refresh drops a
-         scheduled driver). Today and earlier can never be rebuilt — players
-         have already seen them.
+         Regenerate puzzles #150 onward, every mode. Today and earlier can
+         never be rebuilt — players have already seen them.
 
    How answers are chosen (one pick per mode per day, in GENRES order with
    the decade modes first):
@@ -55,6 +58,7 @@ const until = puzzleOn(Date.parse(`${arg("until")}T00:00:00Z`));
 const now = new Date();
 const today = puzzleOn(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 const rebuildFrom = arg("rebuild-from") ? Number(arg("rebuild-from")) : null;
+const repair = process.argv.includes("--repair");
 if (rebuildFrom !== null && !(rebuildFrom > today)) fail(`--rebuild-from must be after today (#${today})`);
 if (until < today) fail(`--until is before today (#${today})`);
 
@@ -85,9 +89,11 @@ const seededPick = (n, g) => {
 };
 
 // ---------- weighted pick with cooldown ----------
-function weightedPick(n, g, recent, usedToday) {
+// `ahead` = this mode's answers already scheduled after day n (only non-empty
+// when --repair fills a gap mid-calendar), kept out of the cooldown window too.
+function weightedPick(n, g, recent, usedToday, ahead = []) {
   const pool = poolOf(g);
-  const blocked = new Set(recent.slice(-cooldownFor(pool)));
+  const blocked = new Set([...recent.slice(-cooldownFor(pool)), ...ahead.slice(0, cooldownFor(pool))]);
   let candidates = pool.filter((d) => !blocked.has(d.name) && !usedToday.has(d.name));
   if (!candidates.length) candidates = pool.filter((d) => !blocked.has(d.name));
   if (!candidates.length) candidates = pool;
@@ -105,6 +111,14 @@ let cal = {};
 if (existsSync(ANSWERS_JS)) cal = Function(`${readFileSync(ANSWERS_JS, "utf8")}\n;return ANSWERS;`)();
 if (rebuildFrom !== null) for (const k of Object.keys(cal)) if (Number(k) >= rebuildFrom) delete cal[k];
 const existing = new Set(Object.keys(cal).map(Number));
+const fits = (name, g) => poolOf(g).some((d) => d.name === name);
+const repaired = [];
+if (repair) {
+  for (const [k, row] of Object.entries(cal)) {
+    if (Number(k) <= today) continue; // today/past are what players have seen
+    for (const g of GENRES) if (!fits(row[g.id], g)) { repaired.push({ n: Number(k), g, was: row[g.id] }); delete row[g.id]; }
+  }
+}
 
 // ---------- fill ----------
 const first = Math.min(today, ...existing);
@@ -113,11 +127,15 @@ let generated = 0, seeded = 0;
 for (let n = first; n <= until; n++) {
   if (!cal[n] && n < today) continue; // never invent history
   const row = { date: dateOf(n), ...(cal[n] || {}) };
-  const usedToday = new Set();
+  const usedToday = new Set(GENRES.map((g) => row[g.id]).filter(Boolean));
   for (const g of modes) {
     if (!row[g.id]) {
       if (n <= today) { row[g.id] = seededPick(n, g); seeded++; }
-      else { row[g.id] = weightedPick(n, g, recent[g.id], usedToday); generated++; }
+      else {
+        const ahead = Object.keys(cal).map(Number).filter((k) => k > n).sort((a, b) => a - b).map((k) => cal[k][g.id]).filter(Boolean);
+        row[g.id] = weightedPick(n, g, recent[g.id], usedToday, ahead);
+        generated++;
+      }
     }
     usedToday.add(row[g.id]);
     recent[g.id].push(row[g.id]);
@@ -164,6 +182,10 @@ ${lines.join("\n")}
 
 // ---------- report ----------
 console.log(`answers.js: #${keys[0]} (${cal[keys[0]].date}) .. #${keys.at(-1)} (${cal[keys.at(-1)].date}) — ${keys.length} days`);
+if (repair) {
+  console.log(repaired.length ? `  repaired ${repaired.length} answer(s):` : "  --repair: nothing to fix");
+  for (const r of repaired) console.log(`    #${r.n} ${cal[r.n].date} ${r.g.label}: ${r.was} -> ${cal[r.n][r.g.id]}`);
+}
 console.log(`  ${generated} answers generated, ${seeded} kept from the game's current pick (today/past), ${existing.size} days already present\n`);
 console.log("mode       pool  cooldown | share of pool (stars/known/deep) | scheduled from tomorrow (stars/known/deep) | most repeats");
 for (const g of GENRES) {
