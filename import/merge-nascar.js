@@ -1,17 +1,14 @@
 /* Merge the generated NASCAR Cup set (output/drivers.generated.json from
-   `node run.js --series=nascar`) into ../data.js, replacing the NASCAR section.
+   `node run.js`) into ../data.js, replacing the DRIVERS list.
 
-   Source reworked 2026 to license-clean Wikipedia/Wikidata (no external data
-   dependency); see sources/nascar.js. The set is built fresh from 1970+ season
-   pages (roster, teams, status, nationality, titles, and 1970+ wins/debut).
-
-   CARRYOVER (same shape as merge-supercars.js): Wikipedia season pages only
-   go back to 1970 cleanly, so for the ~15 drivers who debuted and won most of
-   their races BEFORE 1970 (Petty, Pearson, Cale, …) their full-career wins and
-   real debut are carried from the outgoing verified data via MAX(wins)/
-   MIN(debut); a missing team also falls back to the outgoing record. Titles
-   already come career-complete from the champions list. Dual-career drivers
-   kept in another primary series are excluded.
+   The build is self-contained — nothing is carried over from the existing
+   data.js. Wikipedia's season pages only cover 1970+ cleanly, so two small
+   hardcoded tables fill what those pages can't:
+   - LEGENDS: the 36 drivers who debuted before 1970. Their career Cup wins
+     and real debut year (counting from 1970 would cut Petty to 99 wins and
+     a 1970 debut). Values come from per-race Cup records.
+   - TEAM_FALLBACK: older privateers whose season "Teams and drivers" table
+     lists no team. Used only when the build found no team.
 
    Usage: node merge-nascar.js   (then review `git diff ../data.js`)
 */
@@ -24,6 +21,76 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const DATA_JS = join(__dir, "..", "data.js");
 const strip = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.'\-]/g, " ").replace(/\s+/g, " ").trim();
 
+/* Pre-1970 debutants: [career Cup wins, Cup debut year]. These drivers are
+   all long retired, so the values are final. */
+const LEGENDS = {
+  "Richard Petty": [200, 1958],
+  "David Pearson": [105, 1960],
+  "Bobby Allison": [85, 1961],
+  "Cale Yarborough": [83, 1957],
+  "Bobby Isaac": [37, 1961],
+  "Benny Parsons": [21, 1964],
+  "Buddy Baker": [19, 1959],
+  "Donnie Allison": [10, 1966],
+  "Dave Marcis": [5, 1968],
+  "Elmo Langley": [2, 1954],
+  "James Hylton": [2, 1964],
+  "Dick Brooks": [1, 1969],
+  "Lennie Pond": [1, 1969],
+  "Wendell Scott": [1, 1961],
+  "Ben Arnold": [0, 1968],
+  "Bill Champion": [0, 1951],
+  "Bill Seifert": [0, 1966],
+  "Bill Shirey": [0, 1969],
+  "Bob Burcham": [0, 1968],
+  "Bobby Wawak": [0, 1965],
+  "Buddy Arrington": [0, 1964],
+  "Cecil Gordon": [0, 1968],
+  "Coo Coo Marlin": [0, 1966],
+  "Earl Brooks": [0, 1962],
+  "Ed Negre": [0, 1955],
+  "Frank Warren": [0, 1963],
+  "Friday Hassler": [0, 1960],
+  "Henley Gray": [0, 1964],
+  "J.D. McDuffie": [0, 1963],
+  "Jabe Thomas": [0, 1965],
+  "Joe Ruttman": [0, 1963],
+  "John Sears": [0, 1964],
+  "Neil Castles": [0, 1957],
+  "Richard Childress": [0, 1969],
+  "Tommy Gale": [0, 1968],
+  "Walter Ballard": [0, 1966],
+};
+
+/* Last team for drivers whose Wikipedia entry tables list none. */
+const TEAM_FALLBACK = {
+  "Ben Arnold": "Arnold Racing",
+  "Bill Champion": "Champion Racing",
+  "Bill Seifert": "Oswald Racing",
+  "Bill Shirey": "David Ray Boggs",
+  "Bobby Isaac": "Neil Castles",
+  "Carl Adams": "Adams Racing",
+  "Charlie Roberts": "Roberts Racing",
+  "David Ray Boggs": "Warren Racing",
+  "David Sisco": "Sisco Racing",
+  "Dean Dalton": "Champion Racing",
+  "Earl Ross": "DeWitt Racing",
+  "Friday Hassler": "Friday Hassler",
+  "Henley Gray": "Gray Racing",
+  "Jackie Rogers": "Viglione Racing",
+  "Janet Guthrie": "McClure Motors",
+  "John Sears": "Sears Racing",
+  "Larry Smith": "Harley Smith",
+  "Neil Castles": "Neil Castles",
+  "Raymond Williams": "Bobby Reeves",
+  "Richie Panch": "Puro Racing",
+  "Ron Keselowski": "Lubinski Racing",
+  "Sam Sommers": "Vandiver Racing",
+  "Terry Bivins": "H Miller Racing",
+  "Vic Parsons": "Strong Racing",
+  "Wendell Scott": "Faustina Racing",
+};
+
 /* Cup champions since 1970 — all must survive the full-time filter and carry
    >= 1 career title. */
 const CHAMPIONS_1970_PLUS = [
@@ -34,11 +101,10 @@ const CHAMPIONS_1970_PLUS = [
   "Martin Truex Jr.", "Joey Logano", "Chase Elliott", "Kyle Larson", "Ryan Blaney",
 ];
 
-/* Rock-solid (titles, career wins) anchors — the win totals prove the pre-1970
-   carryover fired (Petty's 200 include his 1960s wins). */
+/* Rock-solid (titles, career wins, debut) anchors. */
 const ANCHORS = [
-  ["Richard Petty", 7, 200], ["Jeff Gordon", 4, 93], ["Jimmie Johnson", 7, 83],
-  ["Dale Earnhardt", 7, 76], ["David Pearson", 3, 105], ["Cale Yarborough", 3, 83],
+  ["Richard Petty", 7, 200, 1958], ["David Pearson", 3, 105, 1960], ["Cale Yarborough", 3, 83, 1957],
+  ["Jeff Gordon", 4, 93, 1992], ["Jimmie Johnson", 7, 83, 2001], ["Dale Earnhardt", 7, 76, 1975],
 ];
 
 function fail(m) {
@@ -49,27 +115,34 @@ function fail(m) {
 const gen = JSON.parse(readFileSync(join(__dir, "output", "drivers.generated.json"), "utf8"))
   .filter((r) => r.series === "NASCAR Cup");
 let src = readFileSync(DATA_JS, "utf8").replace(/\r\n/g, "\n");
-const CUR = Function(`${src}\n;return { DRIVERS, FLAGS };`)();
-const curNascar = new Map(CUR.DRIVERS.filter((d) => d.series === "NASCAR Cup").map((d) => [strip(d.name), d]));
-const otherSeries = new Set(CUR.DRIVERS.filter((d) => d.series !== "NASCAR Cup").map((d) => strip(d.name)));
+const CUR = Function(`${src}\n;return { FLAGS };`)();
 
-// ---------- carryover + dual-career exclusion ----------
-const emit = [], dropped = [], excluded = [];
+// ---------- apply hardcoded tables ----------
+const legends = new Map(Object.entries(LEGENDS).map(([n, v]) => [strip(n), v]));
+const teams = new Map(Object.entries(TEAM_FALLBACK).map(([n, t]) => [strip(n), t]));
+const genKeys = new Set(gen.map((r) => strip(r.name)));
+for (const n of [...Object.keys(LEGENDS), ...Object.keys(TEAM_FALLBACK)]) {
+  if (!genKeys.has(strip(n))) fail(`hardcoded driver not in the generated pool (renamed or dropped?): ${n}`);
+}
+
+const emit = [], dropped = [];
 for (const orig of gen) {
-  if (otherSeries.has(strip(orig.name))) { excluded.push(orig); continue; } // kept in primary series
-  const cur = curNascar.get(strip(orig.name));
+  const key = strip(orig.name);
   const rec = { ...orig };
-  if (cur) {
-    rec.wins = Math.max(rec.wins, cur.wins);   // pre-1970 career wins the 1970+ count can't see
-    rec.debut = Math.min(rec.debut, cur.debut); // real (pre-1970) debut decade
-    if (!rec.team) rec.team = cur.team;         // old privateers whose entry table gave no team
+  const legend = legends.get(key);
+  if (legend) {
+    const [wins, debut] = legend;
+    if (rec.wins > wins) fail(`${rec.name}: counted ${rec.wins} wins since 1970 but LEGENDS says ${wins} career`);
+    rec.wins = wins;
+    rec.debut = debut;
   }
+  if (!rec.team && teams.has(key)) rec.team = teams.get(key);
   rec._complete = Boolean(rec.country && rec.continent && rec.team && Number.isFinite(rec.titles) && Number.isFinite(rec.wins) && rec.status && Number.isFinite(rec.debut));
   if (!rec._complete) { dropped.push(rec); continue; }
   emit.push(rec);
 }
 
-// ---------- golden tests (after carryover) ----------
+// ---------- golden tests ----------
 if (emit.length < 240 || emit.length > 290) fail(`pool size ${emit.length} outside expected 240-290`);
 const byStrip = new Map(emit.map((r) => [strip(r.name), r]));
 for (const c of CHAMPIONS_1970_PLUS) {
@@ -77,9 +150,11 @@ for (const c of CHAMPIONS_1970_PLUS) {
   if (!r) fail(`champion missing from pool: ${c}`);
   if (!(r.titles >= 1)) fail(`champion ${c} has ${r.titles} titles`);
 }
-for (const [name, t, w] of ANCHORS) {
+for (const [name, t, w, d] of ANCHORS) {
   const r = byStrip.get(strip(name));
-  if (!r || r.titles !== t || r.wins !== w) fail(`anchor ${name}: expected ${t}t/${w}w, got ${r?.titles}t/${r?.wins}w`);
+  if (!r || r.titles !== t || r.wins !== w || r.debut !== d) {
+    fail(`anchor ${name}: expected ${t}t/${w}w/${d}, got ${r?.titles}t/${r?.wins}w/${r?.debut}`);
+  }
 }
 if (byStrip.get(strip("Shane van Gisbergen"))?.country !== "New Zealand") fail("SVG nationality wrong");
 if (!byStrip.has(strip("Steve Park"))) fail("Steve Park (full-time 1999-2001) missing — venue filter regression?");
@@ -91,7 +166,7 @@ for (const junk of ["Infineon Raceway", "Sonoma Raceway"]) if (byStrip.has(strip
 const missingFlags = [...new Set(emit.map((r) => r.country))].filter((c) => !CUR.FLAGS[c]);
 if (missingFlags.length) fail(`countries missing from FLAGS: ${missingFlags.join(", ")} — add them first`);
 
-// ---------- rebuild section ----------
+// ---------- rebuild the DRIVERS list ----------
 const q = (s) => JSON.stringify(s);
 const row = (r) =>
   `  { name: ${q(r.name)}, country: ${q(r.country)}, continent: ${q(r.continent)}, series: SERIES.NASCAR, ` +
@@ -100,29 +175,24 @@ const row = (r) =>
 const today = new Date().toISOString().slice(0, 10);
 const block =
   `  // ================= NASCAR CUP =================\n` +
-  `  // Generated ${today} from Wikipedia/Wikidata (1970+): roster/teams/status from season\n` +
-  `  // "Teams and drivers" + points standings (Starts >= 60% of races = full-time), wins\n` +
-  `  // counted from the standings, titles from the champions list, nationality default US +\n` +
-  `  // exceptions. Full-career wins/debut for pre-1970 legends carried from the prior data.\n` +
-  `  // Regenerate: cd import && node run.js --series=nascar && node merge-nascar.js\n` +
-  emit.slice().sort((a, b) => a.name.localeCompare(b.name)).map(row).join("\n") + "\n\n";
+  `  // Generated ${today} from Wikipedia (1970+): roster/teams/status from season "Teams and\n` +
+  `  // drivers" + points standings (Starts >= 60% of races = full-time), wins counted from the\n` +
+  `  // standings, titles from the champions list, nationality default US + exceptions.\n` +
+  `  // Pre-1970 debutants' career wins/debut are hardcoded in merge-nascar.js (LEGENDS).\n` +
+  `  // Regenerate: cd import && node run.js && node merge-nascar.js\n` +
+  emit.slice().sort((a, b) => a.name.localeCompare(b.name)).map(row).join("\n") + "\n";
 
-// Match either header form so the merge stays idempotent across re-runs.
-const findAny = (...ms) => ms.map((m) => src.indexOf(m)).find((i) => i !== -1);
-const s = findAny("  // ================= NASCAR CUP =================\n", "  // ================= NASCAR CUP — active =================\n");
-const e = findAny("  // ================= INDYCAR =================\n", "  // ================= INDYCAR (modern series + pre-1979 USAC) =================\n");
-if (s == null || s === -1 || e == null || e === -1 || e < s) fail("could not locate NASCAR section markers");
+const s = src.indexOf("  // ================= NASCAR CUP =================\n");
+const e = s === -1 ? -1 : src.indexOf("\n];", s) + 1;
+if (s === -1 || e <= s) fail("could not locate the NASCAR section / end of DRIVERS");
 src = src.slice(0, s) + block + src.slice(e);
 
 writeFileSync(DATA_JS, src);
 
 // ---------- post-write verification ----------
 const OUT = Function(`${src}\n;return DRIVERS;`)();
-const nascar = OUT.filter((d) => d.series === "NASCAR Cup");
 const dupAll = new Set();
-for (const d of OUT) { const k = strip(d.name); if (dupAll.has(k)) fail(`post-merge duplicate across DB: ${d.name}`); dupAll.add(k); }
-console.log(`merged: NASCAR section = ${nascar.length} (fresh Wikipedia 1970+, career wins/debut carried for legends)`);
-console.log(`excluded ${excluded.length} dual-career (kept in primary series): ${excluded.map((r) => r.name).join(", ") || "(none)"}`);
+for (const d of OUT) { const k = strip(d.name); if (dupAll.has(k)) fail(`post-merge duplicate: ${d.name}`); dupAll.add(k); }
+console.log(`merged: ${OUT.length} NASCAR drivers (${legends.size} pre-1970 legends hardcoded, ${emit.filter((r) => teams.has(strip(r.name))).length} team fallbacks)`);
 console.log(`dropped ${dropped.length} still-incomplete: ${dropped.map((r) => r.name).join(", ") || "(none)"}`);
-console.log(`total DRIVERS: ${OUT.length}`);
 console.log(`\nAll golden tests passed. Review with: git diff ../data.js`);

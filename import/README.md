@@ -1,114 +1,71 @@
-# Racedle data import pipeline
+# Racedle data import pipeline (NASCAR Cup)
 
-> **Source strategy:** see [DATA_SOURCES.md](DATA_SOURCES.md) — the per-series evaluation of
-> quality data sources. F1's primary source is moving from the Jolpica API scan to **F1DB**
-> (CC BY 4.0 bulk releases, verified 2026-07-07), with Jolpica retained as a cross-validator.
+> **Source details:** see [DATA_SOURCES.md](DATA_SOURCES.md).
 
-Builds the driver database from **license-clean, reuse-friendly public sources** — the only
-sustainable way to reach "every full-season driver since 1970, all series." It deliberately
-does **not** use racing-reference.info: that site blocks automated access and its Terms of Use
-forbid scraping and building tools on its data. Copying it would also undermine Racedle's own
-legal footing (the "public facts" defense). See [../BUSINESS_PLAN.md](../BUSINESS_PLAN.md).
-
-## Sources
-
-| Series | Source | Why |
-|---|---|---|
-| Formula 1 | **Jolpica-F1** API (the open successor to Ergast, retired end-2024) | Structured JSON, F1 1950–present: nationality, per-season champion, career wins, debut. No scraping needed. |
-| NASCAR, IndyCar, V8 Supercars, IMSA, WEC, WRC | **Wikipedia** season articles (CC BY-SA) for the entry lists + **Wikidata** (CC0) for nationality/career span/status | Wikidata's SPARQL is queryable and public-domain; Wikipedia season pages are the reliable place to find who ran a full season. |
+Builds the game's NASCAR Cup driver list from **license-clean, reuse-friendly public data**
+(Wikipedia, CC BY-SA). It deliberately does **not** use racing-reference.info: that site blocks
+automated access and its Terms of Use forbid scraping and building tools on its data. Copying it
+would also undermine Racedle's own legal footing (the "public facts" defense).
 
 ## Requirements
 
-- **Node.js 18+** (uses built-in `fetch`; no npm dependencies to install). This repo's dev
-  machine had no Node — install it first: <https://nodejs.org>.
+- **Node.js 18+** (uses built-in `fetch`; no npm dependencies).
 
 ## Run
 
 ```bash
 cd import
-node run.js                  # all series, 1970 → current year
-node run.js --series=f1       # one series
-node run.js --series=wrc,imsa --debug   # subset with per-season logging
+node run.js           # build the pool: every Cup season 1970 → current year
+node merge-nascar.js  # golden-tested merge into ../data.js
 ```
 
-Outputs land in `import/output/` (git-ignored) and **never touch `../data.js` directly**:
+Run from inside `import/` so the request cache lands in `import/.cache/`.
 
-- `drivers.generated.json` — every record with provenance (`_seasons`, `_wikidata` qid).
-- `data.generated.js` — paste-ready `DRIVERS` entries. **Incomplete rows are commented out**
-  with `// TODO(review):` so they can never break the game.
-- `report.md` — coverage per series, rows needing curation, and a **validation diff against the
-  current `../data.js`** (which hand-curated drivers the pipeline did/didn't re-find, and which
-  new drivers it discovered).
+`run.js` writes to `import/output/` (git-ignored) and **never touches `../data.js`**:
+
+- `drivers.generated.json` — every record with provenance.
+- `data.generated.js` — the same rows in `DRIVERS` syntax; rows still missing a team are
+  commented out with `// TODO(review):`.
+- `report.md` — rows missing a team, plus drivers gained/lost versus the current `../data.js`.
+
+`merge-nascar.js` then applies the two hardcoded tables (pre-1970 legends' career wins/debut,
+and team fallbacks for old privateers), runs the golden tests, and rewrites the `DRIVERS` list
+in `../data.js`. If any test fails, nothing is written.
 
 Requests are throttled (~1/sec per host) and cached on disk (`.cache/`), so reruns are fast and
-polite. `node run.js` after a full run costs almost nothing.
+polite. Delete `.cache/` (or run `npm run clean`) to force a fresh pull, e.g. to pick up the
+latest season.
 
 ### Rate limits & resuming
 
-Jolpica (F1) throttles unauthenticated use to roughly **500 requests/hour** with no
-`Retry-After` header. The F1 collector is built to stay well under that — it makes about **one
-request per season (~77 total)**, not per driver — so a normal run won't hit the wall. If it
-ever does (e.g. you ran it several times in one hour), the run **does not crash**: a per-host
-circuit breaker trips, the run finishes with whatever it has, and it prints
-`... rerun later to finish`. Because successful fetches are cached, **just run `node run.js`
-again** once the hour resets and it resumes where it left off. The same graceful behavior
-applies to the Wikipedia/Wikidata calls for the other series.
+If Wikipedia rate-limits a run, it **does not crash**: a per-host circuit breaker trips, the run
+finishes with whatever it has, and successful fetches stay cached — **just run `node run.js`
+again** later and it resumes where it left off.
 
-## What the pipeline gets reliably vs. what needs curation
+## Golden tests (merge-nascar.js)
 
-**Reliable, automatic:** the roster (who ran a full season each year), nationality → continent,
-debut year, and active/retired status. F1 is fully complete (titles, wins, last team included)
-because Jolpica exposes all of it.
+The merge refuses to write unless:
 
-**Needs a curation pass (non-F1):** `team` (last/current), `titles`, and `wins`. These are not a
-single dependable number in Wikidata across every series/era, so the pipeline leaves them `null`
-and the row stays commented out until a human fills them from the driver's Wikipedia infobox or
-an official series record. This is by design — better a flagged gap than a wrong stat shown in
-the game.
-
-## ⚠️ First-run tuning (expected)
-
-The table parser handles the hard parts automatically — **rowspan/colspan** grids (so NASCAR
-team tables don't bleed crew chiefs into the driver column), **multi-tier headers** (e.g. a
-"Championship entries" super-header above the real "Driver name" row), and **flag-icon links**
-(so nationalities don't get mistaken for names). All eight series parse their modern
-(2010s) season pages out of the box, verified on 2015.
-
-What still needs attention on a full 1970→present run:
-
-- **Older eras** (1970s–90s) use different table layouts and section headings. If specific
-  years yield **0 drivers** in `output/report.md`, add that era's section heading or
-  driver-column label to the series' `sections` / `driverColumns` / `titleCandidates` in
-  [`config.js`](config.js). Run one series with `--debug` to see per-season hit counts.
-- **Endurance (WEC/IMSA)** rosters include every class (LMP2, GTD/GTE, gentleman co-drivers).
-  Filtering to the top class is a curation decision, not something the scraper guesses.
-- The **Wikidata occupation filter** drops entities Wikidata knows aren't drivers (crew chiefs,
-  owners); anyone with unknown occupation is kept and flagged for review.
-
-## Merge workflow
-
-1. `node run.js` → review `output/report.md`.
-2. Curate `data.generated.js`: fill `TODO(review)` rows (team/titles/wins), delete non-full-season
-   noise, resolve name-spelling mismatches flagged in the report.
-3. Move validated entries into `../data.js` under the right series block.
-4. Add any new `country` values to the `FLAGS` map in `../data.js` (the report lists unknowns).
-5. Reload the game and sanity-check (`node run.js` doesn't run the game — open `../index.html`).
+- Every Cup champion since 1970 is present with at least one title.
+- Anchors match (titles / wins / debut): Petty 7/200/1958, Pearson 3/105/1960,
+  Yarborough 3/83/1957, Gordon 4/93/1992, Johnson 7/83/2001, Earnhardt 7/76/1975.
+- Every hardcoded legend / team-fallback name is still in the generated pool.
+- No legend's 1970+ win count exceeds its hardcoded career total.
+- Shane van Gisbergen is New Zealand, Steve Park is present, no racetrack names leaked in.
+- No duplicates, every country has a flag, and the pool is 240–290 drivers.
 
 ## Architecture
 
 ```
 import/
-├── config.js               # per-series source config + year range + full-season rule
-├── run.js                  # orchestrator: collect → dedupe → validate → emit
-├── enrich.js               # roster → records via Wikidata (non-F1)
+├── config.js            # year range + full-time rule (60% of a season's races)
+├── run.js               # orchestrator: collect → emit output/
+├── merge-nascar.js      # hardcoded legends + team fallbacks, golden tests, write ../data.js
 ├── sources/
-│   ├── f1.js               # Jolpica/Ergast (complete records)
-│   └── wikipediaSeasons.js  # generic season entry-list scraper (config-driven)
+│   └── nascar.js        # season standings + "Teams and drivers" + champions list
 ├── lib/
-│   ├── http.js             # throttle + retry + disk cache (built-in fetch)
-│   ├── jolpica.js          # F1 API client
-│   ├── wikidata.js         # SPARQL client
-│   ├── wikipedia.js        # MediaWiki API + tolerant HTML table parser
-│   └── normalize.js        # country/continent maps, status, data.js emitter
-└── output/                 # generated artifacts (git-ignored)
+│   ├── http.js          # throttle + retry + disk cache (built-in fetch)
+│   ├── wikipedia.js     # MediaWiki API + tolerant HTML table parser
+│   └── normalize.js     # continent map, status rule, data.js emitter
+└── output/              # generated artifacts (git-ignored)
 ```

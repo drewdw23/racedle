@@ -12,8 +12,8 @@ mkdirSync(CACHE_DIR, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/* Per-host minimum gap between requests (ms). Wikimedia and Jolpica
-   both ask for courteous rates; keep this conservative. */
+/* Per-host minimum gap between requests (ms). Wikimedia asks for
+   courteous rates; keep this conservative. */
 const HOST_GAP_MS = 1100;
 const lastHit = new Map();
 
@@ -31,8 +31,8 @@ function cachePath(url) {
 }
 
 /* Circuit breaker: once a host has rate-limited us repeatedly, stop
-   hammering it for the rest of the process. A per-hour limit (like
-   Jolpica's, with no Retry-After) will not clear inside one run, so
+   hammering it for the rest of the process. A per-hour limit (with
+   no Retry-After) will not clear inside one run, so
    continuing to retry every request just wastes ~an hour. Instead we
    trip the breaker and fail fast, telling the user to rerun later
    (cached successes are reused, so the rerun resumes). */
@@ -87,8 +87,8 @@ export async function getJSON(url, { retries = 4 } = {}) {
       // Exhausted retries: DO NOT throw (that would abort the whole run
       // and lose all progress). Return a sentinel so callers skip this
       // item and the run finishes with partial data. Transient failures
-      // aren't cached, so a later rerun retries them (rate limits like
-      // Jolpica's reset hourly). Successful earlier calls stay cached, so
+      // aren't cached, so a later rerun retries them (hourly rate limits
+      // reset). Successful earlier calls stay cached, so
       // reruns resume rather than restart.
       if (attempt++ >= retries) {
         if (err.status === 429) {

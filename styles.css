@@ -186,16 +186,15 @@ main {
 }
 .suggestion:last-child { border-bottom: none; }
 .suggestion:hover, .suggestion.highlighted { background: #21262d; }
-.sugg-series { color: var(--text-dim); font-size: 0.8rem; }
 
 .guess-count { text-align: center; color: var(--text-dim); font-size: 0.85rem; min-height: 1.2em; }
 
 /* ---------- Board ---------- */
 .board-scroll { overflow-x: auto; margin-top: 18px; }
-#board { min-width: 760px; }
+#board { min-width: 660px; }
 .board-header, .board-row {
   display: grid;
-  grid-template-columns: 1.5fr 1.2fr 1fr 1.4fr 0.7fr 0.8fr 0.9fr 0.8fr;
+  grid-template-columns: 1.5fr 1.2fr 1.5fr 0.7fr 0.8fr 0.9fr 0.8fr;
   gap: 6px;
   margin-bottom: 6px;
 }

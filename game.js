@@ -5,9 +5,9 @@
    Pure logic (evaluation, seeding) is kept separate from DOM
    rendering so it can be unit-tested later.
 
-   Genres: every genre (see GENRES in data.js) has its own daily
-   puzzle, free-play pool, stats, and streaks. "Ultimate" is the
-   full combined driver pool.
+   Modes: every mode (see GENRES in data.js) has its own daily
+   puzzle, free-play pool, stats, and streaks. "Ultimate" is every
+   NASCAR driver; the decade modes are drivers by Cup debut decade.
    ============================================================ */
 
 /* ---------- Config ---------- */
@@ -46,7 +46,7 @@ function hashStr(s) {
 }
 
 function genrePool(genre) {
-  return genre.series ? DRIVERS.filter((d) => genre.series.includes(d.series)) : DRIVERS;
+  return genre.decades ? DRIVERS.filter((d) => genre.decades.includes(decadeOf(d.debut))) : DRIVERS;
 }
 
 /* Deterministic PRNG so every player gets the same daily driver. */
@@ -76,7 +76,7 @@ function driverForPuzzle(n, genre) {
 
 /*
  * Compare a guessed driver against the answer.
- * Returns 7 cells: { value, status: green|yellow|gray, arrow: up|down|null }
+ * Returns 6 cells: { value, status: green|yellow|gray, arrow: up|down|null }
  *  - Nationality: yellow = same continent
  *  - Titles / Wins band / Decade: yellow = off by one step, arrow points
  *    toward the answer's value
@@ -88,8 +88,6 @@ function evaluateGuess(guess, answer) {
     guess.country === answer.country ? "green" :
     guess.continent === answer.continent ? "yellow" : "gray";
   cells.push({ value: `${flagFor(guess.country)} ${guess.country}`, status: natStatus, arrow: null });
-
-  cells.push({ value: guess.series, status: guess.series === answer.series ? "green" : "gray", arrow: null });
   cells.push({ value: guess.team, status: guess.team === answer.team ? "green" : "gray", arrow: null });
 
   const titleDiff = answer.titles - guess.titles;
@@ -439,7 +437,7 @@ function renderSuggestions(query) {
     const item = document.createElement("button");
     item.type = "button";
     item.className = "suggestion" + (i === suggestionIndex ? " highlighted" : "");
-    item.innerHTML = `<span>${flagFor(d.country)} ${d.name}</span><span class="sugg-series">${d.series}</span>`;
+    item.innerHTML = `<span>${flagFor(d.country)} ${d.name}</span>`;
     item.addEventListener("click", () => submitGuess(d));
     box.appendChild(item);
   });

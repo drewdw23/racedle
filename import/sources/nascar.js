@@ -1,16 +1,16 @@
-/* NASCAR Cup source — license-clean Wikipedia/Wikidata (DATA_SOURCES.md §5).
-   Reworked 2026 from the nascaR.data parquet to the same Wikipedia recipe as
-   Supercars/IndyCar/WRC, so NASCAR carries no external-data dependency.
+/* NASCAR Cup source — license-clean Wikipedia (CC BY-SA), see DATA_SOURCES.md.
+   No external data dependency (replaced the nascaR.data parquet in 2026).
 
    Scope is 1970→now — the project's established floor (pre-1970 seasons are
-   out of scope, and Wikipedia's pre-1972 season pages are inconsistent anyway).
+   out of scope, and Wikipedia's pre-1972 season pages are inconsistent anyway;
+   the pre-1970 legends' career wins/debuts are hardcoded in merge-nascar.js).
    Per season page ("YYYY NASCAR <era-name> Series"):
    - full-time + wins ← the points-STANDINGS table, in either of two layouts:
        · summary (early-70s): a starts count ("Starts"/"St"/"Races") + "Wins".
        · modern grid: one column per race; a started race is a non-empty
          result cell, a win is a finish of "1". races = race-column count.
-     Full-time season = Starts >= FULL_SEASON_FRACTION x races (the analog of
-     the other series' "Rounds" rule). Wins = sum across 1970+ seasons.
+     Full-time season = Starts >= FULL_SEASON_FRACTION x races.
+     Wins = sum across 1970+ seasons.
    - team ← the "Teams and drivers" table (Driver->Team), most-recent season.
    - debut ← earliest 1970+ standings appearance.
    - titles ← Wikipedia "List of NASCAR Cup Series champions" (chronological,

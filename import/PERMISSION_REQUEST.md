@@ -1,7 +1,7 @@
 # Data-reuse permission request — ✅ GRANTED 2026-07-10 · ⚠️ NO LONGER USED (2026)
 
 **Superseded:** NASCAR was **reworked off the nascaR.data parquet onto license-clean
-Wikipedia/Wikidata in 2026** (see DATA_SOURCES.md §5). The game no longer ships nascaR.data, so
+Wikipedia in 2026** (see [DATA_SOURCES.md](DATA_SOURCES.md)). The game no longer ships nascaR.data, so
 its attribution has been removed from the footer and README. Permission was granted and the data
 shipped in good standing from 2026-07-10; this document and the request below are retained only as
 a historical record. No action needed.

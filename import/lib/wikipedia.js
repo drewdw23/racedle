@@ -1,12 +1,11 @@
 /* Wikipedia client (CC BY-SA content via the MediaWiki API).
-   Fetches season articles and extracts driver names from the
-   full-season entry-list table.
+   Resolves NASCAR Cup season articles and parses their tables.
 
    HTML table parsing here is intentionally dependency-free and
-   tolerant rather than a full DOM parse — Wikipedia's motorsport
-   season tables are hand-authored and irregular, so we prefer linked
-   article titles (<a title="...">) as the cleanest name signal and
-   fall back to stripped cell text. See README "First-run tuning". */
+   tolerant rather than a full DOM parse — Wikipedia's season tables
+   are hand-authored and irregular, so we prefer linked article titles
+   (<a title="...">) as the cleanest name signal and fall back to
+   stripped cell text. */
 
 import { getJSON, isHttpError } from "./http.js";
 
@@ -120,47 +119,6 @@ function expandSpans(rawRows) {
   return grid;
 }
 
-/* From a set of parsed tables, pull driver names out of the column(s)
-   whose header text matches any of `driverColumns`. Falls back to any
-   column that mostly contains links to person-like articles. */
-export function driversFromTables(tables, driverColumns) {
-  const wanted = driverColumns.map((c) => c.toLowerCase());
-  const names = new Set();
-
-  for (const rows of tables) {
-    // The column-header block is the LEADING run of header rows (e.g. a
-    // "Championship entries" super-header above the real "Team / Car /
-    // Driver name" row). Sub-headers that appear mid-table (e.g. a
-    // "Wildcard entries" separator) must NOT be treated as the header
-    // block, or every driver above them gets skipped.
-    const isHeaderRow = (r) => r.filter((c) => c.header).length >= r.length / 2;
-    let headerBlockEnd = -1;
-    while (headerBlockEnd + 1 < rows.length && isHeaderRow(rows[headerBlockEnd + 1])) headerBlockEnd++;
-    if (headerBlockEnd < 0) continue;
-    const headerRows = rows.slice(0, headerBlockEnd + 1);
-
-    const width = Math.max(...rows.map((r) => r.length));
-    const combined = [];
-    for (let i = 0; i < width; i++) {
-      combined[i] = headerRows.map((r) => (r[i] ? r[i].text.toLowerCase() : "")).join(" ").trim();
-    }
-    const colIdx = combined.findIndex((h) => wanted.some((w) => h === w || h.split(/\s+/).includes(w) || h.includes(w)));
-    if (colIdx === -1) continue;
-
-    for (let ri = headerBlockEnd + 1; ri < rows.length; ri++) {
-      const cell = rows[ri][colIdx];
-      if (!cell || cell.header) continue; // skip mid-table sub-header separators
-      // Prefer linked article titles (cleanest); else stripped text.
-      const candidates = cell.links.length ? cell.links : [cell.text];
-      for (const c of candidates) {
-        const name = cleanName(c);
-        if (isPlausibleName(name)) names.add(name);
-      }
-    }
-  }
-  return [...names];
-}
-
 function extractLinks(html) {
   const out = [];
   const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
@@ -201,18 +159,4 @@ function decodeEntities(s) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
-}
-
-/* Wikipedia article titles sometimes carry a disambiguator, e.g.
-   "Chris Amon (racing driver)" — drop it. */
-function cleanName(s) {
-  return s.replace(/\s*\([^)]*\)\s*$/, "").trim();
-}
-
-function isPlausibleName(s) {
-  if (!s || s.length < 3 || s.length > 40) return false;
-  if (/\d/.test(s)) return false;
-  // at least two words (given + family), letters/marks/hyphens/apostrophes/periods
-  if (!/^[\p{L}][\p{L}\p{M}.'-]*(?:\s+[\p{L}][\p{L}\p{M}.'-]*)+$/u.test(s)) return false;
-  return true;
 }

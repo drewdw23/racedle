@@ -1,31 +1,30 @@
 # Racedle 🏁
 
-**The daily motorsports driver guessing game** — a Wordle/Loldle-style game for racing fans.
-Guess the mystery driver from **F1, NASCAR Cup, IndyCar, V8 Supercars, IMSA, WEC, and WRC**
-using clues across seven categories. Pick a genre — **Formula 1, NASCAR, IndyCar, V8 Supercars,
-Endurance, Rally** — or play **🏆 Ultimate** across the whole database.
-Every genre has its own daily puzzle, free play, and stats.
+**The daily NASCAR driver guessing game** — a Wordle/Loldle-style game for NASCAR fans.
+Guess the mystery **NASCAR Cup Series** driver using clues across six categories. Play
+**🏆 Ultimate** across every era, or pick a decade — **1950s–60s, 1970s, 1980s, 1990s, 2000s,
+2010s, 2020s** — to play only the drivers who debuted then. Every mode has its own daily puzzle,
+free play, and stats.
 
 ▶️ **Play it:** https://drewdw23.github.io/racedle/
 
 ## How to play
 
-A new mystery driver drops every day at **00:00 UTC** in every genre (same driver for
-everyone). Type a name, pick from the autocomplete, and each guess reveals seven tiles:
+A new mystery driver drops every day at **00:00 UTC** in every mode (same driver for
+everyone). Type a name, pick from the autocomplete, and each guess reveals six tiles:
 
 | Tile | Green 🟩 | Orange 🟧 | Gray ⬛ |
 |---|---|---|---|
 | Nationality | same country | same continent | — |
-| Primary series | match | — | — |
 | Current/last team | match | — | — |
-| Championships | exact | off by one (▲▼ hint) | ▲▼ hint |
-| Race wins (banded) | same band | adjacent band (▲▼) | ▲▼ |
+| Cup championships | exact | off by one (▲▼ hint) | ▲▼ hint |
+| Cup wins (banded) | same band | adjacent band (▲▼) | ▲▼ |
 | Active/Retired | match | — | — |
 | Decade debuted | same decade | adjacent decade (▲▼) | ▲▼ |
 
 Unlimited guesses. Share your spoiler-free emoji grid when you win. **Free play** mode gives
-unlimited random practice rounds in whichever genre you're playing. Streaks and stats are
-tracked per genre — protect them all.
+unlimited random practice rounds in whichever mode you're playing. Streaks and stats are
+tracked per mode.
 
 ## Run it locally
 
@@ -36,53 +35,48 @@ No build step, no dependencies — it's a plain static site:
 
 (Or serve the folder with any static server for a proper URL.)
 
-## Testing & feedback — we need you! 🧪
+## Testing & feedback 🧪
 
-This is **v1 for user testing.** Things we want to hear about:
+Things we want to hear about:
 
 - **Data errors** — wrong team, wrong title count, wrong debut decade, someone marked
-  Active who retired. Stats were compiled through the 2024 season (see the note in
-  [data.js](data.js)) and are being verified; entries marked `// verify` are the shakiest.
-- Difficulty — too easy? too hard? is the continent hint too generous? Are deep-cut
-  full-season drivers fun or frustrating as daily answers?
-- Missing drivers you'd expect (333 full-season drivers in the database).
-- Genre groupings — Endurance covers IMSA + WEC.
-  Should any genre be split out or combined differently?
+  Active who retired.
+- Difficulty — too easy? too hard? Are deep-cut full-time drivers fun or frustrating as daily
+  answers?
+- Missing drivers you'd expect (265 drivers: everyone with a full-time Cup season since 1970).
 - Mobile experience, bugs, confusing UI.
 
 **[→ Open an issue](https://github.com/drewdw23/racedle/issues)** with anything you find.
 
 ## Project docs
 
-- [BUSINESS_PLAN.md](BUSINESS_PLAN.md) — full business & development plan (framework choice,
-  gameplay design, monetization/AdSense setup, promotion strategy, roadmap).
+- [BUSINESS_PLAN.md](BUSINESS_PLAN.md) — business & development plan (gameplay design,
+  monetization/AdSense setup, promotion strategy, roadmap).
+- [import/DATA_SOURCES.md](import/DATA_SOURCES.md) — where the NASCAR data comes from and how
+  it's built.
 
-## Adding a driver
+## Driver data
 
-Non-F1 series: add one object to `DRIVERS` in [data.js](data.js) following the editorial rules
-in the file header (championships = top-class titles; debut = top-class debut; team = current,
-or last team for retired drivers). PRs welcome during testing.
+The driver list in [data.js](data.js) is **generated, not hand-edited**: the import pipeline
+builds it from Wikipedia and a golden-tested merge writes it in:
 
-F1 is **generated, not hand-edited**: the section is produced from F1DB by the import pipeline
-(`cd import && node run.js --series=f1 && node merge-f1.js`) — see
-[import/DATA_SOURCES.md](import/DATA_SOURCES.md). Report F1 data errors upstream or as an issue
-here and we'll re-verify.
+```bash
+cd import && node run.js && node merge-nascar.js
+```
+
+A driver is included if they started at least 60% of a Cup season's races in any season from
+1970 on. The 36 drivers who debuted before 1970 (Petty, Pearson, Yarborough, …) have their
+career wins and debut year hardcoded in [import/merge-nascar.js](import/merge-nascar.js), since
+Wikipedia's pre-1970 season pages aren't reliable enough to count from. Report data errors as
+an issue and we'll re-verify.
 
 ## Data credits
 
-- **F1 driver data:** [F1DB](https://github.com/f1db/f1db), licensed
-  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Cross-validated against the
-  [Jolpica-F1](https://github.com/jolpica/jolpica-f1) API.
-- **NASCAR Cup driver data (1970+):** assembled from [Wikipedia](https://en.wikipedia.org/)
-  season pages (points standings, "Teams and drivers", the champions list; CC BY-SA) and
-  [Wikidata](https://www.wikidata.org/) (CC0). Full-career wins/debut for the pre-1970 legends
-  are carried from the prior dataset. *(Reworked off the nascaR.data parquet in 2026.)*
-- **IndyCar driver data (modern, 2008+):** assembled from [Wikipedia](https://en.wikipedia.org/)
-  season pages + champions/winners lists (CC BY-SA) and [Wikidata](https://www.wikidata.org/) (CC0).
-  Pre-2008 IndyCar/USAC legends are hand-curated.
-- Other series: compiled from public sources (Wikipedia/Wikidata), verification ongoing.
+- **NASCAR Cup driver data:** assembled from [Wikipedia](https://en.wikipedia.org/) (CC BY-SA)
+  — each season's points standings and "Teams and drivers" tables, and the list of Cup Series
+  champions.
 
 ---
 
-*Racedle is an unofficial fan-made game, not affiliated with Formula 1, NASCAR, IndyCar,
-Supercars, IMSA, the FIA, or any series, team or driver.*
+*Racedle is an unofficial fan-made game, not affiliated with, endorsed by, or associated with
+NASCAR or any team or driver.*

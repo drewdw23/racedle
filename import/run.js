@@ -1,129 +1,34 @@
 /* Orchestrator. Usage:
-     node run.js                     # all series
-     node run.js --series=f1,wrc     # subset
-     node run.js --debug             # per-season logging
-     node run.js --series=f1 --validate   # also run the series' validator
-                                          # source and diff the two in report.md
+     node run.js            # build the NASCAR Cup pool
 
-   Outputs (never touches ../data.js directly):
+   Outputs (never touches ../data.js directly — merge-nascar.js does that):
      output/drivers.generated.json   # full records + provenance
      output/data.generated.js        # paste-ready DRIVERS entries (incomplete rows commented)
-     output/report.md                # coverage, gaps, and validation vs current data.js
+     output/report.md                # coverage, gaps, and diff vs current data.js
 */
 
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SERIES_CONFIG, YEAR_FROM, YEAR_TO } from "./config.js";
-import { collectF1 } from "./sources/f1.js";
-import { collectF1DB } from "./sources/f1db.js";
+import { YEAR_FROM, YEAR_TO } from "./config.js";
 import { collectNascar } from "./sources/nascar.js";
-import { collectIndyCar } from "./sources/indycar.js";
-import { collectWRC } from "./sources/wrc.js";
-import { collectSupercars } from "./sources/supercars.js";
-import { collectEndurance } from "./sources/endurance.js";
-import { collectSeasonRosters } from "./sources/wikipediaSeasons.js";
-import { enrichRoster } from "./enrich.js";
 import { emitDataJs } from "./lib/normalize.js";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dir, "output");
 mkdirSync(OUT, { recursive: true });
 
-const args = process.argv.slice(2);
-const debug = args.includes("--debug");
-const validate = args.includes("--validate");
-const seriesArg = args.find((a) => a.startsWith("--series="));
-const selected = seriesArg ? seriesArg.split("=")[1].split(",") : Object.keys(SERIES_CONFIG);
 const currentYear = new Date().getUTCFullYear();
 const log = (m) => process.stdout.write(m + "\n");
-const validationNotes = [];
-
-async function collect(cfgOrEngine) {
-  // Accept a full series config (for engines that need extra settings) or
-  // a bare engine string (for the validator path).
-  const cfg = typeof cfgOrEngine === "string" ? { engine: cfgOrEngine } : cfgOrEngine;
-  const engine = cfg.engine;
-  if (engine === "f1db") return collectF1DB(currentYear, log);
-  if (engine === "jolpica") return collectF1(currentYear, log);
-  if (engine === "nascar") return collectNascar(currentYear, log);
-  if (engine === "indycar") return collectIndyCar(currentYear, log);
-  if (engine === "wrc") return collectWRC(currentYear, log);
-  if (engine === "supercars") return collectSupercars(currentYear, log);
-  if (engine === "endurance") return collectEndurance(currentYear, log, { ...cfg.endurance, series: cfg.series });
-  return null;
-}
-
-/* Cross-source validation: diff primary vs validator per driver on the
-   stat fields. Disagreements are for human review, not auto-resolution —
-   two independent sources catching each other is the reliability story. */
-function diffSources(seriesLabel, primary, secondary, primaryName, secondaryName) {
-  const strip = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.'\-]/g, " ").replace(/\s+/g, " ").trim();
-  const sec = new Map(secondary.map((r) => [strip(r.name), r]));
-  const lines = [];
-  let matched = 0;
-  for (const p of primary) {
-    const s = sec.get(strip(p.name));
-    if (!s) continue;
-    matched++;
-    const diffs = [];
-    for (const f of ["titles", "wins", "team", "debut"]) {
-      if (p[f] != null && s[f] != null && String(p[f]) !== String(s[f])) diffs.push(`${f}: ${primaryName}=${p[f]} ${secondaryName}=${s[f]}`);
-    }
-    if (diffs.length) lines.push(`- ${p.name}: ${diffs.join("; ")}`);
-  }
-  validationNotes.push(
-    `### ${seriesLabel}: ${primaryName} vs ${secondaryName}\n` +
-    `${matched} drivers matched across sources; ${lines.length} with disagreements.\n` +
-    (lines.length ? lines.join("\n") : "- (no disagreements)")
-  );
-  log(`${seriesLabel} validation: ${matched} matched, ${lines.length} disagreements (details in report.md)`);
-}
 
 async function main() {
-  log(`Racedle import — ${YEAR_FROM}-${YEAR_TO} — series: ${selected.join(", ")}\n`);
-  let all = [];
-
-  for (const id of selected) {
-    const cfg = SERIES_CONFIG[id];
-    if (!cfg) {
-      log(`! unknown series "${id}" — skipping`);
-      continue;
-    }
-    const collected = await collect(cfg);
-    if (collected) {
-      all.push(...collected);
-      if (validate && cfg.validator) {
-        const check = await collect(cfg.validator);
-        if (check) diffSources(cfg.series, collected, check, cfg.engine, cfg.validator);
-      }
-    } else {
-      const roster = await collectSeasonRosters(id, cfg, log, debug);
-      all.push(...(await enrichRoster(id, cfg.series, roster, currentYear, log)));
-    }
-  }
-
-  // Dedupe by name: keep the record with the most complete data.
-  const byName = new Map();
-  for (const r of all) {
-    const prev = byName.get(r.name);
-    if (!prev || score(r) > score(prev)) byName.set(r.name, r);
-  }
-  const records = [...byName.values()].sort((a, b) =>
-    a.series === b.series ? a.name.localeCompare(b.name) : a.series.localeCompare(b.series)
-  );
+  log(`Racedle import — NASCAR Cup ${YEAR_FROM}-${YEAR_TO}\n`);
+  const records = (await collectNascar(currentYear, log)).sort((a, b) => a.name.localeCompare(b.name));
 
   writeFileSync(join(OUT, "drivers.generated.json"), JSON.stringify(records, null, 2));
   writeFileSync(join(OUT, "data.generated.js"), emitDataJs(records));
   writeFileSync(join(OUT, "report.md"), report(records));
-  log(`\nWrote ${records.length} records to output/. Review report.md before merging.`);
-}
-
-function score(r) {
-  return ["country", "team", "titles", "wins", "status", "debut"].reduce(
-    (n, k) => n + (r[k] != null ? 1 : 0),
-    0
-  );
+  log(`\nWrote ${records.length} records to output/. Next: node merge-nascar.js`);
 }
 
 function loadCurrentDrivers() {
@@ -147,29 +52,16 @@ function report(records) {
 
   const complete = records.filter((r) => r._complete).length;
   const incomplete = records.length - complete;
-  const bySeries = {};
-  for (const r of records) bySeries[r.series] = (bySeries[r.series] || 0) + 1;
-
   const missingFromGen = current.filter((d) => !genNames.has(d.name)).map((d) => d.name);
   const newVsCurrent = records.filter((r) => !curNames.has(r.name)).map((r) => r.name);
 
   const L = [];
-  L.push(`# Racedle import report`);
-  L.push(`Range ${YEAR_FROM}-${YEAR_TO}. Generated ${records.length} records — ${complete} complete, ${incomplete} need curation.\n`);
-  L.push(`## Coverage by series`);
-  for (const [s, n] of Object.entries(bySeries).sort()) L.push(`- ${s}: ${n}`);
-  L.push(`\n## Needs curation (missing team / titles / wins)`);
-  L.push(`${incomplete} rows are commented out in data.generated.js with a TODO(review). For the non-F1 series, titles and wins are not reliably a single number in Wikidata and must be filled from each driver's Wikipedia infobox or an official record.\n`);
-  L.push(`## Validation vs current data.js (${current.length} hand-curated drivers)`);
-  L.push(`Current drivers NOT re-found by the pipeline (${missingFromGen.length}) — check for name spelling mismatches or drivers who never ran a *full* season in range:`);
+  L.push(`# Racedle import report — NASCAR Cup`);
+  L.push(`Range ${YEAR_FROM}-${YEAR_TO}. Generated ${records.length} records — ${complete} complete, ${incomplete} missing a team (merge-nascar.js fills known ones from TEAM_FALLBACK).\n`);
+  L.push(`## Current drivers NOT re-found by the pipeline (${missingFromGen.length})`);
   L.push(missingFromGen.length ? missingFromGen.map((n) => `- ${n}`).join("\n") : "- (none)");
-  L.push(`\nNew drivers found vs current (${newVsCurrent.length}) — candidates to add after curation:`);
-  L.push(newVsCurrent.slice(0, 500).map((n) => `- ${n}`).join("\n"));
-  if (newVsCurrent.length > 500) L.push(`- …and ${newVsCurrent.length - 500} more`);
-  if (validationNotes.length) {
-    L.push(`\n## Cross-source validation`);
-    L.push(validationNotes.join("\n\n"));
-  }
+  L.push(`\n## New drivers vs current data.js (${newVsCurrent.length})`);
+  L.push(newVsCurrent.length ? newVsCurrent.map((n) => `- ${n}`).join("\n") : "- (none)");
   return L.join("\n") + "\n";
 }
 
