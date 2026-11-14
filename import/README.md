@@ -51,8 +51,8 @@ The merge refuses to write unless:
   Yarborough 3/83/1957, Gordon 4/93/1992, Johnson 7/83/2001, Earnhardt 7/76/1975.
 - Every hardcoded legend / team-fallback name is still in the generated pool.
 - No legend's 1970+ win count exceeds its hardcoded career total.
-- Shane van Gisbergen is New Zealand, Steve Park is present, no racetrack names leaked in.
-- No duplicates, every country has a flag, and the pool is 240–290 drivers.
+- Steve Park is present, and no racetrack names leaked in.
+- No duplicates, and the pool is 240–290 drivers.
 
 ## Architecture
 

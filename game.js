@@ -36,9 +36,6 @@ function decadeOf(year) {
 function norm(s) {
   return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
-function flagFor(country) {
-  return FLAGS[country] || "";
-}
 function hashStr(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) | 0;
@@ -76,14 +73,13 @@ function driverForPuzzle(n, genre) {
 
 /*
  * Compare a guessed driver against the answer.
- * Returns 6 cells: { value, status: green|yellow|gray, arrow: up|down|null }
+ * Returns 5 cells: { value, status: green|yellow|gray, arrow: up|down|null }
  *  - Titles / Wins band / Decade: yellow = off by one step, arrow points
  *    toward the answer's value
  */
 function evaluateGuess(guess, answer) {
   const cells = [];
 
-  cells.push({ value: `${flagFor(guess.country)} ${guess.country}`, status: guess.country === answer.country ? "green" : "gray", arrow: null });
   cells.push({ value: guess.team, status: guess.team === answer.team ? "green" : "gray", arrow: null });
 
   const titleDiff = answer.titles - guess.titles;
@@ -394,7 +390,7 @@ function updateGuessCount() {
 function showWinPanel(animate) {
   const panel = $("win-panel");
   panel.classList.remove("hidden");
-  $("win-driver").textContent = `${flagFor(state.answer.country)} ${state.answer.name}`;
+  $("win-driver").textContent = state.answer.name;
   $("win-guesses").textContent =
     state.guesses.length === 1 ? "first try — pole position!" : `solved in ${state.guesses.length} guesses`;
   $("share-btn").classList.toggle("hidden", state.mode !== "daily");
@@ -433,7 +429,7 @@ function renderSuggestions(query) {
     const item = document.createElement("button");
     item.type = "button";
     item.className = "suggestion" + (i === suggestionIndex ? " highlighted" : "");
-    item.innerHTML = `<span>${flagFor(d.country)} ${d.name}</span>`;
+    item.textContent = d.name;
     item.addEventListener("click", () => submitGuess(d));
     box.appendChild(item);
   });

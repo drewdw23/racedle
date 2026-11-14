@@ -1,7 +1,7 @@
 # Data sources — NASCAR Cup driver data
 
 *Goal: a source that answers the game's inclusion rule — "NASCAR Cup drivers who ran a
-full-time season from 1970 onward" — with accurate values for all six clue categories, under a
+full-time season from 1970 onward" — with accurate values for all five clue categories, under a
 license compatible with an ad-supported (commercial) game.*
 
 ---
@@ -11,7 +11,7 @@ license compatible with an ad-supported (commercial) game.*
 | Criterion | Why it matters |
 |---|---|
 | **Per-season granularity** | "Ran a full-time season" needs starts-per-season vs races-per-season. Career totals alone can't answer it — a one-race start still appears in a season's standings. |
-| **Field coverage** | Must supply or derive every field the game uses: nationality, current/last team, Cup championships, career Cup wins, active/retired, debut year. |
+| **Field coverage** | Must supply or derive every field the game uses: current/last team, Cup championships, career Cup wins, active/retired, debut year. |
 | **License permits commercial use** | The game will run ads. CC0 / CC BY / CC BY-SA are fine (with attribution where required). "Non-commercial" or scraping-prohibited terms are disqualifying. |
 | **Access mode** | Bulk download ≫ API ≫ scraping. Cached, polite access keeps reruns cheap. |
 | **Currency & cadence** | Teams, wins and titles change every season; the source must keep up. |
@@ -56,8 +56,6 @@ For every season from 1970 to the current year:
   including pre-1970 championships.
 - **Debut / wins / status** — debut is the first 1970+ season, wins are summed across 1970+
   seasons, and status is Active if the last full-time season is this year or last.
-- **Nationality** ← default United States plus a short hand-kept map of the non-US regulars
-  (van Gisbergen, Suárez, Ambrose, Montoya, …). New international drivers must be added to it.
 - **Venue filter** — racetrack names that appear in the tables as linked text ("Infineon
   Raceway") are rejected; the filter avoids surname-like words ("Park") so Steve Park survives.
 
@@ -76,8 +74,8 @@ tables fill what the 1970+ season pages can't:
 Golden tests (nothing is written if any fails): every Cup champion since 1970 present with ≥ 1
 title; anchors Petty 7/200/1958, Pearson 3/105/1960, Yarborough 3/83/1957, Gordon 4/93/1992,
 Johnson 7/83/2001, Earnhardt 7/76/1975; every hardcoded name still in the pool; no legend's 1970+
-count above its hardcoded career total; van Gisbergen → New Zealand; Steve Park present; no
-venue names; no duplicates; every country has a flag; pool size 240–290.
+count above its hardcoded career total; Steve Park present; no venue names; no duplicates;
+pool size 240–290.
 
 ## 6. Refresh
 
@@ -99,4 +97,3 @@ answers (they're chosen by index into the pool), so publish refreshes at the mid
 - **1970s debuts can read a year or two late** for minor drivers: some early-'70s standings
   tables list only the top finishers. The debut *decade* is unaffected except at decade
   boundaries.
-- **Nationality is a hand-kept map** — an unlisted international driver defaults to United States.

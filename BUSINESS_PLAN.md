@@ -6,7 +6,7 @@
 
 ## 1. Executive summary
 
-**Racedle** is a free, browser-based daily guessing game for NASCAR fans. Players pick a **mode** — **🏆 Ultimate** (every Cup driver since 1970) or a debut decade (**1950s–60s, 1970s, 1980s, 1990s, 2000s, 2010s, 2020s**) — and each day, every player worldwide gets the same mystery driver per mode. Players guess driver names; each guess reveals color-coded feedback across six categories (nationality, current/last team, Cup championships, Cup wins band, active/retired, debut decade) until the driver is found. Eight daily puzzles per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
+**Racedle** is a free, browser-based daily guessing game for NASCAR fans. Players pick a **mode** — **🏆 Ultimate** (every Cup driver since 1970) or a debut decade (**1950s–60s, 1970s, 1980s, 1990s, 2000s, 2010s, 2020s**) — and each day, every player worldwide gets the same mystery driver per mode. Players guess driver names; each guess reveals color-coded feedback across five categories (current/last team, Cup championships, Cup wins band, active/retired, debut decade) until the driver is found. Eight daily puzzles per player is the Loldle multi-mode engagement model, built in from the start. Revenue comes from display advertising (Google AdSense), with negligible operating costs (static hosting is free; a custom domain is ~$12/year).
 
 The model is proven: **Loldle** (League of Legends) turned the identical formula into millions of monthly visits with zero backend infrastructure. NASCAR has a large, passionate, weekly-engaged fan base with deep history — decades of drivers, rivalries and stats that fans argue about — which is exactly what a daily trivia habit feeds on.
 
@@ -43,11 +43,10 @@ The model is proven: **Loldle** (League of Legends) turned the identical formula
 ### Core loop (shipped)
 1. Player picks a mode (defaults to 🏆 Ultimate — the full pool). Each mode has an independent daily driver, free-play mode, stats, and streaks, so a fan can play up to eight dailies per visit.
 2. Player types a driver name; autocomplete suggests from that mode's pool (265 drivers in Ultimate).
-3. On guess, a row of six tiles flips, one per category:
+3. On guess, a row of five tiles flips, one per category:
 
 | Category | 🟩 Green | 🟧 Orange (close) | ⬛ Gray |
 |---|---|---|---|
-| Nationality | Same country | — | Different country |
 | Current/last team | Exact match | — | Different |
 | Cup championships | Exact number | Off by one (+ ▲▼ hint) | Wrong (+ ▲▼ hint) |
 | Cup wins (banded: 0, 1–9, 10–24, 25–49, 50–99, 100+) | Same band | Adjacent band (+ ▲▼) | Farther (+ ▲▼) |
@@ -144,7 +143,7 @@ Costs: domain $12/yr, hosting $0. Break-even is nearly immediate; upside is unca
 
 ### Phase 0 — Private testing (now → 2 weeks)
 - Share the link with friends and NASCAR Discords for feedback on difficulty, mobile UX, and **data errors** (GitHub Issues as the feedback channel).
-- Fix data, tune feedback (are deep-cut full-time drivers fun as daily answers? is Nationality useful when most drivers are American?).
+- Fix data, tune feedback (are deep-cut full-time drivers fun as daily answers? are five clues enough to solve in a reasonable number of guesses?).
 
 ### Phase 1 — Community seeding (weeks 2–6)
 - **Reddit is the engine.** r/NASCAR is the core audience. **Read the sub's self-promo rules first** — the safe pattern is participating genuinely, then one well-timed "I made a free daily guessing game for us" post with a screenshot of a solved grid. Loldle's initial spike came from exactly one such Reddit post.

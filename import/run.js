@@ -36,7 +36,7 @@ function loadCurrentDrivers() {
   if (!existsSync(p)) return [];
   try {
     const src = readFileSync(p, "utf8");
-    // data.js declares SERIES/GENRES/FLAGS/DRIVERS as consts in one scope;
+    // data.js declares SERIES/GENRES/DRIVERS as consts in one scope;
     // evaluate in a function and hand back DRIVERS.
     // eslint-disable-next-line no-new-func
     return Function(`${src}\n;return DRIVERS;`)();

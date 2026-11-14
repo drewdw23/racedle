@@ -115,7 +115,6 @@ function fail(m) {
 const gen = JSON.parse(readFileSync(join(__dir, "output", "drivers.generated.json"), "utf8"))
   .filter((r) => r.series === "NASCAR Cup");
 let src = readFileSync(DATA_JS, "utf8").replace(/\r\n/g, "\n");
-const CUR = Function(`${src}\n;return { FLAGS };`)();
 
 // ---------- apply hardcoded tables ----------
 const legends = new Map(Object.entries(LEGENDS).map(([n, v]) => [strip(n), v]));
@@ -137,7 +136,7 @@ for (const orig of gen) {
     rec.debut = debut;
   }
   if (!rec.team && teams.has(key)) rec.team = teams.get(key);
-  rec._complete = Boolean(rec.country && rec.team && Number.isFinite(rec.titles) && Number.isFinite(rec.wins) && rec.status && Number.isFinite(rec.debut));
+  rec._complete = Boolean(rec.team && Number.isFinite(rec.titles) && Number.isFinite(rec.wins) && rec.status && Number.isFinite(rec.debut));
   if (!rec._complete) { dropped.push(rec); continue; }
   emit.push(rec);
 }
@@ -156,20 +155,17 @@ for (const [name, t, w, d] of ANCHORS) {
     fail(`anchor ${name}: expected ${t}t/${w}w/${d}, got ${r?.titles}t/${r?.wins}w/${r?.debut}`);
   }
 }
-if (byStrip.get(strip("Shane van Gisbergen"))?.country !== "New Zealand") fail("SVG nationality wrong");
 if (!byStrip.has(strip("Steve Park"))) fail("Steve Park (full-time 1999-2001) missing — venue filter regression?");
 for (const junk of ["Infineon Raceway", "Sonoma Raceway"]) if (byStrip.has(strip(junk))) fail(`venue leaked into pool: ${junk}`);
 {
   const seen = new Map();
   for (const r of emit) { const k = strip(r.name); if (seen.has(k)) fail(`duplicate in pool: ${r.name} vs ${seen.get(k)}`); seen.set(k, r.name); }
 }
-const missingFlags = [...new Set(emit.map((r) => r.country))].filter((c) => !CUR.FLAGS[c]);
-if (missingFlags.length) fail(`countries missing from FLAGS: ${missingFlags.join(", ")} — add them first`);
 
 // ---------- rebuild the DRIVERS list ----------
 const q = (s) => JSON.stringify(s);
 const row = (r) =>
-  `  { name: ${q(r.name)}, country: ${q(r.country)}, series: SERIES.NASCAR, ` +
+  `  { name: ${q(r.name)}, series: SERIES.NASCAR, ` +
   `team: ${q(r.team)}, titles: ${r.titles}, wins: ${r.wins}, status: ${q(r.status)}, debut: ${r.debut} },`;
 
 const today = new Date().toISOString().slice(0, 10);
@@ -177,7 +173,7 @@ const block =
   `  // ================= NASCAR CUP =================\n` +
   `  // Generated ${today} from Wikipedia (1970+): roster/teams/status from season "Teams and\n` +
   `  // drivers" + points standings (Starts >= 60% of races = full-time), wins counted from the\n` +
-  `  // standings, titles from the champions list, nationality default US + exceptions.\n` +
+  `  // standings, titles from the champions list.\n` +
   `  // Pre-1970 debutants' career wins/debut are hardcoded in merge-nascar.js (LEGENDS).\n` +
   `  // Regenerate: cd import && node run.js && node merge-nascar.js\n` +
   emit.slice().sort((a, b) => a.name.localeCompare(b.name)).map(row).join("\n") + "\n";

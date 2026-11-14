@@ -1,7 +1,7 @@
 # Racedle 🏁
 
 **The daily NASCAR driver guessing game** — a Wordle/Loldle-style game for NASCAR fans.
-Guess the mystery **NASCAR Cup Series** driver using clues across six categories. Play
+Guess the mystery **NASCAR Cup Series** driver using clues across five categories. Play
 **🏆 Ultimate** across every era, or pick a decade — **1950s–60s, 1970s, 1980s, 1990s, 2000s,
 2010s, 2020s** — to play only the drivers who debuted then. Every mode has its own daily puzzle,
 free play, and stats.
@@ -11,11 +11,10 @@ free play, and stats.
 ## How to play
 
 A new mystery driver drops every day at **00:00 UTC** in every mode (same driver for
-everyone). Type a name, pick from the autocomplete, and each guess reveals six tiles:
+everyone). Type a name, pick from the autocomplete, and each guess reveals five tiles:
 
 | Tile | Green 🟩 | Orange 🟧 | Gray ⬛ |
 |---|---|---|---|
-| Nationality | same country | — | — |
 | Current/last team | match | — | — |
 | Cup championships | exact | off by one (▲▼ hint) | ▲▼ hint |
 | Cup wins (banded) | same band | adjacent band (▲▼) | ▲▼ |

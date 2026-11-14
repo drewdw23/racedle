@@ -15,8 +15,6 @@
    - debut ← earliest 1970+ standings appearance.
    - titles ← Wikipedia "List of NASCAR Cup Series champions" (chronological,
      distinct years — the old rows rowspan-duplicate otherwise).
-   - nationality ← default United States + a non-US regulars map (NASCAR is
-     overwhelmingly American; the exceptions are named and verified per run).
 
    Pool = drivers with a full-time season in some year >= YEAR_FROM (1970). */
 
@@ -25,24 +23,6 @@ import { inferStatus } from "../lib/normalize.js";
 import { YEAR_FROM, FULL_SEASON_FRACTION } from "../config.js";
 
 const HISTORY_FROM = YEAR_FROM; // 1970 — the project's roster/stat floor; older seasons are out of scope
-
-/* Non-US full-time Cup regulars (default is United States). Keyed by the
-   driver's Wikipedia article name; verify against the pool on each run. */
-const NATIONALITY = {
-  "Shane van Gisbergen": "New Zealand",
-  "Marcos Ambrose": "Australia",
-  "Daniel Suárez": "Mexico",
-  "Daniel Suarez": "Mexico",
-  "Juan Pablo Montoya": "Colombia",
-  "Jacques Villeneuve": "Canada",
-  "Earl Ross": "Canada",
-  "Trevor Boys": "Canada",
-  "Patrick Carpentier": "Canada",
-  "Ron Fellows": "Canada",
-  "Max Papis": "Italy",
-  "Dario Franchitti": "United Kingdom",
-  "Boris Said": "United States",
-};
 
 const strip = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[.'\-]/g, " ").replace(/\s+/g, " ").trim();
 const cleanName = (s) => s.replace(/\s*\([^)]*\)\s*$/, "").trim();
@@ -226,20 +206,18 @@ export async function collectNascar(currentYear, log) {
   const records = [];
   for (const d of drivers.values()) {
     if (![...d.full].some((y) => y >= YEAR_FROM)) continue; // full-time in some year >= 1970
-    const country = NATIONALITY[d.name] || "United States";
     const debut = Math.min(...d.seasons);
     const lastFull = Math.max(...d.full);
     const team = d.lastTeam ? d.lastTeam.trim() : null;
     records.push({
       name: d.name,
-      country,
       series: "NASCAR Cup",
       team,
       titles: titles.get(strip(d.name)) || 0,
       wins: d.wins,
       status: inferStatus(lastFull, null, currentYear),
       debut,
-      _complete: Boolean(country && team && Number.isFinite(debut)),
+      _complete: Boolean(team && Number.isFinite(debut)),
       _fullSeasons: d.full.size,
       _source: "wikipedia (NASCAR standings+teams)",
     });

@@ -15,7 +15,7 @@ export function emitDataJs(records) {
   const q = (s) => JSON.stringify(s ?? "");
   const lines = records.map((r) => {
     const body =
-      `{ name: ${q(r.name)}, country: ${q(r.country)}, ` +
+      `{ name: ${q(r.name)}, ` +
       `series: SERIES.NASCAR, team: ${q(r.team)}, ` +
       `titles: ${r.titles ?? "null"}, wins: ${r.wins ?? "null"}, ` +
       `status: ${q(r.status)}, debut: ${r.debut ?? "null"} },`;
