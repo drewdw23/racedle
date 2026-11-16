@@ -311,19 +311,17 @@ main {
 .yesterday { text-align: center; color: var(--text-dim); font-size: 0.85rem; margin-top: 26px; }
 
 /* ---------- Ads ---------- */
+/* No visible placeholder: a slot stays hidden until an AdSense unit is placed inside it.
+   Explicit width so a responsive <ins class="adsbygoogle"> measures the full width (body is a
+   flex column, where an auto-margin item would otherwise shrink to 0 around an empty <ins>). */
 .ad-slot {
+  width: 100%;
   max-width: 728px;
   margin: 14px auto;
   min-height: 90px;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-dim);
-  font-size: 0.75rem;
-  letter-spacing: 1px;
+  text-align: center;
 }
+.ad-slot:empty { display: none; }
 
 /* ---------- Modals ---------- */
 .modal {
