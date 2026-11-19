@@ -113,9 +113,10 @@ Setup sequence (accounts can't be created programmatically — owner actions):
 1. ✅ **Custom domain: racedle.net** (bought Nov 2026; racedle.com was already taken). AdSense approval on a bare `*.github.io` subdomain is unreliable; a custom domain also protects the brand and makes the site portable. Served by GitHub Pages via the repo's `CNAME` file + DNS at GoDaddy.
 2. Add the site to **Google Search Console** and submit `sitemap.xml`.
 3. Apply at [adsense.google.com](https://adsense.google.com) with the Google account that should receive payouts. Already in place: original content pages (How to Play, FAQ, About), privacy policy with ad-cookie disclosures, cross-site navigation, robots.txt/sitemap. Approval typically takes days to a few weeks.
-4. On approval, paste the AdSense `<script>` into `index.html` (the tag is already there, commented, with instructions) and replace the two placeholder `.ad-slot` divs with ad units. Recommended: one 728×90/responsive banner below the header, one below the game. **Never** interstitials or ads inside the game board — session length is the asset; don't poison it.
-5. Configure Google's **CMP (consent management)** in AdSense settings for EEA/UK GDPR consent — this is built into AdSense and mandatory for EU traffic.
-6. Payout at $100 threshold via bank transfer.
+4. ✅ Connect the site for review: the AdSense `<script>` (publisher `ca-pub-8833835054453563`) is in the `<head>` of every page, and `ads.txt` at the site root lists the same publisher. Then click Verify and Request review in AdSense.
+5. On approval, put ad units inside the two `.ad-slot` divs in `index.html` (they stay hidden while empty). Recommended: one 728×90/responsive banner below the header, one below the game. **Never** interstitials or ads inside the game board — session length is the asset; don't poison it.
+6. Configure Google's **CMP (consent management)** in AdSense settings for EEA/UK GDPR consent — this is built into AdSense and mandatory for EU traffic.
+7. Payout at $100 threshold via bank transfer.
 
 ### Revenue math (games niche, display RPM ≈ $1–4)
 | Stage | DAU | Pageviews/mo (~2/visit) | Est. revenue/mo |
